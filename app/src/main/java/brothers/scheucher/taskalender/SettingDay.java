@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +33,7 @@ public class SettingDay extends ActionBarActivity {
         setContentView(R.layout.activity_setting_day);
         this.context = this;
         this.day_setting = TimeRank.getDaySettingObject(new GregorianCalendar());
+        Log.d(tag, "onCreate called");
 
         //GETTING VIEWS
         duration_view = ((TextView)findViewById(R.id.setting_day_duration));
@@ -99,15 +101,17 @@ public class SettingDay extends ActionBarActivity {
                 }
             });
 
-            rest_duration = day_setting.addLabelDurationIfNotExist(new Label("REST", 0xFFFFFF));
-
             setting_day_content.addView(rowView);
 
         }
 
+        rest_duration = day_setting.addLabelDurationIfNotExist(new Label("REST", 0xFFFFFF));
+
         setting_day_chart = ((PieChart)findViewById(R.id.setting_day_chart));
 
         settingPieChartBecauseOfData();
+
+        MyCalendarProvider.googleCalendar();
     }
 
     private void settingPieChartBecauseOfData() {
@@ -120,6 +124,9 @@ public class SettingDay extends ActionBarActivity {
             }
         }
         this.sum_distributed_duration.setDuration(sum);
+        if (this.rest_duration == null) {
+            Log.d(tag, "ERRROROROROROR");
+        }
         this.rest_duration.setDuration(day_setting.getTotalDurationInMinutes() - sum);
 
         for (Pair<Label, Duration> label_duration : day_setting.getLabels_durations()) {

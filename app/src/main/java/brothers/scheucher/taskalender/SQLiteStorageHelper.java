@@ -38,7 +38,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + MyEvent.DB_COL_START + " text, "
             + MyEvent.DB_COL_END + " text, "
             + MyEvent.DB_COL_TASK_ID + " int, "
-            + MyEvent.DB_COL_PRIORITY + " text ) ";
+            + MyEvent.DB_COL_PRIORITY + " text, "
+            + MyEvent.DB_COL_AVAILABILITY + " int ) ";
 
     private static final String LABEL_TABLE = "CREATE TABLE IF NOT EXISTS " + Label.DB_TABLE + " ( "
             + Label.DB_COL_ID + " int, "
@@ -156,6 +157,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(MyEvent.DB_COL_START, Util.DateToString(event.getStart()));
         values.put(MyEvent.DB_COL_END, Util.DateToString(event.getEnd()));
         values.put(MyEvent.DB_COL_PRIORITY, event.getPriority());
+        values.put(MyEvent.DB_COL_AVAILABILITY, event.getAvailability());
         if (event.getTask() != null) {
             values.put(MyEvent.DB_COL_TASK_ID, event.getTask().getId());
         } else {
@@ -292,6 +294,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             event.setEnd(Util.StringToDate(cursor.getString(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_END))));
             event.setTask(cursor.getInt(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_TASK_ID)));
             event.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_PRIORITY)));
+            event.setAvailability(cursor.getInt(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_AVAILABILITY)));
             Log.d(tag, "MyEvent read: " + event.description());
             TimeRank.addEventToList(event);
         }

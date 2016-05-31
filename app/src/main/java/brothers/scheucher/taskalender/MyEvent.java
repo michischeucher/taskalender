@@ -12,10 +12,12 @@ public class MyEvent implements Comparable {
     private static final String tag = "MyEvent";
 
     private int id;
+    private long extern_id;
     private String name;
     private String notice;
     private GregorianCalendar start;
     private GregorianCalendar end;
+    private boolean availability;
 
     private Task task;
     private boolean not_created_by_user; //if set, then this will not be saved!
@@ -32,10 +34,12 @@ public class MyEvent implements Comparable {
     public static final String DB_COL_START = "EventStart";
     public static final String DB_COL_END = "EventEnd";
     public static final String DB_COL_TASK_ID = "EventTaskID";
+    public static final String DB_COL_AVAILABILITY = "EventAvailability";
     public static final String DB_COL_PRIORITY = "EventPriority";
 
     public MyEvent() {
         this.id = -1;
+        this.extern_id = -1;
         this.name = "";
         this.notice = "";
         this.start = new GregorianCalendar();
@@ -47,9 +51,11 @@ public class MyEvent implements Comparable {
         this.priority = "C";
         this.task = null;
         this.color = -1;
+        this.availability = false;
     }
     public MyEvent(int id) {
         this.id = id;
+        this.extern_id = -1;
         this.name = "EventName";
         this.notice = "EventNotice";
         this.start = new GregorianCalendar();
@@ -61,9 +67,11 @@ public class MyEvent implements Comparable {
         this.priority = "C";
         this.task = null;
         this.color = -1;
+        this.availability = false;
     }
     public MyEvent(int duration, boolean is_task_event) {
         this.id = -1;
+        this.extern_id = -1;
         this.name = "";
         this.notice = "";
         this.start = new GregorianCalendar();
@@ -75,25 +83,55 @@ public class MyEvent implements Comparable {
         this.not_created_by_user = false;
         this.task = null;
         this.color = -1;
+        this.availability = false;
+        checkBlocking();
+    }
+    public MyEvent(long extern_id) {
+        this.id = -1;
+        this.extern_id = extern_id;
+        this.name = "";
+        this.notice = "";
+        this.start = new GregorianCalendar();
+        this.end = new GregorianCalendar();
+        this.priority = "C";
+        this.not_created_by_user = true;
+        this.task = null;
+        this.color = -1;
+        this.availability = false;
     }
 
 
     public void setStart(int year, int month, int day) {
         Util.setDate(this.start, year, month, day);
+
+        checkBlocking();
+
     }
     public void setEnd(int year, int month, int day) {
         Util.setDate(this.end, year, month, day);
+
+        checkBlocking();
+
     }
 
     public void setStart(int hourOfDay, int minute) {
         Util.setTime(this.start, hourOfDay, minute);
+
+        checkBlocking();
     }
 
     public void setEnd(int hourOfDay, int minute) {
         Util.setTime(this.end, hourOfDay, minute);
+        checkBlocking();
     }
 
 
+    public void checkBlocking() {
+        //FIXME: Ganztägige Termine sollten nicht blockierend sein!
+        if (Util.getMinutesBetweenDates(this.start, this.end) >= 24 * 60) {
+            this.availability = true;
+        }
+    }
 
     public String getName() {
         return name;
@@ -249,7 +287,7 @@ public class MyEvent implements Comparable {
     }
 
     public boolean isBlocking() {
-        return true;
+        return !availability;
     }
 
     public void setEndWithDuration(int duration) {
@@ -280,5 +318,25 @@ public class MyEvent implements Comparable {
 
     public TimeObj getTimeObj() {
         return new TimeObj(this.start, this.end);
+    }
+
+    public boolean getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(int availability) {
+        if (availability > 0) {
+            this.availability = true;
+        } else {
+            this.availability = false;
+        }
+    }
+
+    public long getExternID() {
+        return extern_id;
+    }
+
+    public void setExternID(long id) {
+        this.extern_id = id;
     }
 }

@@ -79,7 +79,14 @@ public class Day {
 
     public void addEvent(MyEvent event_to_add) {
         if (!this.events.contains(event_to_add)) {
+            for (MyEvent e : this.events) {
+                if (e.getExternID() != -1 && e.getExternID() == event_to_add.getExternID()) {
+                    Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
+                    return;
+                }
+            }
             this.events.add(event_to_add);
+
             if (event_to_add.isBlocking()) {
                 this.scheduler.addBlockingTime(event_to_add.getStart(), event_to_add.getEnd());
             }
@@ -184,6 +191,7 @@ public class Day {
 
         for (MyEvent e : this.events) {
             if (e.getDurationInMinutes() >= 60 * 24) {
+                Log.d(tag, "Event is over the whole day: " + e.description());
                 continue;
             }
             if (block == null || Util.calculateOverlappingTime(block.getTimeObj(), e.getTimeObj()) == null) { //no overlapping => new block
@@ -270,7 +278,7 @@ public class Day {
 
         //draw events that are longer than a day...
         for (MyEvent e : this.events) {
-            if (e.getDurationInMinutes() > 60 * 24) {
+            if (e.getDurationInMinutes() >= 60 * 24) {
                 Log.d(tag, "FOUND a event, that is longer than a day...: " + e.description());
                 top_container_events.setVisibility(View.VISIBLE);
 
@@ -290,6 +298,12 @@ public class Day {
                 }
                 top_container_events.addView(event);
             }
+        }
+    }
+
+    public void addAllEvents(ArrayList<MyEvent> events) {
+        for (MyEvent e : events) {
+            addEvent(e);
         }
     }
 

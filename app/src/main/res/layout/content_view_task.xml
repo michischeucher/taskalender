@@ -35,6 +35,8 @@
                 android:paddingRight="@dimen/activity_margin"
                 android:paddingBottom="30sp"
                 android:background="#00FF00"
+                android:singleLine="true"
+
                 />
             <Button
                 android:id="@+id/edit_button"

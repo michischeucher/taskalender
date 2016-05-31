@@ -45,6 +45,7 @@ public class TimeRank {
         SQLiteStorageHelper.getInstance(context, 1).addAllTasksFromDatabase();
         SQLiteStorageHelper.getInstance(context, 1).addAllEventsFromDatabase();
         SQLiteStorageHelper.getInstance(context, 1).addAllLabelsFromDatabase();
+
         TimeRank.calculateDays();
     }
 
@@ -417,6 +418,11 @@ public class TimeRank {
                 new_day.addEvent(e);
             }
         }
+
+        ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(new_day.getStart().getTimeInMillis(), new_day.getEnd().getTimeInMillis());
+        new_day.addAllEvents(events_from_other_calendars);
+        events.addAll(events_from_other_calendars);
+
         days.add(new_day);
         return new_day;
     }

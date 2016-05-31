@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <include layout="@layout/day_view"/>
+
+    </ScrollView>
+
+    <include layout="@layout/top_container"/>
+
+    <include
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/info_container"/>
+
+    <Button
+        android:id="@+id/calender_day_new_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="+"
+        android:textColor="#FFFFFF"
+        android:textSize="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/rounded_button"
+        android:onClick="handleClickOnNewButton"
+        />
+    
+    <LinearLayout
+        android:id="@+id/calender_day_new_button_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@+id/calender_day_new_button"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"
+        >
+        <Button
+            android:id="@+id/calender_day_new_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aufgabe hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+        <Button
+            android:id="@+id/calender_day_new_event"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Termin hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+        <Button
+            android:id="@+id/calender_day_new_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Label hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

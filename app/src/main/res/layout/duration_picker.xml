@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".DurationPicker"
+    android:padding="@dimen/activity_margin"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/hour_rotateable"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@android:drawable/ic_menu_rotate"
+            />
+
+        <View
+            android:id="@+id/hour_rotateable_overlay"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="#00FF0000"
+            />
+
+        <TextView
+            android:id="@+id/hour"
+            android:layout_toRightOf="@id/hour_rotateable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="2 Stunden"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/minute_rotateable"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@android:drawable/ic_menu_rotate"
+            />
+
+        <View
+            android:id="@+id/minute_rotateable_overlay"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="#00FF0000"
+            />
+
+        <TextView
+            android:id="@+id/minute"
+            android:layout_toRightOf="@id/minute_rotateable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="30 Minuten"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        >
+        <Button
+            android:id="@+id/negative_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Abbrechen"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textAllCaps="true"
+            style="?android:actionButtonStyle"
+            />
+        <Button
+            android:id="@+id/positive_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textAllCaps="true"
+            style="?android:actionButtonStyle"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

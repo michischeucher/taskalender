@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginLeft="@dimen/activity_margin"
+    android:layout_marginRight="@dimen/activity_margin"
+    android:layout_marginBottom="12dp"
+    >
+    <View
+        android:id="@+id/task_line"
+        android:layout_width="wrap_content"
+        android:layout_height="8px"
+        android:background="#FFFF0000"
+        >
+    </View>
+    <TextView
+        android:id="@+id/task_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/touch_size"
+        android:background="#50FF0000"
+        android:text="Aufgabe1"
+        android:textSize="@dimen/text_size_list"
+        android:textColor="#000000"
+        />
+
+</LinearLayout>

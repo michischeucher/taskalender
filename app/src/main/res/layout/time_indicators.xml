@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+
+    <!-- asdf -->
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+
+    <!-- lkj -->
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+    <View style="@style/HourIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+    <View style="@style/HourHalfIndicator" />
+    <View style="@style/HourHalfIndicatorPause" />
+
+</LinearLayout>

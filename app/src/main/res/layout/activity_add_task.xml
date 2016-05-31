@@ -1,0 +1,165 @@
+<RelativeLayout
+    android:id="@+id/add_task"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="brothers.scheucher.taskalender.AddTask"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_margin"
+        >
+
+
+            <EditText
+                android:id="@+id/add_task_title"
+                android:hint="@string/title"
+                style="@style/TitleText"
+                />
+
+            <EditText
+                android:id="@+id/add_task_notice"
+                style="@style/NormalText"
+                android:hint="Notiz hinzufügen"
+                android:autoLink="all"
+                />
+
+            <View style="@style/SeperationLine" />
+
+            <TextView
+                android:text="@string/task_duration_description"
+                style="@style/DescriptionText"
+                />
+            <TextView
+                android:id="@+id/add_task_duration"
+                android:text="1 Std. 32 Min."
+                style="@style/NormalText"
+                />
+
+            <TextView
+                android:text="@string/earliest_start"
+                style="@style/DescriptionText"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                >
+                <TextView
+                    android:id="@+id/add_task_earliest_start_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ab sofort"
+                    android:textSize="@dimen/abc_text_size_medium_material"
+                    android:textColor="@color/text_normal"
+                    android:background="@null"
+                    />
+                <TextView
+                    android:id="@+id/add_task_earliest_start_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textSize="@dimen/abc_text_size_medium_material"
+                    android:textColor="@color/text_normal"
+                    android:hint="09:00"
+                    android:background="@null"
+                    android:visibility="invisible"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:text="@string/deadline_description"
+                android:layout_weight="1"
+                style="@style/DescriptionText"
+                />
+            <LinearLayout
+                android:id="@+id/add_task_deadline_container"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <TextView
+                    android:id="@+id/add_task_deadline_date"
+                    style="@style/NormalText"
+                    android:layout_weight="1"
+                    android:text="Deadline date"
+                    />
+
+                <TextView
+                    android:id="@+id/add_task_deadline_time"
+                    style="@style/NormalText"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:hint="23:59"
+                    />
+            </LinearLayout>
+
+            <View style="@style/SeperationLine" />
+
+            <TextView
+                android:text="@string/repeat_description"
+                style="@style/DescriptionText"
+                />
+            <TextView
+                android:id="@+id/add_task_repeat"
+                style="@style/NormalText"
+                android:text="Keine Wiederholung"
+                />
+
+            <View style="@style/SeperationLine"/>
+
+            <TextView
+                android:text="@string/label_description"
+                style="@style/DescriptionText"
+                />
+            <LinearLayout
+                android:id="@+id/add_task_label_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                >
+
+                <TextView
+                    android:id="@+id/add_task_label"
+                    android:layout_weight="1"
+                    android:text="@string/choose_label_text"
+                    style="@style/NormalText"
+                    />
+
+                <TextView
+                    android:id="@+id/add_task_label_color"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@null"
+                    android:layout_weight="1"
+                    />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_size"/>
+            <Button
+                android:id="@+id/add_task_delete_button"
+                android:text="@string/delete_task_description"
+                style="@style/DeleteButton"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

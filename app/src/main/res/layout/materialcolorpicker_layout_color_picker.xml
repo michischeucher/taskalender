@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".ColorPickerDialog">
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:id="@+id/colorView"
+        android:elevation="2dp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/materialcolorpicker__activity_horizontal_margin"
+        android:paddingRight="@dimen/materialcolorpicker__activity_horizontal_margin"
+        android:paddingTop="@dimen/materialcolorpicker__activity_vertical_margin"
+        android:paddingBottom="@dimen/materialcolorpicker__activity_vertical_margin"
+        android:clickable="false"
+        android:focusable="false"
+        >
+        <TextView
+            android:id="@+id/redToolTip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_red_light"
+            android:singleLine="true" />
+        <SeekBar
+            android:id="@+id/redSeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:maxHeight="3dip"
+            android:minHeight="3dip"
+            android:progressDrawable="@drawable/red_progress"
+            android:thumbTint="@android:color/holo_red_light"/>
+
+        <TextView
+            android:id="@+id/greenToolTip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_green_light"
+            android:singleLine="true" />
+        <SeekBar
+            android:id="@+id/greenSeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:maxHeight="3dip"
+            android:minHeight="3dip"
+            android:progressDrawable="@drawable/materialcolorpicker__green_progress"
+            android:thumbTint="@android:color/holo_green_light" />
+
+        <TextView
+            android:id="@+id/blueToolTip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_blue_light"
+            android:singleLine="true" />
+        <SeekBar
+            android:id="@+id/blueSeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:maxHeight="3dip"
+            android:minHeight="3dip"
+            android:progressDrawable="@drawable/materialcolorpicker__blue_progress"
+            android:thumbTint="@android:color/holo_blue_light"/>
+
+        <Button
+            android:id="@+id/okColorButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok"
+            android:layout_gravity="right"
+            android:clickable="true"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

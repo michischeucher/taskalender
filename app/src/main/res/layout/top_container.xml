@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/top_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:orientation="horizontal"
+    android:paddingBottom="5dp"
+    >
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="70dp"
+        android:paddingTop="10dp"
+        android:background="#E0FFFFFF"
+        >
+        <TextView
+            android:id="@+id/calender_day_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/abc_text_size_headline_material"
+            android:text="1"
+            />
+        <TextView
+            android:id="@+id/calender_day_of_week"
+            android:layout_below="@+id/calender_day_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Sa"
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:paddingBottom="10px"
+
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/top_container_events"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:background="#E0FFFFFF"
+        android:visibility="gone"
+        >
+
+        <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingTop="10dp"
+                android:paddingBottom="0dp"
+                android:text="Geburtstag von Heidemarie"
+                />
+        </LinearLayout>
+        -->
+    </LinearLayout>
+
+</LinearLayout>

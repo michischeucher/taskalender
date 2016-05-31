@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/activity_margin"
+    android:layout_marginRight="@dimen/activity_margin">
+
+    <TextView
+        android:id="@+id/description_of_item"
+        android:text="Verbleibende Dauer: "
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_small_material"
+        android:paddingTop="@dimen/description_distance_top"
+        android:paddingBottom="@dimen/description_distance_bottom"
+        />
+    <EditText
+        android:id="@+id/text_of_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1 Std. 32 Min."
+        android:textSize="@dimen/abc_text_size_medium_material"
+        android:textColor="@color/text_normal"
+        android:background="@null"
+        android:layout_below="@id/description_of_item"
+        android:editable="false"
+        />
+
+</RelativeLayout>

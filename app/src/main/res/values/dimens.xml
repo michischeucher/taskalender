@@ -1,0 +1,17 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="text_size_list">24dp</dimen>
+    <dimen name="touch_size">72dp</dimen>
+    <dimen name="materialcolorpicker__activity_horizontal_margin">16dp</dimen>
+    <dimen name="materialcolorpicker__activity_vertical_margin">16dp</dimen>
+    <dimen name="description_distance_top">20dip</dimen>
+    <dimen name="description_distance_bottom">10dip</dimen>
+    <dimen name="distance_to_line">18dp</dimen>
+    <dimen name="text_distance_bottom">15dip</dimen>
+    <dimen name="text_distance_top">15dip</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>

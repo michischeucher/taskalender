@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Taskalender</string>
+
+    <string name="hello_world">Hello Welt!</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="dummy_section_text">TEXT unnötig</string>
+    <string name="title_activity_asdf">asdf</string>
+    <string name="title_activity_add_task">Aufgabe</string>
+    <string name="title_activity_add_event">Termin</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_add_task">Aufgabe hinzufügen</string>
+    <string name="action_add_event">Termin hinzufügen</string>
+    <string name="id">Identification</string>
+    <string name="action_reset_database">Datenbank zurücksetzen</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="day_ansicht">Tagesansicht</string>
+    <string name="label_ansicht">Labels</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Abbrechen</string>
+	<string name="materialcolorpicker__btnSelectColor">Auswählen</string>
+    <string name="materialcolorpicker__descLib">Material Color Picker Dialog</string>
+    <string name="materialcolorpicker__errHex" >Hex Code Format nicht korrekt</string>
+    <string name="materialcolorpicker__inputColor">Farbe: </string>
+    <string name="title_activity_add_label">Label</string>
+    <string name="choose_label_text">Label auswählen</string>
+    <string name="title">Titel</string>
+    <string name="title_activity_setting_day">Tages-Einstellungen</string>
+    <string name="title_activity_view_task">ViewTask</string>
+    <string name="task_duration_description">Verbleibende Dauer:</string>
+    <string name="earliest_start">Frühestmöglicher Start:</string>
+    <string name="deadline_description">Deadline:</string>
+    <string name="repeat_description">Wiederholung:</string>
+    <string name="label_description">Label:</string>
+    <string name="delete_task_description">Aufgabe löschen</string>
+    <string name="pencil">~</string>
+    <string name="choose_color">Farbe auswählen:</string>
+    <string name="label_strucutre_text">Label einordnen unter:</string>
+    <string name="no_color_selected">Keine Farbe ausgewählt</string>
+    <string name="task_event">TaskEvent</string>
+    <string name="title_activity_view_event">ViewEvent</string>
+
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="brothers.scheucher.taskalender.AddTask"
+    >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    >
+    <LinearLayout
+        android:id="@+id/setting_day_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/touch_size"
+        android:layout_margin="@dimen/activity_margin"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <brothers.scheucher.taskalender.PieChart
+                android:id="@+id/setting_day_chart"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_centerHorizontal="true"
+                >
+            </brothers.scheucher.taskalender.PieChart>
+        </RelativeLayout>
+
+        <TextView
+            android:text="Gesamtzeit pro Tag: "
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:paddingTop="@dimen/description_distance_top"
+            android:paddingBottom="@dimen/description_distance_bottom"
+            />
+        <TextView
+            android:id="@+id/setting_day_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="6 Std. 30 Min."
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:textColor="@color/text_normal"
+            android:background="@null"
+            />
+
+    </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

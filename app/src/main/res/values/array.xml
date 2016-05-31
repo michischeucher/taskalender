@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="drawer_list_strings">
+        <item>Tag</item>
+        <item>Labels</item>
+        <item>Keine Ahnung</item>
+    </array>
+</resources>

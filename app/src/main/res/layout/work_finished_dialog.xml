@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/work_finished_dialog"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".WorkFinishedDialog"
+    >
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    >
+
+    <TextView
+        android:id="@+id/date_description"
+        android:text="Datum: "
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_small_material"
+        android:paddingTop="@dimen/description_distance_top"
+        android:paddingBottom="@dimen/description_distance_bottom"
+        />
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Do, 13.04.2015"
+        android:textSize="@dimen/abc_text_size_medium_material"
+        android:textColor="@color/text_normal"
+        android:background="@null"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/start_time_description"
+                android:text="Start: "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_small_material"
+                android:paddingTop="@dimen/description_distance_top"
+                android:paddingBottom="@dimen/description_distance_bottom"
+                />
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="14 Uhr"
+                android:textSize="@dimen/abc_text_size_medium_material"
+                android:textColor="@color/text_normal"
+                android:background="@null"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/end_time_description"
+                android:text="Ende: "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_small_material"
+                android:paddingTop="@dimen/description_distance_top"
+                android:paddingBottom="@dimen/description_distance_bottom"
+                />
+            <TextView
+                android:id="@+id/end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="15:30 Uhr"
+                android:textSize="@dimen/abc_text_size_medium_material"
+                android:textColor="@color/text_normal"
+                android:background="@null"
+                />
+            </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/duration_description"
+        android:text="Gearbeitete Dauer: "
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_small_material"
+        android:paddingTop="@dimen/description_distance_top"
+        android:paddingBottom="@dimen/description_distance_bottom"
+        />
+    <TextView
+        android:id="@+id/duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="1 Std. 32 Min."
+        android:textSize="@dimen/abc_text_size_medium_material"
+        android:textColor="@color/text_normal"
+        android:background="@null"
+        android:paddingBottom="@dimen/distance_to_line"
+        />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:background="@android:color/darker_gray"
+        />
+
+    <TextView
+        android:id="@+id/remaining_duration_description"
+        android:text="@string/task_duration_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_small_material"
+        android:paddingTop="@dimen/description_distance_top"
+        android:paddingBottom="@dimen/description_distance_bottom"
+        />
+    <TextView
+        android:id="@+id/remaining_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="1 Std. 32 Min."
+        android:textSize="@dimen/abc_text_size_medium_material"
+        android:textColor="@color/text_normal"
+        android:background="@null"
+        android:paddingBottom="@dimen/distance_to_line"
+        />
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        >
+        <Button
+            android:id="@+id/negative_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Abbrechen"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textAllCaps="true"
+            style="?android:actionButtonStyle"
+            />
+        <Button
+            android:id="@+id/positive_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textAllCaps="true"
+            style="?android:actionButtonStyle"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>
+</RelativeLayout>

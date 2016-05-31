@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/label_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingLeft="@dimen/activity_margin"
+    android:paddingRight="@dimen/activity_margin"
+    >
+
+    <TextView
+        android:id="@+id/label_name"
+        android:text="Termin1"
+        android:textSize="@dimen/text_size_list"
+        android:layout_height="@dimen/touch_size"
+        android:layout_width="wrap_content"
+        android:lines="1"
+        android:singleLine="true"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        />
+    <View
+        android:id="@+id/label_color"
+        android:layout_width="50dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:layout_height="50dp"
+        android:background="#d3d3d3"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        ></View>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:background="@android:color/darker_gray"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        />
+
+
+</RelativeLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/event"
+    android:layout_height="0dp"
+    android:layout_weight="30"
+    android:layout_width="match_parent"
+    android:background="#FFFF0000"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:onClick="handleClickOnEvent"
+    >
+    <TextView
+        android:id="@+id/event_name"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:layout_marginRight="5dp"
+        android:text="Leerer Termin"
+        android:textSize="11dp"
+        />
+</LinearLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/view_task"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:fitsSystemWindows="true"
+    tools:context="brothers.scheucher.taskalender.ViewTask">
+
+    <include layout="@layout/content_view_task" />
+
+    <!--<android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_input_add" />
+    -->
+
+    <Button
+        android:id="@+id/new_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="✓"
+        android:textColor="#FFFFFF"
+        android:textSize="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/rounded_button"
+        android:onClick="handleClickOnNewButton"
+        />
+    <LinearLayout
+        android:id="@+id/button_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/new_button"
+        android:visibility="gone"
+        >
+        <Button
+            android:id="@+id/all_finished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gesamte Aufgabe erledigt ✓"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+        <Button
+            android:id="@+id/part_finished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Arbeitseinheit eintragen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

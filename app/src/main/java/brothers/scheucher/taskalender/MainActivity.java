@@ -117,6 +117,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "handleClickOnEvent id = " + id + " task_event = " + task_event);
 
         Intent intent;
+        Bundle b = new Bundle();
         if (task_event) {
             intent = new Intent(this, ViewTask.class);
         } else {
@@ -124,7 +125,6 @@ public class MainActivity extends ActionBarActivity {
         }
         //fa = super.getActivity();
         //Intent intent = fa.getIntent();
-        Bundle b = new Bundle();
         b.putInt("id", id); //Your id
         intent.putExtras(b); //Put your id to your next Intent
         startActivity(intent);

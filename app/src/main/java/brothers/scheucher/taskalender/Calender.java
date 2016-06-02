@@ -277,7 +277,7 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             }
             Log.d(tag, "### START DRAWING EVENTS... for " + Util.getFormattedDate(date) + " #events today = " + day.getEvents().size());
 
-//            potential_text_view.setText(day.getPotential());
+            potential_text_view.setText(day.getPotential());
 //            day.sortEvents();
             day.calculateBlocksAndColoumns();
             day.drawEvents(calender_day_events_tasks, inflater);

@@ -250,7 +250,7 @@ public class AddTask extends ActionBarActivity {
 
             task.save(this);
             TimeRank.addTaskToList(task);
-//            TimeRank.calculateDays();
+            TimeRank.calculateDays();
             finish();
             return true;
         }

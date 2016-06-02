@@ -156,6 +156,7 @@ public class AddEvent extends ActionBarActivity {
             event.save(this);
             TimeRank.addEventToList(event);
             TimeRank.calculateDays();
+            ViewEvent.notifyChanges();
             Calender.notifyChanges();
             finish();
             return true;

@@ -20,6 +20,9 @@ public class ViewEvent extends ActionBarActivity {
     private Context context;
     private Activity activity;
     private RelativeLayout view_event;
+    private LayoutInflater inflater;
+    private LinearLayout view_event_fields_container;
+    private TextView event_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +42,10 @@ public class ViewEvent extends ActionBarActivity {
         }
 
         view_event = ((RelativeLayout)findViewById(R.id.view_event));
-
-        final TextView event_name = ((TextView)view_event.findViewById(R.id.title));
-        event_name.setText(event.getName());
-        event_name.setBackgroundColor(0xFF000000 | event.getColor());
-        if (Util.isDarkColor(event.getColor())) {
-            event_name.setTextColor(0xFFFFFFFF);
-        }
+        event_name = ((TextView)view_event.findViewById(R.id.title));
+        inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view_event_fields_container = (LinearLayout)view_event.findViewById(R.id.view_event_fields_container);
 
         Button edit_button = ((Button)view_event.findViewById(R.id.edit_button));
         edit_button.setOnClickListener(new View.OnClickListener() {
@@ -60,9 +60,16 @@ public class ViewEvent extends ActionBarActivity {
             }
         });
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout view_event_fields_container = (LinearLayout)view_event.findViewById(R.id.view_event_fields_container);
+        fillFieldsBecauseOfData();
+    }
+
+    private void fillFieldsBecauseOfData() {
+        event_name.setText(event.getName());
+        event_name.setBackgroundColor(0xFF000000 | event.getColor());
+        if (Util.isDarkColor(event.getColor())) {
+            event_name.setTextColor(0xFFFFFFFF);
+        }
+
         if (!event.getNotice().equals("")) {
             View row = inflater.inflate(R.layout.text_item_with_description, view_event_fields_container, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Notiz: ");
@@ -89,4 +96,8 @@ public class ViewEvent extends ActionBarActivity {
 
     }
 
+    public static void notifyChanges() {
+        Log.d(tag, "notifyChanges");
+        //fillFieldsBecauseOfData();
+    }
 }

@@ -108,6 +108,10 @@ public class TaskBlock implements Comparable {
         Log.d(tag, "##TASK BLOCK: " + this.description());
         for (GregorianCalendar current_date : Util.getListOfDates(this.start, this.end)) {
             Day day = TimeRank.getDay(current_date);
+            if (day == null) {
+                day = TimeRank.createDay(current_date);
+                TimeRank.addDayToList(day);
+            }
             Log.d(tag, "#addTasksToDay: " + day.description());
             for (int i = tasks.size() - 1; i >= 0; i--) {
                 day.addTask(tasks.get(i));

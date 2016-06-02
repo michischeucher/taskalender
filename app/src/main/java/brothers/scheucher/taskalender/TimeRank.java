@@ -29,7 +29,6 @@ public class TimeRank {
 
     public static void startApplication(Context context) {
         TimeRank.context = context;
-
         if (events != null) {
             return;
         }
@@ -50,16 +49,7 @@ public class TimeRank {
     }
 
     public static void calculateDays() {
-        ///TODO: calculating days (action fired when clicked on settings... ;)
-        //creating all days where there is a event
-        days.clear();
-        for (MyEvent event : events) {
-            for (GregorianCalendar date : event.getDates()) {
-                if (TimeRank.getDay(date) == null) {
-                    TimeRank.createDay(date);
-                }
-            }
-        }
+        Log.d(tag, "# START calculateDays()");
 
         //START from last deadline... calculating blocks
         if (tasks.size() <= 0) {
@@ -69,10 +59,19 @@ public class TimeRank {
             t.resetJustForCalculations();
         }
 
+        //creating all days where there is a event
+        days.clear();
+        /*for (MyEvent event : events) {
+            for (GregorianCalendar date : event.getDates()) {
+                if (TimeRank.getDay(date) == null) {
+                    TimeRank.createDay(date);
+                }
+            }
+        }*/
 
         Log.d(tag, "##### START CALCULATING BLOCKS #####");
         Collections.sort(tasks, Collections.reverseOrder());
-        TimeRank.printAllTasks();
+        //TimeRank.printAllTasks();
 
         task_blocks.clear();
 
@@ -116,17 +115,16 @@ public class TimeRank {
 
         Log.d(tag, "##### END CALCULATING BLOCKS #####");
 
-        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
+/*        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
         for (TaskBlock tb : task_blocks) {
             Log.d(tag, "start: " + Util.getFormattedDateTime(tb.getStart()) + " end: " + Util.getFormattedDateTime(tb.getEnd()));
             Log.d(tag, "   potential: " + tb.getPotential() + " overlapping_time = " + tb.getOverlapping_time() +  " #tasks: " + tb.getTasks().size() + " tasks(remaining_durations) = " + tb.getRemainingDurationOfTasks());
         }
         Log.d(tag, "--- end printing TaskBlocks ---");
-
+*/
         //CALCULATING DAYS with TASKS...
         Log.d(tag, "##### START CALCULATING DAYS with TASKS #####");
         GregorianCalendar now = new GregorianCalendar();
-        Day current_day = TimeRank.getDay(now);
         for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
             TaskBlock tb = task_blocks.get(i);
             tb.calculateTaskFillingFactors();
@@ -196,12 +194,14 @@ public class TimeRank {
     }
 
     public static int getNewEventID() {
-        if (last_event_id == -1) {
-            for (MyEvent event : events) {
-                if (event.getId() > last_event_id) {
-                    last_event_id = event.getId();
+            if (last_event_id == -1) {
+                synchronized(context) {
+                    for (MyEvent event : events) {
+                        if (event.getId() > last_event_id) {
+                            last_event_id = event.getId();
+                        }
+                    }
                 }
-            }
         }
         last_event_id += 1;
         return last_event_id;
@@ -236,15 +236,19 @@ public class TimeRank {
 
 
     public static void addEventToList(MyEvent new_event) {
-        if (!events.contains(new_event)) {
-            events.add(new_event);
-        } else {
-            Log.d(tag, "new_event already in list: " + new_event.description());
+        synchronized(context) {
+            if (!events.contains(new_event)) {
+                events.add(new_event);
+            } else {
+                Log.d(tag, "new_event already in list: " + new_event.description());
+            }
         }
     }
     public static void deleteEventFromList(MyEvent event) {
-        if (events.contains(event)) {
-            events.remove(event);
+        synchronized(context) {
+            if (events.contains(event)) {
+                events.remove(event);
+            }
         }
     }
 
@@ -413,15 +417,19 @@ public class TimeRank {
 
     public static Day createDay(GregorianCalendar date) {
         Day new_day = new Day(date);
-        for (MyEvent e : TimeRank.getEvents()) {
-            if (e.isRelevantFotThatDay(date)) {
-                new_day.addEvent(e);
+        synchronized(context) {
+            for (MyEvent e : TimeRank.getEvents()) {
+                if (e.isRelevantFotThatDay(date)) {
+                    new_day.addEvent(e);
+                }
             }
         }
 
         ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(new_day.getStart().getTimeInMillis(), new_day.getEnd().getTimeInMillis());
         new_day.addAllEvents(events_from_other_calendars);
-        events.addAll(events_from_other_calendars);
+        synchronized(context) {
+            events.addAll(events_from_other_calendars);
+        }
 
         days.add(new_day);
         return new_day;

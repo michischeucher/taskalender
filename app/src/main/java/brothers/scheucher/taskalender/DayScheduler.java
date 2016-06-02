@@ -22,6 +22,7 @@ public class DayScheduler {
     }
 
     public void addBlockingTime(GregorianCalendar start, GregorianCalendar end) {
+        Log.d(tag, "addBlockingTime: " + Util.getFormattedDateTimeToDateTime(start, end));
         TimeObj blocking_time = new TimeObj(start, end);
         for (ListIterator<TimeObj> it = this.free_slots.listIterator(); it.hasNext();) {
             TimeObj slot = it.next();
@@ -32,14 +33,18 @@ public class DayScheduler {
                     it.remove();
                 } else if (overlapping_time.sameStart(slot)) {
                     slot.start = overlapping_time.end;
+                    Log.d(tag, "same start, new start: " + Util.getFormattedDateTime(slot.start));
                 } else if (overlapping_time.sameEnd(slot)) {
                     slot.end = overlapping_time.start;
+                    Log.d(tag, "same end, new end: " + Util.getFormattedDateTime(slot.end));
                 } else { //nothing is equal => overlapping is in the middle
                     TimeObj new_slot = new TimeObj(start);
                     new_slot.start = (GregorianCalendar) overlapping_time.end.clone();
                     new_slot.end = (GregorianCalendar) slot.end.clone();
                     slot.end = overlapping_time.start;
                     it.add(new_slot);
+                    Log.d(tag, "overlapping in the middle, new slot: " + Util.getFormattedDateTimeToTime(new_slot.start, new_slot.end));
+
                 }
             }
         }

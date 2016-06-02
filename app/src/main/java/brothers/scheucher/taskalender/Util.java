@@ -264,12 +264,12 @@ public class Util {
         int g = 0x00FF00 & color;
         g = g >> 8;
         int b = 0x0000FF & color;
-        Log.d(tag, "color = " + color + " is r = " + r + " g = " + g + " b = " + b);
+//        Log.d(tag, "color = " + color + " is r = " + r + " g = " + g + " b = " + b);
         if ((r + g + b) < 430) {
-            Log.d(tag, "is dark");
+//            Log.d(tag, "is dark");
             return true;
         } else {
-            Log.d(tag, "is not dark");
+//            Log.d(tag, "is not dark");
             return false;
         }
     }

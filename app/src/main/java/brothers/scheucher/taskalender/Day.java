@@ -24,6 +24,7 @@ public class Day {
     private ArrayList<MyEvent> events;
     private DayScheduler scheduler;
     private ArrayList<Block> event_blocks;
+    private ArrayList<MyEvent> events_whole_day;
 
     public Day() {
         this.start = new GregorianCalendar();
@@ -33,6 +34,7 @@ public class Day {
         this.events = new ArrayList<MyEvent>();
         this.scheduler = new DayScheduler(start);
         this.event_blocks = new ArrayList<>();
+        this.events_whole_day = new ArrayList<>();
     }
 
     public Day(GregorianCalendar date) {
@@ -49,7 +51,8 @@ public class Day {
             Util.setTime(today_start, 0, 0);
             scheduler.addBlockingTime(today_start, now);
         }
-        event_blocks = new ArrayList<>();
+        this.event_blocks = new ArrayList<>();
+        this.events_whole_day = new ArrayList<>();
     }
 
 
@@ -81,7 +84,7 @@ public class Day {
         if (!this.events.contains(event_to_add)) {
             for (MyEvent e : this.events) {
                 if (e.getExternID() != -1 && e.getExternID() == event_to_add.getExternID()) {
-                    Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
+//                    Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
                     return;
                 }
             }
@@ -90,9 +93,17 @@ public class Day {
             if (event_to_add.isBlocking()) {
                 this.scheduler.addBlockingTime(event_to_add.getStart(), event_to_add.getEnd());
             }
-            Log.d(tag, "addEvent: Event hinzugefügt... " + event_to_add.description());
+//            Log.d(tag, "addEvent: Event hinzugefügt... " + event_to_add.description());
         } else {
-            Log.d(tag, "addEvent: already exists..." + event_to_add.description());
+//            Log.d(tag, "addEvent: already exists..." + event_to_add.description());
+        }
+    }
+
+    private void addEventWithoutChecking(MyEvent new_event) {
+        events.add(new_event);
+        Log.d(tag, "addEventWithoutChecking: " + new_event.description());
+        if (new_event.isBlocking()) {
+            scheduler.addBlockingTime(new_event.getStart(), new_event.getEnd());
         }
     }
 
@@ -150,12 +161,14 @@ public class Day {
             work_time_for_that_task -= effective_time;
 
             Log.d(tag, "   going to addEvent " + new_event.description());
-            addEvent(new_event);
+            addEventWithoutChecking(new_event);
         }
 
 
         sortEvents();
     }
+
+
 
     public String getPotential() {
         if (Util.earlierDate(this.end, new GregorianCalendar())) {
@@ -186,12 +199,14 @@ public class Day {
     public void calculateBlocksAndColoumns() {
         sortEvents();
         event_blocks.clear();
+        events_whole_day.clear();
 
         Block block = null;
 
         for (MyEvent e : this.events) {
             if (e.getDurationInMinutes() >= 60 * 24) {
-                Log.d(tag, "Event is over the whole day: " + e.description());
+//                Log.d(tag, "Event is over the whole day: " + e.description());
+                events_whole_day.add(e);
                 continue;
             }
             if (block == null || Util.calculateOverlappingTime(block.getTimeObj(), e.getTimeObj()) == null) { //no overlapping => new block
@@ -215,6 +230,8 @@ public class Day {
     }
 
     public void drawEvents(LinearLayout calender_day_events_tasks, LayoutInflater inflater) {
+        calender_day_events_tasks.removeAllViewsInLayout();
+
         LinearLayout event_block;
         LinearLayout event_coloumn;
         LinearLayout event;
@@ -274,30 +291,29 @@ public class Day {
     }
 
     public void drawWholeDayEvents(LinearLayout top_container_events, LayoutInflater inflater) {
+        top_container_events.removeAllViewsInLayout();
+
         LinearLayout event;
 
         //draw events that are longer than a day...
-        for (MyEvent e : this.events) {
-            if (e.getDurationInMinutes() >= 60 * 24) {
-                Log.d(tag, "FOUND a event, that is longer than a day...: " + e.description());
-                top_container_events.setVisibility(View.VISIBLE);
+        for (MyEvent e : this.events_whole_day) {
+            top_container_events.setVisibility(View.VISIBLE);
 
-                event = (LinearLayout) inflater.inflate(R.layout.event_top_container, top_container_events, false);
-                ((TextView) event.findViewById(R.id.event_name)).setText(e.getName());
-                event.setBackgroundColor(e.getColor() | 0xFF000000);
-                if (Util.isDarkColor(e.getColor())) {
-                    ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
-                }
-                if (e.getTask() != null) {
-                    event.setTag(R.string.task_event, true);
-                    event.setTag(R.string.id, e.getTask().getId());
-                    event.setBackgroundColor(0xA0000000 | e.getColor());
-                } else {
-                    event.setTag(R.string.task_event, false);
-                    event.setTag(R.string.id, e.getId());
-                }
-                top_container_events.addView(event);
+            event = (LinearLayout) inflater.inflate(R.layout.event_top_container, top_container_events, false);
+            ((TextView) event.findViewById(R.id.event_name)).setText(e.getName());
+            event.setBackgroundColor(e.getColor() | 0xFF000000);
+            if (Util.isDarkColor(e.getColor())) {
+                ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
             }
+            if (e.getTask() != null) {
+                event.setTag(R.string.task_event, true);
+                event.setTag(R.string.id, e.getTask().getId());
+                event.setBackgroundColor(0xA0000000 | e.getColor());
+            } else {
+                event.setTag(R.string.task_event, false);
+                event.setTag(R.string.id, e.getId());
+            }
+            top_container_events.addView(event);
         }
     }
 

@@ -116,7 +116,7 @@ public class WorkFinishedDialog extends Dialog {
                 event.setEndWithDuration(worked_duration.getDuration());
                 event.save(TimeRank.getContext());
                 TimeRank.addEventToList(event);
-                TimeRank.calculateDays();
+                TimeRank.createCalculatingJob();
                 dismiss();
             }
         });

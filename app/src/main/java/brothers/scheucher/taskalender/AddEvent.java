@@ -85,7 +85,7 @@ public class AddEvent extends ActionBarActivity {
             public void onClick(View v) {
                 event.delete(TimeRank.getContext());
                 TimeRank.deleteEventFromList(event);
-                TimeRank.calculateDays();
+                TimeRank.createCalculatingJob();
                 Calender.notifyChanges();
                 finish();
             }
@@ -155,8 +155,7 @@ public class AddEvent extends ActionBarActivity {
             Log.d(tag, "going to save event = " + event.description());
             event.save(this);
             TimeRank.addEventToList(event);
-            TimeRank.calculateDays();
-            ViewEvent.notifyChanges();
+            TimeRank.createCalculatingJob();
             Calender.notifyChanges();
             finish();
             return true;

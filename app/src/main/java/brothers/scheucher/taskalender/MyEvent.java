@@ -103,26 +103,17 @@ public class MyEvent implements Comparable {
 
     public void setStart(int year, int month, int day) {
         Util.setDate(this.start, year, month, day);
-
-        checkBlocking();
-
     }
     public void setEnd(int year, int month, int day) {
         Util.setDate(this.end, year, month, day);
-
-        checkBlocking();
-
     }
 
     public void setStart(int hourOfDay, int minute) {
         Util.setTime(this.start, hourOfDay, minute);
-
-        checkBlocking();
     }
 
     public void setEnd(int hourOfDay, int minute) {
         Util.setTime(this.end, hourOfDay, minute);
-        checkBlocking();
     }
 
 
@@ -207,7 +198,7 @@ public class MyEvent implements Comparable {
     }
 
     public String description() {
-        return "name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end);
+        return "name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end) + " availability: " + this.availability;
     }
 
     public int getId() {

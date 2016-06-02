@@ -33,7 +33,6 @@ public class SettingDay extends ActionBarActivity {
         setContentView(R.layout.activity_setting_day);
         this.context = this;
         this.day_setting = TimeRank.getDaySettingObject(new GregorianCalendar());
-        Log.d(tag, "onCreate called");
 
         //GETTING VIEWS
         duration_view = ((TextView)findViewById(R.id.setting_day_duration));

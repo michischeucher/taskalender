@@ -193,7 +193,7 @@ public class AddTask extends ActionBarActivity {
             public void onClick(View v) {
                 task.delete(TimeRank.getContext());
                 TimeRank.deleteTaskFromList(task);
-                TimeRank.calculateDays();
+                TimeRank.createCalculatingJob();
                 Calender.notifyChanges();
                 finish();
             }
@@ -250,7 +250,7 @@ public class AddTask extends ActionBarActivity {
 
             task.save(this);
             TimeRank.addTaskToList(task);
-            TimeRank.calculateDays();
+            TimeRank.createCalculatingJob();
             finish();
             return true;
         }

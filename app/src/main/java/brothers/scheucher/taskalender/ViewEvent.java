@@ -60,6 +60,12 @@ public class ViewEvent extends ActionBarActivity {
             }
         });
 
+//        fillFieldsBecauseOfData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         fillFieldsBecauseOfData();
     }
 
@@ -69,6 +75,8 @@ public class ViewEvent extends ActionBarActivity {
         if (Util.isDarkColor(event.getColor())) {
             event_name.setTextColor(0xFFFFFFFF);
         }
+
+        view_event_fields_container.removeAllViewsInLayout();
 
         if (!event.getNotice().equals("")) {
             View row = inflater.inflate(R.layout.text_item_with_description, view_event_fields_container, false);
@@ -96,8 +104,4 @@ public class ViewEvent extends ActionBarActivity {
 
     }
 
-    public static void notifyChanges() {
-        Log.d(tag, "notifyChanges");
-        //fillFieldsBecauseOfData();
-    }
 }

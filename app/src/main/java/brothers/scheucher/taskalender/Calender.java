@@ -64,6 +64,7 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
     public void onResume() {
         Log.d(tag, "Calender: onResume");
         super.onResume();
+
     }
 
     public static void notifyChanges() {
@@ -154,6 +155,7 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
         private LinearLayout top_container_events;
         private TextView potential_text_view;
         protected LayoutInflater inflater;
+        private GregorianCalendar current_date;
 
         public DummySectionFragment() {
         }
@@ -187,14 +189,12 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             int number = args.getInt("number");
             int current_date_offset = number - MAX_SWIPES_LEFT_RIGHT;
 
-            GregorianCalendar current_date = new GregorianCalendar();
+            current_date = new GregorianCalendar();
             current_date.set(GregorianCalendar.HOUR_OF_DAY, 0);
             current_date.set(GregorianCalendar.MINUTE, 0);
             current_date.add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
 
             Log.d(tag, "number " + number + " + current_date_offset " + current_date_offset + " => " + Util.getFormattedDate(current_date));
-
-
 
             TextView calender_day_date_view = ((TextView) calender_day.findViewById(R.id.calender_day_date));
             TextView calender_day_of_week_view = ((TextView) calender_day.findViewById(R.id.calender_day_of_week));
@@ -206,8 +206,6 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
                 calender_day_of_week_view.setTextColor(0xFF0000FF);
             }
 
-            //draw events (and calculated tasks for that day)
-            drawEvents(current_date);
 
             //scaling:
             //calender_day_events_tasks.getLayoutParams().height = (int) (1440 * scale_factor);
@@ -268,6 +266,14 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             });
 
             return calender_day;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            //draw events (and calculated tasks for that day)
+            drawEvents(current_date);
+
         }
 
         private void drawEvents(GregorianCalendar date) {

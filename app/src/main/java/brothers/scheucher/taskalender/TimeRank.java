@@ -45,95 +45,12 @@ public class TimeRank {
         SQLiteStorageHelper.getInstance(context, 1).addAllEventsFromDatabase();
         SQLiteStorageHelper.getInstance(context, 1).addAllLabelsFromDatabase();
 
-        TimeRank.calculateDays();
+        TimeRank.createCalculatingJob();
     }
 
-    public static void calculateDays() {
-        Log.d(tag, "# START calculateDays()");
-
-        //START from last deadline... calculating blocks
-        if (tasks.size() <= 0) {
-            return;
-        }
-        for (Task t : tasks) {
-            t.resetJustForCalculations();
-        }
-
-        //creating all days where there is a event
-        days.clear();
-        /*for (MyEvent event : events) {
-            for (GregorianCalendar date : event.getDates()) {
-                if (TimeRank.getDay(date) == null) {
-                    TimeRank.createDay(date);
-                }
-            }
-        }*/
-
-        Log.d(tag, "##### START CALCULATING BLOCKS #####");
-        Collections.sort(tasks, Collections.reverseOrder());
-        //TimeRank.printAllTasks();
-
-        task_blocks.clear();
-
-        //first block
-        TaskBlock block = new TaskBlock();
-        block.setEnd((GregorianCalendar) tasks.get(0).getDeadline().clone());
-        task_blocks.add(block);
-
-        boolean last_task = false;
-        GregorianCalendar earlier_date;
-        int possible_work_time_for_current_task = 0;
-        int overlapping_time = 0;
-
-        for (int i = 0; i < TimeRank.getTasks().size(); i++) {
-            Task current_task = tasks.get(i);
-            current_task.setOverlapping_minutes(block.getOverlapping_time());
-            block.addTask(current_task);
-
-            if ((i + 1) < TimeRank.getTasks().size()) {
-                earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
-            } else { // if last task there is only now... ;)
-                earlier_date = new GregorianCalendar();
-                last_task = true;
-            }
-
-            possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date);
-            overlapping_time = current_task.getRemaining_duration() + current_task.getOverlapping_minutes() - possible_work_time_for_current_task;
-
-            block.setOverlapping_time(overlapping_time);
-            block.setStart(earlier_date);               //every time a new task added?! hmm...
-            block.setPotential((-1) * overlapping_time);//every time a new task added?! hmm...
-
-            if (overlapping_time < 0 && !last_task) { //if everything is possible in that block...
-                block = new TaskBlock();
-                block.setEnd((GregorianCalendar) earlier_date.clone());
-                task_blocks.add(block);
-            } else if (overlapping_time > 0 && last_task) {
-                Log.d(tag, "PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
-            }
-        }
-
-        Log.d(tag, "##### END CALCULATING BLOCKS #####");
-
-/*        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
-        for (TaskBlock tb : task_blocks) {
-            Log.d(tag, "start: " + Util.getFormattedDateTime(tb.getStart()) + " end: " + Util.getFormattedDateTime(tb.getEnd()));
-            Log.d(tag, "   potential: " + tb.getPotential() + " overlapping_time = " + tb.getOverlapping_time() +  " #tasks: " + tb.getTasks().size() + " tasks(remaining_durations) = " + tb.getRemainingDurationOfTasks());
-        }
-        Log.d(tag, "--- end printing TaskBlocks ---");
-*/
-        //CALCULATING DAYS with TASKS...
-        Log.d(tag, "##### START CALCULATING DAYS with TASKS #####");
-        GregorianCalendar now = new GregorianCalendar();
-        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
-            TaskBlock tb = task_blocks.get(i);
-            tb.calculateTaskFillingFactors();
-            tb.addTasksToDays();
-        }
-
-        Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
-
-        Calender.notifyChanges();
+    public static void createCalculatingJob() {
+        CalculateAsync calc_async = new CalculateAsync();
+        calc_async.execute();
     }
 
     private static int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date) {
@@ -437,5 +354,94 @@ public class TimeRank {
 
     public static ArrayList<TaskBlock> getTaskBlocks() {
         return task_blocks;
+    }
+
+    public static void calculateDays() {
+        Log.d(tag, "# START createCalculatingJob()");
+
+        //START from last deadline... calculating blocks
+        if (tasks.size() <= 0) {
+            return;
+        }
+        for (Task t : tasks) {
+            t.resetJustForCalculations();
+        }
+
+        //creating all days where there is a event
+        days.clear();
+        /*for (MyEvent event : events) {
+            for (GregorianCalendar date : event.getDates()) {
+                if (TimeRank.getDay(date) == null) {
+                    TimeRank.createDay(date);
+                }
+            }
+        }*/
+
+        Log.d(tag, "##### START CALCULATING BLOCKS #####");
+        Collections.sort(tasks, Collections.reverseOrder());
+        //TimeRank.printAllTasks();
+
+        task_blocks.clear();
+
+        //first block
+        TaskBlock block = new TaskBlock();
+        block.setEnd((GregorianCalendar) tasks.get(0).getDeadline().clone());
+        task_blocks.add(block);
+
+        boolean last_task = false;
+        GregorianCalendar earlier_date;
+        int possible_work_time_for_current_task = 0;
+        int overlapping_time = 0;
+
+        for (int i = 0; i < TimeRank.getTasks().size(); i++) {
+            Task current_task = tasks.get(i);
+            current_task.setOverlapping_minutes(block.getOverlapping_time());
+            block.addTask(current_task);
+
+            if ((i + 1) < TimeRank.getTasks().size()) {
+                earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
+            } else { // if last task there is only now... ;)
+                earlier_date = new GregorianCalendar();
+                last_task = true;
+            }
+
+            possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date);
+            overlapping_time = current_task.getRemaining_duration() + current_task.getOverlapping_minutes() - possible_work_time_for_current_task;
+
+            block.setOverlapping_time(overlapping_time);
+            block.setStart(earlier_date);               //every time a new task added?! hmm...
+            block.setPotential((-1) * overlapping_time);//every time a new task added?! hmm...
+
+            if (overlapping_time < 0 && !last_task) { //if everything is possible in that block...
+                block = new TaskBlock();
+                block.setEnd((GregorianCalendar) earlier_date.clone());
+                task_blocks.add(block);
+            } else if (overlapping_time > 0 && last_task) {
+                Log.d(tag, "PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
+            }
+        }
+
+        Log.d(tag, "##### END CALCULATING BLOCKS #####");
+
+/*        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
+        for (TaskBlock tb : task_blocks) {
+            Log.d(tag, "start: " + Util.getFormattedDateTime(tb.getStart()) + " end: " + Util.getFormattedDateTime(tb.getEnd()));
+            Log.d(tag, "   potential: " + tb.getPotential() + " overlapping_time = " + tb.getOverlapping_time() +  " #tasks: " + tb.getTasks().size() + " tasks(remaining_durations) = " + tb.getRemainingDurationOfTasks());
+        }
+        Log.d(tag, "--- end printing TaskBlocks ---");
+*/
+        //CALCULATING DAYS with TASKS...
+        Log.d(tag, "##### START CALCULATING DAYS with TASKS #####");
+        GregorianCalendar now = new GregorianCalendar();
+        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
+            TaskBlock tb = task_blocks.get(i);
+            tb.calculateTaskFillingFactors();
+            tb.addTasksToDays();
+        }
+
+        Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
+
+//        Calender.notifyChanges();
+
     }
 }

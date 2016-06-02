@@ -26,6 +26,9 @@ public class ViewTask extends ActionBarActivity {
     private Context context;
     private Activity activity;
     private RelativeLayout view_task;
+    private TextView task_name;
+    private LayoutInflater inflater;
+    private LinearLayout view_task_fields_container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,11 @@ public class ViewTask extends ActionBarActivity {
         }
 
         view_task = ((RelativeLayout)findViewById(R.id.view_task));
+        inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view_task_fields_container = (LinearLayout)view_task.findViewById(R.id.view_task_fields_container);
 
-        TextView task_name = ((TextView)view_task.findViewById(R.id.title));
-        task_name.setText(task.getName());
-        task_name.setBackgroundColor(0xFF000000 | task.getColor());
-        if (Util.isDarkColor(task.getColor())) {
-            task_name.setTextColor(0xFFFFFFFF);
-        }
+        task_name = ((TextView)view_task.findViewById(R.id.title));
 
         final Button button = ((Button)view_task.findViewById(R.id.new_button));
         button.setOnClickListener(new View.OnClickListener() {
@@ -104,9 +105,23 @@ public class ViewTask extends ActionBarActivity {
             }
         });
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout view_task_fields_container = (LinearLayout)view_task.findViewById(R.id.view_task_fields_container);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fillFieldsBecauseOfData();
+    }
+
+    private void fillFieldsBecauseOfData() {
+        view_task_fields_container.removeAllViewsInLayout();
+
+        task_name.setText(task.getName());
+        task_name.setBackgroundColor(0xFF000000 | task.getColor());
+        if (Util.isDarkColor(task.getColor())) {
+            task_name.setTextColor(0xFFFFFFFF);
+        }
+
         if (!task.getNotice().equals("")) {
             View row = inflater.inflate(R.layout.text_item_with_description, view_task_fields_container, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Notiz: ");
@@ -153,7 +168,6 @@ public class ViewTask extends ActionBarActivity {
             ((TextView)row.findViewById(R.id.text_of_item)).setText(task.getLabelString());
             view_task_fields_container.addView(row);
         }
-
     }
 
     private void toggleButtonOptions(Button button) {

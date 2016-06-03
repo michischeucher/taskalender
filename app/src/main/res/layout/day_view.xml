@@ -6,6 +6,13 @@
     android:orientation="horizontal"
     >
 
+    <ScrollView
+        android:id="@+id/day_view_scrolling"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:id="@+id/height_container"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -42,8 +49,9 @@
                 android:weightSum="1440"
                 >
             </LinearLayout>
+
         </RelativeLayout>
-
     </LinearLayout>
-
+    </RelativeLayout>
+    </ScrollView>
 </LinearLayout>

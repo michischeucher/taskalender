@@ -7,14 +7,8 @@
     android:layout_marginRight="10dp"
     >
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
 
-        <include layout="@layout/day_view"/>
-
-    </ScrollView>
+    <include layout="@layout/day_view"/>
 
     <include layout="@layout/top_container"/>
 

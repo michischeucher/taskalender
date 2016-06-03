@@ -417,7 +417,7 @@ public class TimeRank {
                 block.setEnd((GregorianCalendar) earlier_date.clone());
                 task_blocks.add(block);
             } else if (overlapping_time > 0 && last_task) {
-                Log.d(tag, "PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
+                Log.d(tag, "########### PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
             }
         }
 
@@ -432,16 +432,17 @@ public class TimeRank {
 */
         //CALCULATING DAYS with TASKS...
         Log.d(tag, "##### START CALCULATING DAYS with TASKS #####");
-        GregorianCalendar now = new GregorianCalendar();
+        Day last_day_where_time_left = null;
         for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
             TaskBlock tb = task_blocks.get(i);
             tb.calculateTaskFillingFactors();
-            tb.addTasksToDays();
+            if (i == (task_blocks.size() - 1)) { //first block must start with today
+                last_day_where_time_left = tb.addTasksToDays(new GregorianCalendar());
+            } else { //otherwise it starts with the end of the other block
+                last_day_where_time_left = tb.addTasksToDays(last_day_where_time_left.getStart());
+            }
         }
 
         Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
-
-//        Calender.notifyChanges();
-
     }
 }

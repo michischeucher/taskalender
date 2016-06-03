@@ -25,6 +25,7 @@ public class Day {
     private DayScheduler scheduler;
     private ArrayList<Block> event_blocks;
     private ArrayList<MyEvent> events_whole_day;
+    private static final int MIN_DISPLAY_DURATION_FOR_ONE_EVENT = 30;
 
     public Day() {
         this.start = new GregorianCalendar();
@@ -209,6 +210,13 @@ public class Day {
                 events_whole_day.add(e);
                 continue;
             }
+
+            //just for displaying in the right form... (mind. 1/2 std!!)
+            int duration = e.getDurationInMinutes();
+            if (duration < MIN_DISPLAY_DURATION_FOR_ONE_EVENT) {
+                e.setEndWithDuration(MIN_DISPLAY_DURATION_FOR_ONE_EVENT);
+            }
+
             if (block == null || Util.calculateOverlappingTime(block.getTimeObj(), e.getTimeObj()) == null) { //no overlapping => new block
                 block = new Block(e.getStart(), e.getEnd());
                 if (Util.earlierDate(this.end, e.getEnd())) {
@@ -221,6 +229,8 @@ public class Day {
                 event_blocks.add(block);
             }
             block.addEvent(e);
+            //resetting the right value afterwards
+            e.setEndWithDuration(duration);
         }
 
         for (Block b : this.event_blocks) {
@@ -267,7 +277,7 @@ public class Day {
                     last_event_end = (GregorianCalendar) e.getEnd().clone();
 
                     event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
-                    ((TextView) event.findViewById(R.id.event_name)).setText(e.getName());
+                    ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedDateTimeToDateTime(e.getStart(), e.getEnd()));
                     event.setBackgroundColor(e.getColor() | 0xFF000000);
                     if (Util.isDarkColor(e.getColor())) {
                         ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
@@ -281,7 +291,11 @@ public class Day {
                         event.setTag(R.string.id, e.getId());
                     }
 
-                    Util.setWeight(event, e.getDurationInMinutes());
+                    int duration = e.getDurationInMinutes();
+                    if (duration < MIN_DISPLAY_DURATION_FOR_ONE_EVENT) {
+                        duration = MIN_DISPLAY_DURATION_FOR_ONE_EVENT;
+                    }
+                    Util.setWeight(event, duration);
                     event_coloumn.addView(event);
                 }
             }

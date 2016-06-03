@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -100,20 +101,29 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
     }
 
     private class CalenderPagerAdapter extends FragmentStatePagerAdapter {
+        private DummySectionFragment fragment;
+
         public CalenderPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
+        public void restoreState(Parcelable state, ClassLoader loader) {
+//            super.restoreState(state, loader);
+        }
+
+        @Override
         public Fragment getItem(int i) {
             Log.d(tag, "Calender: CalenderPagerAdapter: getItem");
-            Fragment fragment = new DummySectionFragment(scale_dedector);
+            fragment = new DummySectionFragment(scale_dedector);
             Bundle args = new Bundle();
             args.putInt("number", i);
             args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i);
             fragment.setArguments(args);
             return fragment;
         }
+
+
 
         @Override
         public int getCount() {
@@ -173,6 +183,8 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             calender_day_events_tasks = (LinearLayout)(calender_day.findViewById(R.id.calender_day_events_tasks));
             top_container_events = (LinearLayout)(calender_day.findViewById(R.id.top_container_events));
             potential_text_view = (TextView)(calender_day.findViewById(R.id.potential));
+
+
 //            calender_day_events_tasks.setOnTouchListener(new View.OnTouchListener() {
 //                @Override
 //                public boolean onTouch(View v, MotionEvent event) {
@@ -185,6 +197,7 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
 //                }
 //            });
 //
+
             Bundle args = getArguments();
             int number = args.getInt("number");
             int current_date_offset = number - MAX_SWIPES_LEFT_RIGHT;
@@ -273,7 +286,6 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             super.onResume();
             //draw events (and calculated tasks for that day)
             drawEvents(current_date);
-
         }
 
         private void drawEvents(GregorianCalendar date) {
@@ -289,6 +301,7 @@ public class Calender extends Fragment implements ScaleGestureDetector.OnScaleGe
             day.drawEvents(calender_day_events_tasks, inflater);
             day.drawWholeDayEvents(top_container_events, inflater);
             Log.d(tag, "### END DRAWING EVENTS! (for: " + Util.getFormattedDate(date) + ")");
+
         }
 
     }

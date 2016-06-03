@@ -56,8 +56,8 @@ public class MyEvent implements Comparable {
     public MyEvent(int id) {
         this.id = id;
         this.extern_id = -1;
-        this.name = "EventName";
-        this.notice = "EventNotice";
+        this.name = "";
+        this.notice = "";
         this.start = new GregorianCalendar();
         this.start.set(GregorianCalendar.MINUTE, 0);
         this.end = new GregorianCalendar();
@@ -329,5 +329,9 @@ public class MyEvent implements Comparable {
 
     public void setExternID(long id) {
         this.extern_id = id;
+    }
+
+    public void setAvailability(boolean availability) {
+        this.availability = availability;
     }
 }

@@ -104,10 +104,13 @@ public class TaskBlock implements Comparable {
         }
     }
 
-    public void addTasksToDays() {
+    //returns the day, where time is left (for next block: the next block must use the time of this day to distribute)
+    public Day addTasksToDays(GregorianCalendar start_date) {
         Log.d(tag, "##TASK BLOCK: " + this.description());
-        for (GregorianCalendar current_date : Util.getListOfDates(this.start, this.end)) {
-            Day day = TimeRank.getDay(current_date);
+        Day last_day_where_time_left = null;
+        Day day = null;
+        for (GregorianCalendar current_date : Util.getListOfDates(start_date, this.end)) {
+            day = TimeRank.getDay(current_date);
             if (day == null) {
                 day = TimeRank.createDay(current_date);
                 TimeRank.addDayToList(day);
@@ -116,7 +119,11 @@ public class TaskBlock implements Comparable {
             for (int i = tasks.size() - 1; i >= 0; i--) {
                 day.addTask(tasks.get(i));
             }
+            if (day.getPossibleWorkTime(day.getStart(), day.getEnd()) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
+                return day;
+            }
         }
+        return day;
     }
 
     public String description() {

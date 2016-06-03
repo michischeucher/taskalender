@@ -229,14 +229,11 @@ public class Task implements Comparable {
     }
 
     public int getColor() {
-        int color = -1;
         if (this.label_ids.size() != 0) {
-            Label first_label = TimeRank.getLabel(this.label_ids.get(0));
-            if (first_label != null) {
-                color = first_label.getColor();
-            }
+            return TimeRank.getLabel(this.label_ids.get(0)).getColor();
+        } else {
+            return 0xE0E0E0;
         }
-        return color;
     }
 
     public boolean hasLabel(int label_id) {

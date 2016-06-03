@@ -2,13 +2,9 @@ package brothers.scheucher.taskalender;
 
 import android.util.Log;
 import android.util.Pair;
-
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
-/**
- * Created by michi on 05.11.2015.
- */
 public class DaySettingObject {
     private static final String tag = "DaySettingObject";
 
@@ -19,17 +15,12 @@ public class DaySettingObject {
 
     public DaySettingObject() {
         this.total_duration = new Duration(60 * 6);
-        this.labels_durations = new ArrayList<Pair<Label, Duration>>();
+        this.labels_durations = new ArrayList<>();
     }
 
     public DaySettingObject(Duration total_duration) {
         this.total_duration = total_duration;
-        this.labels_durations = new ArrayList<Pair<Label, Duration>>();
-    }
-
-    public DaySettingObject(Duration total_duration, ArrayList<Pair<Label, Duration>> labels_durations) {
-        this.total_duration = total_duration;
-        this.labels_durations = labels_durations;
+        this.labels_durations = new ArrayList<>();
     }
 
     public void addLabelDuration(Label label, Duration duration_of_that_label) {
@@ -62,9 +53,6 @@ public class DaySettingObject {
         return labels_durations;
     }
 
-    public void setLabels_durations(ArrayList<Pair<Label, Duration>> labels_durations) {
-        this.labels_durations = labels_durations;
-    }
 
     public int getTotalDurationInMinutes() {
         if (this.total_duration != null) {
@@ -76,7 +64,7 @@ public class DaySettingObject {
 
     public void addConstraint(MyConstraint new_constraint) {
         if(this.constraints == null) {
-            this.constraints = new ArrayList<MyConstraint>();
+            this.constraints = new ArrayList<>();
         }
         this.constraints.add(new_constraint);
     }

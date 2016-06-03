@@ -10,13 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-/**
- * This is the only class of the project. Consist in a costum duration_dialog that show
- * the GUI for choose the color.
- *
- * @author Simone Pessotto
- *
- */
 public class DurationPickerDialog extends Dialog {
 
     private static final String tag = "DurationPickerDialog";
@@ -50,7 +43,6 @@ public class DurationPickerDialog extends Dialog {
         this.duration_max_set = false;
         this.duration_min_set = false;
     }
-
 
     public void setMaxValue(int max_value_hours, int max_value_minutes) {
         if (!duration_max_set) {

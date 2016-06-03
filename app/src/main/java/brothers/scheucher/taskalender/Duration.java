@@ -1,8 +1,5 @@
 package brothers.scheucher.taskalender;
 
-/**
- * Created by michi on 04.11.2015.
- */
 public class Duration {
     private int hours;
     private int minutes;

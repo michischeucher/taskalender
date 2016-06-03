@@ -26,7 +26,7 @@ public class Day {
         Util.setTime(this.start, 0, 0);
         this.end = (GregorianCalendar)start.clone();
         this.end.add(GregorianCalendar.DAY_OF_YEAR, 1);
-        this.events = new ArrayList<MyEvent>();
+        this.events = new ArrayList<>();
         this.scheduler = new DayScheduler(date);
         GregorianCalendar now = new GregorianCalendar();
         if (Util.isSameDate(this.start, now)) {
@@ -55,7 +55,7 @@ public class Day {
         if (!this.events.contains(event_to_add)) {
             for (MyEvent e : this.events) {
                 if (e.getExternID() != -1 && e.getExternID() == event_to_add.getExternID()) {
-//                    Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
+                    //Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
                     return;
                 }
             }
@@ -100,10 +100,8 @@ public class Day {
 
     public void addTask(Task task) {
         //Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
-        GregorianCalendar start_of_day = (GregorianCalendar)this.start.clone();
-        GregorianCalendar end_of_day = (GregorianCalendar)this.end.clone();
 
-        int available_work_time = getPossibleWorkTime(start_of_day, end_of_day);
+        int available_work_time = scheduler.getPossibleWorkTime();
         int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
         //Log.d(tag, "   worktime: " + work_time_for_that_task + " from overall available: " + available_work_time);
         if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)

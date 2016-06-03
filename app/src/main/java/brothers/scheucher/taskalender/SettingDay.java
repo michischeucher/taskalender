@@ -147,7 +147,9 @@ public class SettingDay extends ActionBarActivity {
         if (id == R.id.action_save) {
             MyConstraint constraint = new MyConstraint();
             day_setting.addConstraint(constraint);
+            day_setting.save(this);
             TimeRank.addDaySettingObject(day_setting);
+            TimeRank.createCalculatingJob();
             finish();
             return true;
         }

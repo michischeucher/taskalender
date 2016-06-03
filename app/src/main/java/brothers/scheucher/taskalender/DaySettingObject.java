@@ -1,5 +1,6 @@
 package brothers.scheucher.taskalender;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 import java.util.ArrayList;
@@ -8,19 +9,35 @@ import java.util.GregorianCalendar;
 public class DaySettingObject {
     private static final String tag = "DaySettingObject";
 
-    private Duration total_duration;
+    private int id;
+    private Duration total_duration; //in minutes
+    private int earliest_minute;
+    private int latest_minute;
     private ArrayList<Pair<Label, Duration>> labels_durations;
+
+    //database
+    public static final String DB_TABLE = "DaySettingTable";
+    public static final String DB_COL_ID = "DaySettingID";
+    public static final String DB_COL_TOTALDURATION = "DaySettingTotalDuration";
+    public static final String DB_COL_EARLIESTMINUTE = "DaySettingEarliestMinute";
+    public static final String DB_COL_LATESTMINUTE = "DaySettingLatestMinute";
+
 
     private ArrayList<MyConstraint> constraints;
 
     public DaySettingObject() {
+        this.id = TimeRank.getNewDaySettingObjectID();
         this.total_duration = new Duration(60 * 6);
         this.labels_durations = new ArrayList<>();
+        this.earliest_minute = 60 * 8;
+        this.latest_minute = 60 * 20;
     }
-
-    public DaySettingObject(Duration total_duration) {
-        this.total_duration = total_duration;
+    public DaySettingObject(int id) {
+        this.id = id;
+        this.total_duration = new Duration(60 * 6);
         this.labels_durations = new ArrayList<>();
+        this.earliest_minute = 60 * 8;
+        this.latest_minute = 60 * 20;
     }
 
     public void addLabelDuration(Label label, Duration duration_of_that_label) {
@@ -78,5 +95,45 @@ public class DaySettingObject {
             max_relevant = Math.max(con.howRelevant(date), max_relevant);
         }
         return max_relevant;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String description() {
+        return "DaySettingObject: total_duration = " + Util.getFormattedDuration(this.getTotalDurationInMinutes());
+    }
+
+    public void save(Context context) {
+        if (id == -1) {
+            id = TimeRank.getNewDaySettingObjectID();
+        }
+        SQLiteStorageHelper db_helper = SQLiteStorageHelper.getInstance(context, 1);
+        db_helper.openDB();
+        db_helper.saveDaySettingObject(this);
+        db_helper.closeDB();
+        db_helper.close();
+
+    }
+
+    public void setTotalDuration(int total_duration_in_minutes) {
+        this.total_duration.setDuration(total_duration_in_minutes);
+    }
+
+    public int getEarliest_minute() {
+        return earliest_minute;
+    }
+
+    public void setEarliest_minute(int earliest_minute) {
+        this.earliest_minute = earliest_minute;
+    }
+
+    public int getLatest_minute() {
+        return latest_minute;
+    }
+
+    public void setLatest_minute(int latest_minute) {
+        this.latest_minute = latest_minute;
     }
 }

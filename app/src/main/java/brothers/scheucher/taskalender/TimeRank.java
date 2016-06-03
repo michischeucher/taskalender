@@ -24,6 +24,7 @@ public class TimeRank {
     private static int last_task_id = -1;
     private static int last_event_id = -1;
     private static int last_label_id = -1;
+    private static int last_day_setting_id = -1;
 
     private static Context context;
 
@@ -36,19 +37,23 @@ public class TimeRank {
             return;
         }
 
-        events = new ArrayList<MyEvent>();
-        tasks = new ArrayList<Task>();
-        labels = new ArrayList<Label>();
-        days = new ArrayList<Day>();
+        events = new ArrayList<>();
+        tasks = new ArrayList<>();
+        labels = new ArrayList<>();
+        days = new ArrayList<>();
+        day_settings = new ArrayList<>();
 
-        task_blocks = new ArrayList<TaskBlock>();
+        task_blocks = new ArrayList<>();
 
         scale_factor = 1.0f;
 
         //SQLiteStorageHelper.getInstance(context, 1).resetDatabase();
-        SQLiteStorageHelper.getInstance(context, 1).addAllTasksFromDatabase();
-        SQLiteStorageHelper.getInstance(context, 1).addAllEventsFromDatabase();
-        SQLiteStorageHelper.getInstance(context, 1).addAllLabelsFromDatabase();
+        SQLiteStorageHelper sql_helper = SQLiteStorageHelper.getInstance(context, 1);
+
+        sql_helper.addAllTasksFromDatabase();
+        sql_helper.addAllEventsFromDatabase();
+        sql_helper.addAllLabelsFromDatabase();
+        sql_helper.addAllDaySettingObjectsFromDatabase();
 
         TimeRank.createCalculatingJob();
     }
@@ -140,6 +145,19 @@ public class TimeRank {
         last_label_id += 1;
         return last_label_id;
     }
+
+    public static int getNewDaySettingObjectID() {
+        if (last_day_setting_id == -1) {
+            for (DaySettingObject dso : day_settings) {
+                if (dso.getId() > last_day_setting_id) {
+                    last_day_setting_id = dso.getId();
+                }
+            }
+        }
+        last_day_setting_id += 1;
+        return last_day_setting_id;
+    }
+
 
 
     public static void addTaskToList(Task new_task) {
@@ -313,7 +331,7 @@ public class TimeRank {
 
     public static void addDaySettingObject(DaySettingObject new_day_setting) {
         if (day_settings == null) {
-            day_settings = new ArrayList<DaySettingObject>();
+            day_settings = new ArrayList<>();
         }
         if (!day_settings.contains(new_day_setting)) {
             day_settings.add(new_day_setting);
@@ -323,14 +341,15 @@ public class TimeRank {
     public static DaySettingObject getDaySettingObject(GregorianCalendar date) {
         DaySettingObject most_relevant = null;
         int max_relevant = -2;
-        if (day_settings != null) {
-            for (DaySettingObject ds : day_settings) {
-                int relavant_value = ds.howRelevant(date);
-                if (relavant_value > max_relevant) {
-                    max_relevant = relavant_value;
-                    most_relevant = ds;
-                }
+        int relevant = -2;
+        for (DaySettingObject ds : day_settings) {
+            relevant = ds.howRelevant(date);
+            if (relevant > max_relevant) {
+                max_relevant = relevant;
+                most_relevant = ds;
             }
+        }
+        if (most_relevant != null) {
             return most_relevant;
         } else {
             return new DaySettingObject();
@@ -450,4 +469,5 @@ public class TimeRank {
 
         Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
     }
+
 }

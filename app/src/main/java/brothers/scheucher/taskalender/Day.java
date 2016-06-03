@@ -12,6 +12,7 @@ import static java.util.Collections.sort;
 
 public class Day {
     private static final String tag = "Day";
+    private DaySettingObject day_settings;
 
     private GregorianCalendar start;
     private GregorianCalendar end;
@@ -37,6 +38,15 @@ public class Day {
         }
         this.event_blocks = new ArrayList<>();
         this.events_whole_day = new ArrayList<>();
+        this.day_settings = TimeRank.getDaySettingObject(date);
+
+        GregorianCalendar earliest_start_date = (GregorianCalendar)start.clone();
+        earliest_start_date.add(GregorianCalendar.MINUTE, day_settings.getEarliest_minute());
+        scheduler.addBlockingTime(start, earliest_start_date);
+
+        GregorianCalendar latest_minute_date = (GregorianCalendar)start.clone();
+        latest_minute_date.add(GregorianCalendar.MINUTE, day_settings.getLatest_minute());
+        scheduler.addBlockingTime(latest_minute_date, end);
     }
 
     public GregorianCalendar getStart() {
@@ -67,12 +77,13 @@ public class Day {
         }// else { Log.d(tag, "addEvent: already exists..." + event_to_add.description());}
     }
 
-    private void addEventWithoutChecking(MyEvent new_event) {
+    private void addTaskEventWithoutChecking(MyEvent new_event) {
         events.add(new_event);
-        //Log.d(tag, "addEventWithoutChecking: " + new_event.description());
+        //Log.d(tag, "addTaskEventWithoutChecking: " + new_event.description());
         if (new_event.isBlocking()) {
             scheduler.addBlockingTime(new_event.getStart(), new_event.getEnd());
         }
+
     }
 
     public String description() {
@@ -95,13 +106,25 @@ public class Day {
             }
         }
 
+        sum_work_time = checkAvailableWorkTime(sum_work_time);
+
         return sum_work_time;
+    }
+
+    private int checkAvailableWorkTime(int available_work_time) {
+        if (available_work_time > (day_settings.getTotalDurationInMinutes() - getDistributedTaskEventsDuration())) {
+            return (day_settings.getTotalDurationInMinutes() - getDistributedTaskEventsDuration());
+        } else {
+            return available_work_time;
+        }
     }
 
     public void addTask(Task task) {
         //Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
 
         int available_work_time = scheduler.getPossibleWorkTime();
+        available_work_time = checkAvailableWorkTime(available_work_time);
+
         int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
         //Log.d(tag, "   worktime: " + work_time_for_that_task + " from overall available: " + available_work_time);
         if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
@@ -126,19 +149,27 @@ public class Day {
             work_time_for_that_task -= effective_time;
 
             //Log.d(tag, "   going to addEvent " + new_event.description());
-            addEventWithoutChecking(new_event);
+            addTaskEventWithoutChecking(new_event);
         }
 
         sortEvents();
     }
 
+    private int getDistributedTaskEventsDuration() {
+        int duration_of_all_task_events = 0;
+        for (MyEvent e : events) {
+            if (e.getTask() != null) {
+                duration_of_all_task_events += e.getDurationInMinutes();
+            }
+        }
+        return duration_of_all_task_events;
+    }
 
 
     public String getPotential() {
         if (Util.earlierDate(this.end, new GregorianCalendar())) {
             return "Kein Potential, da Vergangenheit";
         }
-        ArrayList<Integer> potential = new ArrayList<>();
         TimeObj day_time = new TimeObj(this.start, this.end);
         String ret = "";
         boolean found = false;
@@ -196,10 +227,10 @@ public class Day {
             e.setEndWithDuration(duration);
         }
 
-        for (Block b : this.event_blocks) {
+        /*for (Block b : this.event_blocks) {
             Log.d(tag, b.description());
             b.printColumns();
-        }
+        }*/
     }
 
     public void drawEvents(LinearLayout calender_day_events_tasks, LayoutInflater inflater) {
@@ -240,7 +271,7 @@ public class Day {
                     last_event_end = (GregorianCalendar) e.getEnd().clone();
 
                     event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
-                    ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedDateTimeToDateTime(e.getStart(), e.getEnd()));
+                    ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd()));
                     event.setBackgroundColor(e.getColor() | 0xFF000000);
                     if (Util.isDarkColor(e.getColor())) {
                         ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);

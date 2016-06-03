@@ -9,9 +9,6 @@ import android.util.Log;
 
 import java.io.File;
 
-/**
- * Created by Michael on 08.07.2015.
- */
 public class SQLiteStorageHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TimeRank.db";
@@ -46,11 +43,14 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + Label.DB_COL_NAME + " text, "
             + Label.DB_COL_COLOR + " int, "
             + Label.DB_COL_PARENT_ID + " int ) ";
-
+    private static final String DAYSETTING_TABLE = "CREATE TABLE IF NOT EXISTS " + DaySettingObject.DB_TABLE + " ( "
+            + DaySettingObject.DB_COL_ID + " int, "
+            + DaySettingObject.DB_COL_TOTALDURATION + " int ) ";
 
     private static final String DROP_TASK_TABLE = "DROP TABLE IF EXISTS " + Task.DB_TABLE;
     private static final String DROP_EVENT_TABLE = "DROP TABLE IF EXISTS " + MyEvent.DB_TABLE;
     private static final String DROP_LABEL_TABLE = "DROP TABLE IF EXISTS " + Label.DB_TABLE;
+    private static final String DROP_DAYSETTING_TABLE = "DROP TABLE IF EXISTS " + DaySettingObject.DB_TABLE;
 
     public boolean openDB() {
         db = this.getWritableDatabase();
@@ -70,12 +70,10 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         Log.d(tag, "onCreate");
         try{
             if(db.isOpen()){
-//                db.execSQL(DROP_TASK_TABLE);
                 db.execSQL(TASK_TABLE);
-//                db.execSQL(DROP_EVENT_TABLE);
                 db.execSQL(EVENT_TABLE);
-//                db.execSQL(DROP_LABEL_TABLE);
                 db.execSQL(LABEL_TABLE);
+                db.execSQL(DAYSETTING_TABLE);
                 Log.d(tag, "db created");
             }
 
@@ -89,6 +87,9 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
         // some magic happens with your mama
         db.execSQL(DROP_TASK_TABLE);
+        db.execSQL(DROP_EVENT_TABLE);
+        db.execSQL(DROP_LABEL_TABLE);
+        db.execSQL(DROP_DAYSETTING_TABLE);
         onCreate(db);
         Log.d(tag, "db updated from version " + oldVersion + " to version " + newVersion);
     }
@@ -255,6 +256,32 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean saveDaySettingObject(DaySettingObject dso) {
+        ContentValues values = new ContentValues();
+        values.put(DaySettingObject.DB_COL_TOTALDURATION, dso.getTotalDurationInMinutes());
+
+        Cursor cursor = db.rawQuery("SELECT * from " + DaySettingObject.DB_TABLE + " WHERE " +
+                DaySettingObject.DB_COL_ID + " = \"" + dso.getId() + "\"", null);
+
+        if (cursor.getCount() > 0) { //update
+            Log.d(tag, "update: " + dso.description());
+            long result = db.update(DaySettingObject.DB_TABLE, values, DaySettingObject.DB_COL_ID + " = \"" + dso.getId() + "\"", null);
+            if (result < 1) {
+                Log.d(tag, "saveDaySettingObject update ERROR (result = " + result + ")");
+                return false;
+            }
+        } else { //insert*/
+            Log.d(tag, "insert:" + dso.description());
+            values.put(DaySettingObject.DB_COL_ID, dso.getId());
+            long result = db.insert(DaySettingObject.DB_TABLE, null, values);
+            if (result == -1){
+                Log.d(tag, "saveDaySettingObject insertion ERROR (result = " + result + ")");
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void addAllTasksFromDatabase() {
         Log.d(tag, "addAllTasksFromDatabase - start");
         SQLiteDatabase db = this.getReadableDatabase();
@@ -317,6 +344,23 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
 
             Log.d(tag, "Label read: " + label.description());
             TimeRank.addLabelToList(label);
+        }
+        cursor.close();
+        db.close();
+    }
+    public void addAllDaySettingObjectsFromDatabase() {
+        Log.d(tag, "addAllDaySettingObjectsFromDatabase - start");
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(DaySettingObject.DB_TABLE, null, null, null, null, null, null, null);
+
+        while (cursor.moveToNext()){
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_ID));
+            DaySettingObject dso = new DaySettingObject(id);
+            dso.setTotalDuration(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_TOTALDURATION)));
+
+            Log.d(tag, "DaySettingObject read: " + dso.description());
+            TimeRank.addDaySettingObject(dso);
         }
         cursor.close();
         db.close();

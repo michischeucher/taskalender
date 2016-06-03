@@ -355,4 +355,8 @@ public class Util {
             block.setLayoutParams(params);
         }
     }
+
+    public static String getFormattedTimeToTime(GregorianCalendar start, GregorianCalendar end) {
+        return Util.getFormattedTimeInner(start) + " - " + Util.getFormattedTime(end);
+    }
 }

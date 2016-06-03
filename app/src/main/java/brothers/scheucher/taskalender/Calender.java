@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -11,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,7 +31,6 @@ public class Calender extends Fragment {
     public static RelativeLayout ll;
     protected static Activity fa;
 
-    public static LinearLayout height_container;
 
 
     public Calender() {
@@ -39,8 +38,14 @@ public class Calender extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //Log.d(tag, "onCreateView");
+        Log.d(tag, "onCreateView");
         super.onCreate(savedInstanceState);
         fa = super.getActivity();
         ll = (RelativeLayout) inflater.inflate(R.layout.activity_calender, container, false);
@@ -85,6 +90,13 @@ public class Calender extends Fragment {
         }
 
         @Override
+        public void restoreState(Parcelable state, ClassLoader loader) {
+            super.restoreState(state, loader);
+            Log.d(tag, "restored");
+
+        }
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return "Section " + (position + 1);
         }
@@ -109,14 +121,9 @@ public class Calender extends Fragment {
         private TextView potential_text_view;
         protected LayoutInflater inflater;
         private GregorianCalendar current_date;
-
-        private ScaleGestureDetector scale_dedector;
+        private LinearLayout height_container;
 
         public CalenderDayFragment() {
-        }
-
-        public CalenderDayFragment(ScaleGestureDetector scale_dedector) {
-            this.scale_dedector = scale_dedector;
         }
 
         @Override

@@ -40,5 +40,7 @@
     <string name="no_color_selected">Keine Farbe ausgewählt</string>
     <string name="task_event">TaskEvent</string>
     <string name="title_activity_view_event">ViewEvent</string>
+    <string name="no_label">Kein Label</string>
+    <string name="choose_label">Label auswählen</string>
 
 </resources>

@@ -5,17 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
 import static java.util.Collections.sort;
 
-
-/**
- * Created by Michael on 09.07.2015.
- */
 public class Day {
     private static final String tag = "Day";
 
@@ -26,17 +20,6 @@ public class Day {
     private ArrayList<Block> event_blocks;
     private ArrayList<MyEvent> events_whole_day;
     private static final int MIN_DISPLAY_DURATION_FOR_ONE_EVENT = 30;
-
-    public Day() {
-        this.start = new GregorianCalendar();
-        Util.setTime(this.start, 0, 0);
-        this.end = (GregorianCalendar)start.clone();
-        this.end.add(GregorianCalendar.DAY_OF_YEAR, 1);
-        this.events = new ArrayList<MyEvent>();
-        this.scheduler = new DayScheduler(start);
-        this.event_blocks = new ArrayList<>();
-        this.events_whole_day = new ArrayList<>();
-    }
 
     public Day(GregorianCalendar date) {
         this.start = date;
@@ -56,15 +39,6 @@ public class Day {
         this.events_whole_day = new ArrayList<>();
     }
 
-
-    public DayScheduler getScheduler() {
-        return scheduler;
-    }
-
-    public void setScheduler(DayScheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
     public GregorianCalendar getStart() {
         return start;
     }
@@ -75,10 +49,6 @@ public class Day {
 
     public ArrayList<MyEvent> getEvents() {
         return events;
-    }
-
-    public void setEvents(ArrayList<MyEvent> events) {
-        this.events = events;
     }
 
     public void addEvent(MyEvent event_to_add) {
@@ -93,21 +63,17 @@ public class Day {
 
             if (event_to_add.isBlocking()) {
                 this.scheduler.addBlockingTime(event_to_add.getStart(), event_to_add.getEnd());
-            }
-//            Log.d(tag, "addEvent: Event hinzugefügt... " + event_to_add.description());
-        } else {
-//            Log.d(tag, "addEvent: already exists..." + event_to_add.description());
-        }
+            }//            Log.d(tag, "addEvent: Event hinzugefügt... " + event_to_add.description());
+        }// else { Log.d(tag, "addEvent: already exists..." + event_to_add.description());}
     }
 
     private void addEventWithoutChecking(MyEvent new_event) {
         events.add(new_event);
-        Log.d(tag, "addEventWithoutChecking: " + new_event.description());
+        //Log.d(tag, "addEventWithoutChecking: " + new_event.description());
         if (new_event.isBlocking()) {
             scheduler.addBlockingTime(new_event.getStart(), new_event.getEnd());
         }
     }
-
 
     public String description() {
         return "Day: " + Util.getFormattedDate(this.start) + " #events = " + this.events.size();
@@ -133,20 +99,20 @@ public class Day {
     }
 
     public void addTask(Task task) {
-        Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
+        //Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
         GregorianCalendar start_of_day = (GregorianCalendar)this.start.clone();
         GregorianCalendar end_of_day = (GregorianCalendar)this.end.clone();
 
         int available_work_time = getPossibleWorkTime(start_of_day, end_of_day);
         int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
-        Log.d(tag, "   worktime: " + work_time_for_that_task + " from overall available: " + available_work_time);
+        //Log.d(tag, "   worktime: " + work_time_for_that_task + " from overall available: " + available_work_time);
         if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
             work_time_for_that_task = task.getRemaining_duration() - task.already_distributed_duration; //rest of duration...
             task.already_distributed_duration = task.getRemaining_duration();
         } else {
             task.already_distributed_duration += work_time_for_that_task;
         }
-        Log.d(tag, "   worktime is now: " + work_time_for_that_task);
+        //Log.d(tag, "   worktime is now: " + work_time_for_that_task);
         while(work_time_for_that_task > 0) {
             TimeObj free_slot = this.scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
 
@@ -161,10 +127,9 @@ public class Day {
             new_event.setEndWithDuration(effective_time);
             work_time_for_that_task -= effective_time;
 
-            Log.d(tag, "   going to addEvent " + new_event.description());
+            //Log.d(tag, "   going to addEvent " + new_event.description());
             addEventWithoutChecking(new_event);
         }
-
 
         sortEvents();
     }
@@ -186,7 +151,7 @@ public class Day {
                     ret += System.getProperty("line.separator");
                 }
                 ret += Util.getFormattedDateTimeToDateTime(tb.getStart(), tb.getEnd()) + ": " + Util.getFormattedPotential(tb.getPotential());
-                Log.d(tag, "Potential found " + tb.getPotential() + " in block " + tb.description());
+                //Log.d(tag, "Potential found " + tb.getPotential() + " in block " + tb.description());
                 found = true;
             }
         }
@@ -206,7 +171,7 @@ public class Day {
 
         for (MyEvent e : this.events) {
             if (e.getDurationInMinutes() >= 60 * 24) {
-//                Log.d(tag, "Event is over the whole day: " + e.description());
+                //Log.d(tag, "Event is over the whole day: " + e.description());
                 events_whole_day.add(e);
                 continue;
             }
@@ -374,7 +339,7 @@ public class Day {
         }
 
         public String description() {
-            return "Block: #columns = " + columns.size() + " time: " + this.time.description();
+            return "Block: #columns = " + columns.size() + " " + this.time.description();
         }
 
         public void printColumns() {

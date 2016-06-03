@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     >
 
-    <ScrollView
+    <brothers.scheucher.taskalender.ScrollViewScalable
         android:id="@+id/day_view_scrolling"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -53,5 +53,5 @@
         </RelativeLayout>
     </LinearLayout>
     </RelativeLayout>
-    </ScrollView>
+    </brothers.scheucher.taskalender.ScrollViewScalable>
 </LinearLayout>

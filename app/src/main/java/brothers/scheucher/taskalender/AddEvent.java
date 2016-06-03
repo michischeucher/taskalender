@@ -4,8 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,17 +15,18 @@ import android.widget.TimePicker;
 
 import java.util.GregorianCalendar;
 
-
-public class AddEvent extends ActionBarActivity {
+public class AddEvent extends AppCompatActivity {
     private static final String tag = "AddEvent";
     private MyEvent event;
+
     private boolean is_start;
 
-    TextView event_start_date_view;
-    TextView event_start_time_view;
-    TextView event_end_date_view;
-    TextView event_end_time_view;
-    Button delete_button;
+    private TextView event_start_date_view;
+    private TextView event_start_time_view;
+    private TextView event_end_date_view;
+    private TextView event_end_time_view;
+    private TextView title_view;
+    private TextView notice_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,42 +41,45 @@ public class AddEvent extends ActionBarActivity {
             event = new MyEvent();
         }
 
-//        SQLiteStorageHelper.getInstance(this, 1).addAllTasksFromDatabase();
-
-
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         event_start_date_view = ((TextView)findViewById(R.id.add_event_start_date));
         event_start_time_view = ((TextView)findViewById(R.id.add_event_start_time));
         event_end_date_view = ((TextView)findViewById(R.id.add_event_end_date));
         event_end_time_view = ((TextView)findViewById(R.id.add_event_end_time));
-        delete_button = ((Button)findViewById(R.id.add_event_delete_button));
+        Button delete_button = ((Button) findViewById(R.id.add_event_delete_button));
+        title_view = ((TextView)findViewById(R.id.add_event_title));
+        notice_view = ((TextView)findViewById(R.id.add_event_notice));
 
         updateDateAndTimeFields();
+        title_view.setText(event.getName());
+        notice_view.setText(event.getNotice());
+
 
         event_start_date_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePicker(v, true);
+                showDatePicker(true);
             }
         });
         event_start_time_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePicker(v, true);
+                showTimePicker(true);
             }
         });
         event_end_date_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePicker(v, false);
+                showDatePicker(false);
             }
         });
         event_end_time_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePicker(v, false);
+                showTimePicker(false);
             }
         });
 
@@ -86,16 +89,12 @@ public class AddEvent extends ActionBarActivity {
                 event.delete(TimeRank.getContext());
                 TimeRank.deleteEventFromList(event);
                 TimeRank.createCalculatingJob();
-                Calender.notifyChanges();
                 finish();
             }
         });
-
-        ((TextView)findViewById(R.id.add_event_title)).setText(event.getName());
-        ((TextView)findViewById(R.id.add_event_notice)).setText(event.getNotice());
     }
 
-    public void showDatePicker(View view, boolean start_bool) {
+    public void showDatePicker(boolean start_bool) {
         //Log.d(tag, "showDatePicker");
         int year;
         int month;
@@ -115,7 +114,7 @@ public class AddEvent extends ActionBarActivity {
         dialog.show();
     }
 
-    public void showTimePicker(View view, boolean start_bool) {
+    public void showTimePicker(boolean start_bool) {
         //Log.d(tag, "showTimePicker");
         int minute;
         int hour;
@@ -134,29 +133,21 @@ public class AddEvent extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_add_task, menu);
         getMenuInflater().inflate(R.menu.menu_add_event, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            View add_event_view = findViewById(R.id.add_event);
-            event.setName((String.valueOf(((TextView) add_event_view.findViewById(R.id.add_event_title)).getText())));
-            event.setNotice((String.valueOf(((TextView) add_event_view.findViewById(R.id.add_event_notice)).getText())));
-            Log.d(tag, "going to save event = " + event.description());
+            event.setName(String.valueOf(title_view.getText()));
+            event.setNotice(String.valueOf(notice_view.getText()));
+            //Log.d(tag, "going to save event = " + event.description());
             event.save(this);
             TimeRank.addEventToList(event);
             TimeRank.createCalculatingJob();
-            Calender.notifyChanges();
             finish();
             return true;
         }
@@ -169,10 +160,7 @@ public class AddEvent extends ActionBarActivity {
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//            Log.d(tag, "year = " + year + " month = " + monthOfYear + " day = " + dayOfMonth);
-
-            GregorianCalendar date;
-            TextView text_view;
+            //Log.d(tag, "year = " + year + " month = " + monthOfYear + " day = " + dayOfMonth);
 
             if (is_start) {
                 long old_millis = event.getStart().getTimeInMillis();
@@ -203,7 +191,7 @@ public class AddEvent extends ActionBarActivity {
 
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-//            Log.d(tag, "hour = " + hourOfDay + " minute = " + minute);
+            //Log.d(tag, "hour = " + hourOfDay + " minute = " + minute);
 
             if (is_start) {
                 int old_minute_of_day = Util.getMinuteOfDay(event.getStart());

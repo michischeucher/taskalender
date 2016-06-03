@@ -3,9 +3,6 @@ package brothers.scheucher.taskalender;
 import android.os.AsyncTask;
 import android.util.Log;
 
-/**
- * Created by michi on 02.06.2016.
- */
 public class CalculateAsync extends AsyncTask<Void, Void, Void> {
 
 

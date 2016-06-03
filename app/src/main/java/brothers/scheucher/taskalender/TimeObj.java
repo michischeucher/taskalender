@@ -40,7 +40,7 @@ public class TimeObj implements Comparable {
     }
 
     public String description() {
-        return "start: " + Util.getFormattedTime(start) + " end: " + Util.getFormattedTime(end);
+        return "start: " + Util.getFormattedTime(start) + " end: " + Util.getFormattedTime(end) + " = " + Util.getFormattedDuration(Util.getMinutesBetweenDates(start, end));
     }
 
     public boolean isSameAs(TimeObj other) {
@@ -68,14 +68,6 @@ public class TimeObj implements Comparable {
     }
 
     public int getDuration() {
-        return (int)(this.end.getTimeInMillis() - this.start.getTimeInMillis()) / 1000 / 60;
-    }
-
-    public int getStartMinute() {
-        return Util.getMinuteOfDay(this.start);
-    }
-
-    public int getEndMinute() {
-        return Util.getMinuteOfDay(this.end);
+        return Util.getMinutesBetweenDates(this.start, this.end);
     }
 }

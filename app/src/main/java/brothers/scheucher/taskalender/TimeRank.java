@@ -27,6 +27,9 @@ public class TimeRank {
 
     private static Context context;
 
+    public static float scale_factor;
+
+
     public static void startApplication(Context context) {
         TimeRank.context = context;
         if (events != null) {
@@ -39,6 +42,8 @@ public class TimeRank {
         days = new ArrayList<Day>();
 
         task_blocks = new ArrayList<TaskBlock>();
+
+        scale_factor = 1.0f;
 
         //SQLiteStorageHelper.getInstance(context, 1).resetDatabase();
         SQLiteStorageHelper.getInstance(context, 1).addAllTasksFromDatabase();

@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,19 +21,15 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
-public class AddTask extends ActionBarActivity {
+public class AddTask extends AppCompatActivity {
     private static final String tag = "AddTask";
     private Task task;
     private Context context;
 
-    private TextView duration_view;
     private TextView earliest_start_date;
     private TextView deadline_date_view;
-    private TextView deadline_time_view;
-    private LinearLayout add_task_label_container;
     private TextView add_task_label;
-    private View add_task_label_color;
-    private Button delete_button;
+    private TextView add_task_label_color;
     private boolean[] selected_labels;
 
     DurationPickerDialog duration_dialog;
@@ -44,7 +40,9 @@ public class AddTask extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         context = this;
 
         Bundle b = getIntent().getExtras();
@@ -59,14 +57,14 @@ public class AddTask extends ActionBarActivity {
         }
 
         //GETTING VIEWS
-        duration_view = ((TextView) findViewById(R.id.add_task_duration));
+        TextView duration_view = ((TextView) findViewById(R.id.add_task_duration));
         earliest_start_date = ((TextView) findViewById(R.id.add_task_earliest_start_date));
         deadline_date_view = ((TextView)findViewById(R.id.add_task_deadline_date));
-        deadline_time_view = ((TextView)findViewById(R.id.add_task_deadline_time));
-        add_task_label_container = ((LinearLayout) findViewById(R.id.add_task_label_container));
+        TextView deadline_time_view = ((TextView) findViewById(R.id.add_task_deadline_time));
+        LinearLayout add_task_label_container = ((LinearLayout) findViewById(R.id.add_task_label_container));
         add_task_label = ((TextView) add_task_label_container.findViewById(R.id.add_task_label));
-        add_task_label_color = ((View)add_task_label_container.findViewById(R.id.add_task_label_color));
-        delete_button = ((Button) findViewById(R.id.add_task_delete_button));
+        add_task_label_color = ((TextView) add_task_label_container.findViewById(R.id.add_task_label_color));
+        Button delete_button = ((Button) findViewById(R.id.add_task_delete_button));
 
 
         duration_dialog = new DurationPickerDialog(AddTask.this, duration_view, task.getDuration());
@@ -132,9 +130,9 @@ public class AddTask extends ActionBarActivity {
 
                 final ArrayList<Label> label_sequence = TimeRank.getLabelSequence();
                 selected_labels = new boolean[label_sequence.size()];
-                ArrayList<String> label_sequence_strings = new ArrayList<String>();
+                ArrayList<String> label_sequence_strings = new ArrayList<>();
                 int i = 0;
-                final ArrayList<Integer> selected_item_index_list = new ArrayList<Integer>();
+                final ArrayList<Integer> selected_item_index_list = new ArrayList<>();
                 for (Label l : label_sequence) {
                     label_sequence_strings.add(l.getLabelStringWithHirarchie());
                     if (task.getLabelIds().contains(l.getId())) {
@@ -146,42 +144,42 @@ public class AddTask extends ActionBarActivity {
                 }
                 builder.setMultiChoiceItems(label_sequence_strings.toArray(new CharSequence[label_sequence_strings.size()])
                         , selected_labels, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                            if (isChecked) {
-                                selected_item_index_list.add(which);
-                            } else {
-                                selected_item_index_list.remove(Integer.valueOf(which));
-                            }
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            selected_item_index_list.add(which);
+                        } else {
+                            selected_item_index_list.remove(Integer.valueOf(which));
                         }
-                    })
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // FIRE ZE MISSILES!
-                            Log.d(tag, "OK clicked");
-                            ArrayList<Integer> selected_label_ids = new ArrayList<Integer>();
-                            for (int i : selected_item_index_list) {
-                                Log.d(tag, "selected = "+ i);
-                                selected_label_ids.add(label_sequence.get(i).getId());
-                            }
-                            task.setLabelIds(selected_label_ids);
-                            if (task.getLabelIds().size() == 0) {
-                                add_task_label.setText("Label auswählen");
-                                add_task_label_color.setBackgroundColor(0x00FFFFFF);
+                    }
+                })
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // FIRE ZE MISSILES!
+                                Log.d(tag, "OK clicked");
+                                ArrayList<Integer> selected_label_ids = new ArrayList<>();
+                                for (int i : selected_item_index_list) {
+                                    Log.d(tag, "selected = " + i);
+                                    selected_label_ids.add(label_sequence.get(i).getId());
+                                }
+                                task.setLabelIds(selected_label_ids);
+                                if (task.getLabelIds().size() == 0) {
+                                    add_task_label.setText(R.string.choose_label);
+                                    add_task_label_color.setBackgroundColor(0x00FFFFFF);
 
-                            } else {
-                                int color = 0xFF000000 | task.getColor();
-                                add_task_label.setText(task.getLabelString());
-                                add_task_label_color.setBackgroundColor(color);
+                                } else {
+                                    int color = 0xFF000000 | task.getColor();
+                                    add_task_label.setText(task.getLabelString());
+                                    add_task_label_color.setBackgroundColor(color);
+                                }
                             }
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the duration_dialog
-                            Log.d(tag, "cancelled");
-                        }
-                    });
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the duration_dialog
+                                Log.d(tag, "cancelled");
+                            }
+                        });
                 // Create the AlertDialog object and return it
 
                 builder.show();

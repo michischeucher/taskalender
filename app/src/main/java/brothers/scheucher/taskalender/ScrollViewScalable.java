@@ -61,6 +61,9 @@ public class ScrollViewScalable extends ScrollView {
             TimeRank.scale_factor = Math.max(MIN_SCALING_FACTOR, Math.min(TimeRank.scale_factor, MAX_SCALING_FACTOR));
 //Calender.setScrollPosition((int)(scroll_pos_begin * TimeRank.scale_factor));
 //            Calender.notifyScalingOrScrollingChanged();
+
+            int y = (int)detector.getFocusY();
+
             scrollTo(0,(int)(scroll_pos_begin * TimeRank.scale_factor));
             scalingChanged();
             return true;

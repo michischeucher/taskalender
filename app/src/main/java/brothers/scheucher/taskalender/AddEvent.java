@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -27,6 +28,7 @@ public class AddEvent extends AppCompatActivity {
     private TextView event_end_time_view;
     private TextView title_view;
     private TextView notice_view;
+    private Switch blocking_switch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +54,13 @@ public class AddEvent extends AppCompatActivity {
         Button delete_button = ((Button) findViewById(R.id.add_event_delete_button));
         title_view = ((TextView)findViewById(R.id.add_event_title));
         notice_view = ((TextView)findViewById(R.id.add_event_notice));
+        blocking_switch = (Switch)findViewById(R.id.blocking_switch);
+        blocking_switch.setChecked(event.isBlocking());
 
         updateDateAndTimeFields();
         title_view.setText(event.getName());
         notice_view.setText(event.getNotice());
+
 
 
         event_start_date_view.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +149,7 @@ public class AddEvent extends AppCompatActivity {
         if (id == R.id.action_save) {
             event.setName(String.valueOf(title_view.getText()));
             event.setNotice(String.valueOf(notice_view.getText()));
+            event.setAvailability(!blocking_switch.isChecked());
             //Log.d(tag, "going to save event = " + event.description());
             event.save(this);
             TimeRank.addEventToList(event);

@@ -102,6 +102,13 @@ public class ViewEvent extends ActionBarActivity {
             view_event_fields_container.addView(row);
         }
 
-    }
+        if (!event.isBlocking()) {
+            View row = inflater.inflate(R.layout.text_item_with_description, view_event_fields_container, false);
+            ((TextView)row.findViewById(R.id.description_of_item)).setText("Kein Blockiernder Termin!");
+            ((TextView)row.findViewById(R.id.text_of_item)).setText("Während diesem Termin werden Aufgaben vorgeschlagen.");
+            view_event_fields_container.addView(row);
+        }
+
+        }
 
 }

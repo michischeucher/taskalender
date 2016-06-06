@@ -34,6 +34,7 @@ public class Calender extends Fragment {
     public static RelativeLayout ll;
     protected static Activity fa;
     private static ArrayList<ScrollViewScalable> scroll_positions;
+    public static boolean got_to_now;
 
     public Calender() {
         // Required empty public constructor
@@ -53,10 +54,14 @@ public class Calender extends Fragment {
         fa = super.getActivity();
         ll = (RelativeLayout) inflater.inflate(R.layout.activity_calender, container, false);
 
+        got_to_now = true;
+
         calender_pager_adapter = new CalenderPagerAdapter(super.getFragmentManager());
         view_pager = (ViewPager) ll.findViewById(R.id.day_pager);
         view_pager.setAdapter(calender_pager_adapter);
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
+
+
 
         return ll;
     }
@@ -89,8 +94,14 @@ public class Calender extends Fragment {
     }
 
     public static void goToNow() {
+        Calender.got_to_now = true;
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
+        Calender.setScrollPosition(CalenderDayFragment.calculateScrollposition(new GregorianCalendar()));
+        notifyScalingOrScrollingChanged();
+//        calender_pager_adapter.notifyDataSetChanged();
     }
+
+
 
 
     private class CalenderPagerAdapter extends FragmentStatePagerAdapter {
@@ -143,7 +154,7 @@ public class Calender extends Fragment {
         private TextView potential_text_view;
         protected LayoutInflater inflater;
         private GregorianCalendar current_date;
-        private LinearLayout height_container;
+        private static LinearLayout height_container;
         private ScrollViewScalable day_view_scrolling;
 
         public CalenderDayFragment() {
@@ -166,16 +177,23 @@ public class Calender extends Fragment {
             }
 //            day_view_scrolling.scrollTo(0, Calender.scroll_pos);
 
+            Bundle args = getArguments();
+            int number = args.getInt("number");
+            int current_date_offset = number - MAX_SWIPES_LEFT_RIGHT;
+
+            current_date = new GregorianCalendar();
+            current_date.set(GregorianCalendar.HOUR_OF_DAY, 0);
+            current_date.set(GregorianCalendar.MINUTE, 0);
+            current_date.add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
+
             day_view_scrolling.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
-//                view.scalingChanged();
                     GregorianCalendar now = new GregorianCalendar();
-                    if (Util.isSameDate(current_date, now)) {
-                        int scroll_minute = Util.getMinuteOfDay(now) - 80;
-                        int scroll_position = (int) ((scroll_minute / 1440.0f) * height_container.getLayoutParams().height);
-                        Calender.setScrollPosition(scroll_position);
-                        day_view_scrolling.scrollTo(0, scroll_position);
+                    if (got_to_now && Util.isSameDate(current_date, now)) {
+                        got_to_now = false;
+
+                        day_view_scrolling.scrollTo(0, calculateScrollposition(now));
                     } else {
                         day_view_scrolling.scrollTo(0, Calender.getScrollPosition());
                     }
@@ -185,14 +203,6 @@ public class Calender extends Fragment {
                 }
 
             });
-            Bundle args = getArguments();
-            int number = args.getInt("number");
-            int current_date_offset = number - MAX_SWIPES_LEFT_RIGHT;
-
-            current_date = new GregorianCalendar();
-            current_date.set(GregorianCalendar.HOUR_OF_DAY, 0);
-            current_date.set(GregorianCalendar.MINUTE, 0);
-            current_date.add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
 
             //Log.d(tag, "number " + number + " + current_date_offset " + current_date_offset + " => " + Util.getFormattedDate(current_date));
 
@@ -263,9 +273,6 @@ public class Calender extends Fragment {
             return calender_day;
         }
 
-
-
-
         @Override
         public void onResume() {
             super.onResume();
@@ -287,6 +294,13 @@ public class Calender extends Fragment {
 
             Log.d(tag, "Finished drawing events for " + Util.getFormattedDate(date) + "");
         }
+
+        public static int calculateScrollposition(GregorianCalendar now) {
+            int scroll_minute = Util.getMinuteOfDay(now) - 80;
+            int scroll_position = (int) ((scroll_minute / 1440.0f) * height_container.getLayoutParams().height);
+            return scroll_position;
+        }
+
 
     }
 }

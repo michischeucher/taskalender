@@ -68,6 +68,12 @@ public class ScrollViewScalable extends ScrollView {
             scalingChanged();
             return true;
         }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            super.onScaleEnd(detector);
+            TimeRank.saveScaleFactor();
+        }
     }
 
     public void scalingChanged() {

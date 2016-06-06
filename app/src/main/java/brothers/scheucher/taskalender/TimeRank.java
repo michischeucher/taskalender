@@ -1,6 +1,7 @@
 package brothers.scheucher.taskalender;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class TimeRank {
         task_blocks = new ArrayList<>();
 
         scale_factor = 1.0f;
+        restoreScaleFactor();
 
         //SQLiteStorageHelper.getInstance(context, 1).resetDatabase();
         SQLiteStorageHelper sql_helper = SQLiteStorageHelper.getInstance(context, 1);
@@ -472,4 +474,14 @@ public class TimeRank {
         Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
     }
 
+    public static void saveScaleFactor() {
+        SharedPreferences settings =  context.getSharedPreferences("Settings", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putFloat("ScaleFactor", scale_factor);
+        editor.commit();
     }
+    public static void restoreScaleFactor() {
+        SharedPreferences settings = context.getSharedPreferences("Settings", 0);
+        scale_factor = settings.getFloat("ScaleFactor", 1);
+    }
+}

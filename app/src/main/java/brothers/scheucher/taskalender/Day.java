@@ -298,15 +298,22 @@ public class Day {
 
     }
 
-    public void drawWholeDayEvents(LinearLayout top_container_events, LayoutInflater inflater) {
+    public void drawWholeDayEvents(LinearLayout height_container, LinearLayout top_container_events, LayoutInflater inflater) {
         top_container_events.removeAllViewsInLayout();
 
         LinearLayout event;
 
-        //draw events that are longer than a day...
-        for (MyEvent e : this.events_whole_day) {
+
+        if (this.events_whole_day.size() > 0) {
             top_container_events.setVisibility(View.VISIBLE);
 
+            height_container.setPadding(height_container.getPaddingLeft(),
+                    Util.calculatePixelFromDB(95),
+                    height_container.getPaddingRight(),
+                    height_container.getPaddingBottom());
+        }
+        //draw events that are longer than a day...
+        for (MyEvent e : this.events_whole_day) {
             event = (LinearLayout) inflater.inflate(R.layout.event_top_container, top_container_events, false);
             ((TextView) event.findViewById(R.id.event_name)).setText(e.getName());
             event.setBackgroundColor(e.getColor() | 0xFF000000);

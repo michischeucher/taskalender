@@ -14,11 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 public class Calender extends Fragment {
@@ -27,11 +29,11 @@ public class Calender extends Fragment {
     private static final int MAX_SWIPES_LEFT_RIGHT = 50;
 
     private static CalenderPagerAdapter calender_pager_adapter;
-    private ViewPager view_pager;
+    private static int scroll_pos;
+    private static ViewPager view_pager;
     public static RelativeLayout ll;
     protected static Activity fa;
-
-
+    private static ArrayList<ScrollViewScalable> scroll_positions;
 
     public Calender() {
         // Required empty public constructor
@@ -40,7 +42,8 @@ public class Calender extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        scroll_pos = 0;
+        scroll_positions = new ArrayList<>();
     }
 
     @Override
@@ -58,11 +61,35 @@ public class Calender extends Fragment {
         return ll;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     public static void notifyChanges() {
         //Log.d(tag, "Calender: changeSomeValues");
         if (calender_pager_adapter != null) {
             calender_pager_adapter.notifyDataSetChanged();
         }
+    }
+
+    public static void setScrollPosition(int t) {
+        Calender.scroll_pos = t;
+    }
+
+    public static void notifyScalingOrScrollingChanged() {
+        for (ScrollViewScalable s : scroll_positions) {
+            s.setScrollY(Calender.scroll_pos);
+            s.scalingChanged();
+        }
+    }
+
+    public static int getScrollPosition() {
+        return Calender.scroll_pos;
+    }
+
+    public static void goToNow() {
+        view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
     }
 
 
@@ -75,7 +102,7 @@ public class Calender extends Fragment {
 
         @Override
         public Fragment getItem(int i) {
-            Log.d(tag, "Calender: CalenderPagerAdapter: getItem");
+            //Log.d(tag, "Calender: CalenderPagerAdapter: getItem");
             fragment = new CalenderDayFragment();
             Bundle args = new Bundle();
             args.putInt("number", i);
@@ -93,17 +120,12 @@ public class Calender extends Fragment {
         public void restoreState(Parcelable state, ClassLoader loader) {
             super.restoreState(state, loader);
             Log.d(tag, "restored");
-
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "Section " + (position + 1);
-        }
 
         @Override
         public int getItemPosition(Object object) {
-            Log.d(tag, "Calender: CalenderPagerAdapter: getItemPosition");
+            //Log.d(tag, "Calender: CalenderPagerAdapter: getItemPosition");
             return POSITION_NONE; //for updating all fragments, when notifyDatasetcahnge is called... :)
         }
     }
@@ -122,6 +144,7 @@ public class Calender extends Fragment {
         protected LayoutInflater inflater;
         private GregorianCalendar current_date;
         private LinearLayout height_container;
+        private ScrollViewScalable day_view_scrolling;
 
         public CalenderDayFragment() {
         }
@@ -135,7 +158,33 @@ public class Calender extends Fragment {
             top_container_events = (LinearLayout)(calender_day.findViewById(R.id.top_container_events));
             potential_text_view = (TextView)(calender_day.findViewById(R.id.potential));
             height_container = (LinearLayout)(calender_day.findViewById(R.id.height_container));
+            day_view_scrolling = (ScrollViewScalable)(calender_day.findViewById(R.id.day_view_scrolling));
 
+            day_view_scrolling.scalingChanged();
+            if (!scroll_positions.contains(day_view_scrolling)) {
+                scroll_positions.add(day_view_scrolling);
+            }
+//            day_view_scrolling.scrollTo(0, Calender.scroll_pos);
+
+            day_view_scrolling.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+//                view.scalingChanged();
+                    GregorianCalendar now = new GregorianCalendar();
+                    if (Util.isSameDate(current_date, now)) {
+                        int scroll_minute = Util.getMinuteOfDay(now) - 80;
+                        int scroll_position = (int) ((scroll_minute / 1440.0f) * height_container.getLayoutParams().height);
+                        Calender.setScrollPosition(scroll_position);
+                        day_view_scrolling.scrollTo(0, scroll_position);
+                    } else {
+                        day_view_scrolling.scrollTo(0, Calender.getScrollPosition());
+                    }
+                    Log.d(tag, "on pre draw with scroll: " + Calender.getScrollPosition());
+                    day_view_scrolling.getViewTreeObserver().removeOnPreDrawListener(this);
+                    return true;
+                }
+
+            });
             Bundle args = getArguments();
             int number = args.getInt("number");
             int current_date_offset = number - MAX_SWIPES_LEFT_RIGHT;
@@ -214,6 +263,9 @@ public class Calender extends Fragment {
             return calender_day;
         }
 
+
+
+
         @Override
         public void onResume() {
             super.onResume();
@@ -231,7 +283,8 @@ public class Calender extends Fragment {
             potential_text_view.setText(day.getPotential());
             day.calculateBlocksAndColoumns();
             day.drawEvents(calender_day_events_tasks, inflater);
-            day.drawWholeDayEvents(top_container_events, inflater);
+            day.drawWholeDayEvents(height_container, top_container_events, inflater);
+
             Log.d(tag, "Finished drawing events for " + Util.getFormattedDate(date) + "");
         }
 

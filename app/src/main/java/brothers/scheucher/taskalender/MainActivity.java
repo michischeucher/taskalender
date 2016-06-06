@@ -98,13 +98,9 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = new Intent(this, SettingDay.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_add_task) {
-            Intent intent = new Intent(this, AddTask.class);
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.action_add_event) {
-            Intent intent = new Intent(this, AddEvent.class);
-            startActivity(intent);
+        } else if (id == R.id.action_go_to_now) {
+            Log.d(tag, "going to now...");
+            Calender.goToNow();
             return true;
         }
 

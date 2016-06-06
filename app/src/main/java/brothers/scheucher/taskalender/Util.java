@@ -1,5 +1,6 @@
 package brothers.scheucher.taskalender;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -358,5 +359,11 @@ public class Util {
 
     public static String getFormattedTimeToTime(GregorianCalendar start, GregorianCalendar end) {
         return Util.getFormattedTimeInner(start) + " - " + Util.getFormattedTime(end);
+    }
+
+    public static int calculatePixelFromDB(int dp) {
+        DisplayMetrics metrics = TimeRank.getContext().getResources().getDisplayMetrics();
+        float fpixels = metrics.density * dp;
+        return (int) (fpixels + 0.5f);
     }
 }

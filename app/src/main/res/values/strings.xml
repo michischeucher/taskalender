@@ -42,5 +42,6 @@
     <string name="title_activity_view_event">ViewEvent</string>
     <string name="no_label">Kein Label</string>
     <string name="choose_label">Label auswählen</string>
+    <string name="action_today">Jetzt</string>
 
 </resources>

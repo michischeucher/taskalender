@@ -29,6 +29,7 @@ public class TimeRank {
     private static Context context;
 
     public static float scale_factor;
+    private static boolean something_changed;
 
 
     public static void startApplication(Context context) {
@@ -56,6 +57,7 @@ public class TimeRank {
         sql_helper.addAllDaySettingObjectsFromDatabase();
 
         TimeRank.createCalculatingJob();
+        something_changed = false;
     }
 
     public static void createCalculatingJob() {
@@ -470,4 +472,4 @@ public class TimeRank {
         Log.d(tag, "##### END CALCULATING DAYS with TASKS #####");
     }
 
-}
+    }

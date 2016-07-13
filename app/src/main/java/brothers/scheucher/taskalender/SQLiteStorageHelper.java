@@ -45,7 +45,9 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + Label.DB_COL_PARENT_ID + " int ) ";
     private static final String DAYSETTING_TABLE = "CREATE TABLE IF NOT EXISTS " + DaySettingObject.DB_TABLE + " ( "
             + DaySettingObject.DB_COL_ID + " int, "
-            + DaySettingObject.DB_COL_TOTALDURATION + " int ) ";
+            + DaySettingObject.DB_COL_TOTALDURATION + " int, "
+            + DaySettingObject.DB_COL_EARLIESTMINUTE + " int, "
+            + DaySettingObject.DB_COL_LATESTMINUTE + " int ) ";
 
     private static final String DROP_TASK_TABLE = "DROP TABLE IF EXISTS " + Task.DB_TABLE;
     private static final String DROP_EVENT_TABLE = "DROP TABLE IF EXISTS " + MyEvent.DB_TABLE;
@@ -259,6 +261,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
     public boolean saveDaySettingObject(DaySettingObject dso) {
         ContentValues values = new ContentValues();
         values.put(DaySettingObject.DB_COL_TOTALDURATION, dso.getTotalDurationInMinutes());
+        values.put(DaySettingObject.DB_COL_EARLIESTMINUTE, dso.getEarliest_minute());
+        values.put(DaySettingObject.DB_COL_LATESTMINUTE, dso.getLatest_minute());
 
         Cursor cursor = db.rawQuery("SELECT * from " + DaySettingObject.DB_TABLE + " WHERE " +
                 DaySettingObject.DB_COL_ID + " = \"" + dso.getId() + "\"", null);
@@ -358,6 +362,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_ID));
             DaySettingObject dso = new DaySettingObject(id);
             dso.setTotalDuration(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_TOTALDURATION)));
+            dso.setEarliest_minute(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_EARLIESTMINUTE)));
+            dso.setLatest_minute(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_LATESTMINUTE)));
 
             Log.d(tag, "DaySettingObject read: " + dso.description());
             TimeRank.addDaySettingObject(dso);

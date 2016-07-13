@@ -55,11 +55,12 @@ public class Task implements Comparable {
         this.deadline = new GregorianCalendar();
         this.deadline.set(GregorianCalendar.HOUR_OF_DAY, 23);
         this.deadline.set(GregorianCalendar.MINUTE, 0);
-        this.remaining_duration = new Duration(30);
+        this.remaining_duration = new Duration(0);
+        this.label_ids = new ArrayList<Integer>();
+
         this.overlapping_minutes = 0;
         this.already_distributed_duration = 0;
         this.filling_factor = 0;
-        this.label_ids = new ArrayList<Integer>();
     }
 
     public Task(int id) {

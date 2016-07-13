@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -23,6 +24,7 @@ public class ViewTask extends ActionBarActivity {
 
     private static final String tag = "ViewTask";
     private Task task;
+    private int id;
     private Context context;
     private Activity activity;
     private RelativeLayout view_task;
@@ -39,7 +41,7 @@ public class ViewTask extends ActionBarActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            int id = b.getInt("id");
+            id = b.getInt("id");
             task = TimeRank.getTask(id);
             Log.d(tag, "fetched task");
         } else {
@@ -92,7 +94,7 @@ public class ViewTask extends ActionBarActivity {
             }
         });
 
-        Button edit_button = ((Button)view_task.findViewById(R.id.edit_button));
+        FloatingActionButton edit_button = ((FloatingActionButton)view_task.findViewById(R.id.edit_button));
         edit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +112,12 @@ public class ViewTask extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fillFieldsBecauseOfData();
+        if (TimeRank.getTask(id) == null) {
+            Log.d(tag, "Task doesn't exist anymore..." + task.description());
+            finish();
+        } else {
+            fillFieldsBecauseOfData();
+        }
     }
 
     private void fillFieldsBecauseOfData() {

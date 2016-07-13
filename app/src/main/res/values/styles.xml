@@ -4,11 +4,14 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="DescriptionText">
@@ -41,18 +44,21 @@
         <item name="android:layout_weight">2</item>
         <item name="android:background">@android:color/darker_gray</item>
     </style>
+
     <style name="HourIndicatorPause">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">98</item>
     </style>
+
     <style name="HourHalfIndicator">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">2</item>
         <item name="android:background">#FFFF0000</item>
-<!--        <item name="android:src">@drawable/dotted</item> if it is a imageview...?! not worked :(-->
+        <!--        <item name="android:src">@drawable/dotted</item> if it is a imageview...?! not worked :(-->
     </style>
+
     <style name="HourHalfIndicatorPause">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>

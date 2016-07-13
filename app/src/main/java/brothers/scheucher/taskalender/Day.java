@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import static java.util.Collections.sort;
 
 public class Day {
@@ -112,11 +114,25 @@ public class Day {
     }
 
     private int checkAvailableWorkTime(int available_work_time) {
-        if (available_work_time > (day_settings.getTotalDurationInMinutes() - getDistributedTaskEventsDuration())) {
-            return (day_settings.getTotalDurationInMinutes() - getDistributedTaskEventsDuration());
+        int already_worked = calculateWorkedTime();
+        Log.d(tag, "already worked: " + description() + already_worked);
+        if (available_work_time > (day_settings.getTotalDurationInMinutes() - already_worked)) {
+            return (day_settings.getTotalDurationInMinutes() - already_worked);
         } else {
             return available_work_time;
         }
+    }
+
+    private int calculateWorkedTime() {
+        DayScheduler scheduler = new DayScheduler(this.start);
+        scheduler.addBlockingTime(this.start, 0, day_settings.getEarliest_minute());
+        scheduler.addBlockingTime(this.start, day_settings.getLatest_minute(), 24 * 60);
+        for (MyEvent e : this.events) {
+            if (e.isBlocking()) {
+                scheduler.addBlockingTime(e.getStart(), e.getEnd());
+            }
+        }
+        return 24 * 60 - scheduler.getPossibleWorkTime() - day_settings.getEarliest_minute() - (24 * 60 - day_settings.getLatest_minute());
     }
 
     public void addTask(Task task) {
@@ -272,14 +288,15 @@ public class Day {
 
                     event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
                     ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd()));
-                    event.setBackgroundColor(e.getColor() | 0xFF000000);
+                    Util.setColorOfDrawable(event,e.getColor() | 0xFF000000);
                     if (Util.isDarkColor(e.getColor())) {
                         ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
                     }
+
                     if (e.getTask() != null) {
                         event.setTag(R.string.task_event, true);
                         event.setTag(R.string.id, e.getTask().getId());
-                        event.setBackgroundColor(0xA0000000 | e.getColor());
+                        Util.setColorOfDrawable(event, e.getColor() | 0xA0000000);
                     } else {
                         event.setTag(R.string.task_event, false);
                         event.setTag(R.string.id, e.getId());
@@ -316,14 +333,14 @@ public class Day {
         for (MyEvent e : this.events_whole_day) {
             event = (LinearLayout) inflater.inflate(R.layout.event_top_container, top_container_events, false);
             ((TextView) event.findViewById(R.id.event_name)).setText(e.getName());
-            event.setBackgroundColor(e.getColor() | 0xFF000000);
+            Util.setColorOfDrawable(event, e.getColor() | 0xFF000000);
             if (Util.isDarkColor(e.getColor())) {
                 ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
             }
             if (e.getTask() != null) {
                 event.setTag(R.string.task_event, true);
                 event.setTag(R.string.id, e.getTask().getId());
-                event.setBackgroundColor(0xA0000000 | e.getColor());
+                Util.setColorOfDrawable(event, e.getColor() | 0xAF000000);
             } else {
                 event.setTag(R.string.task_event, false);
                 event.setTag(R.string.id, e.getId());
@@ -352,7 +369,7 @@ public class Day {
                 time.end = (GregorianCalendar) e.getEnd().clone();
             }
             for (Column c : columns) {
-                if (Util.earlierDate(c.getEnd(), e.getStart())) {
+                if (Util.earlierDateOrSame(c.getEnd(), e.getStart())) {
                     //possible:
                     c.addEvent(e);
                     return;

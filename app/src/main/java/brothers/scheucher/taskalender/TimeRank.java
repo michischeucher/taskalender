@@ -264,7 +264,7 @@ public class TimeRank {
                 return e;
             }
         }
-        return new MyEvent();
+        return null;
     }
 
     public static Task getTask(int id) {
@@ -299,7 +299,7 @@ public class TimeRank {
 
     private static ArrayList<Label> getRecursiveLabelStructure(Label label) {
         Log.d(tag, "getRecursiveLabelStructure called");
-        ArrayList<Label> ret = new ArrayList<Label>();
+        ArrayList<Label> ret = new ArrayList<>();
         ArrayList<Label> childs = label.getChildLabels();
         ret.add(label);
         for (Label l : childs) {

@@ -58,7 +58,7 @@ public class ColorPickerDialog extends Dialog implements SeekBar.OnSeekBarChange
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.materialcolorpicker_layout_color_picker);
+        setContentView(R.layout.color_picker);
 
         colorView = findViewById(R.id.colorView);
 

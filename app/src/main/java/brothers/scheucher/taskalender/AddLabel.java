@@ -40,6 +40,8 @@ public class AddLabel extends AppCompatActivity {
             label = TimeRank.getLabel(id);
         } else {
             label = new Label();
+            findViewById(R.id.add_label_title).requestFocus();
+
         }
 
         ActionBar actionBar = getSupportActionBar();

@@ -1,106 +1,73 @@
 package brothers.scheucher.taskalender;
 
-import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
+
     private static final String tag = "MainActivity";
-    private static FragmentManager fragment_manager;
-
-    private String[] left_drawer_titles;
     private DrawerLayout drawer_layout;
-    private ListView drawer_list;
-
-    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this;
 
-        drawer_layout = ((DrawerLayout)findViewById(R.id.drawer_layout));
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         TimeRank.startApplication(this);
 
-        if (findViewById(R.id.fragment_container) != null) {
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
-            if (savedInstanceState != null) {
-                return;
-            }
-            Calender calender_fragment = new Calender();
-            calender_fragment.setArguments(getIntent().getExtras());
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, calender_fragment).commit();
-        }
+        drawer_layout = ((DrawerLayout)findViewById(R.id.drawer_layout));
 
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer_layout.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) drawer_layout.findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //first fragment
+        displayView(R.id.nav_day);
+        navigationView.setCheckedItem(R.id.nav_day);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        //setting the left drawer
-        TextView day_ansicht = ((TextView) findViewById(R.id.day_ansicht));
-        day_ansicht.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "click on day ansicht...");
-                Calender calender_fragment = new Calender();
-                calender_fragment.setArguments(getIntent().getExtras());
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, calender_fragment).commit();
-                drawer_layout.closeDrawers();
-            }
-        });
-        TextView label_ansicht = ((TextView) findViewById(R.id.label_ansicht));
-        label_ansicht.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "click on label ansicht...");
-                LabelFragment label_fragment = LabelFragment.newInstance(-1);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, label_fragment).commit();
-                drawer_layout.closeDrawers();
-            }
-        });
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_calender, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingDay.class);
             startActivity(intent);
-            return true;
-        } else if (id == R.id.action_go_to_now) {
-            Log.d(tag, "going to now...");
-            Calender.goToNow();
             return true;
         }
 
@@ -126,18 +93,44 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void handleClickOnTask(View view) {
-        int id = (int) view.getTag(R.string.id);
-        Log.d(tag, "handleClickOnTask id = " + id);
-
-        Intent intent = new Intent(this, AddTask.class);
-        //fa = super.getActivity();
-        //Intent intent = fa.getIntent();
-        Bundle b = new Bundle();
-        b.putInt("id", id); //Your id
-        intent.putExtras(b); //Put your id to your next Intent
+    public void handleClickOnPotential(View view) {
+        Intent intent = new Intent(this, PotentialActivity.class);
         startActivity(intent);
     }
 
+    private void displayView(int view_id) {
+        drawer_layout.closeDrawer(GravityCompat.START);
 
+        if (view_id == R.id.nav_day) {
+            Calender fragment = new Calender();
+            fragment.setArguments(getIntent().getExtras());
+            getSupportActionBar().setTitle("Kalender");
+
+            android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //transaction.addToBackStack("Kalender shown");
+            transaction.replace(R.id.fragment_container, fragment).commit();
+        } else if (view_id == R.id.nav_task) {
+            LabelFragment fragment = LabelFragment.newInstance(-1);
+            fragment.setArguments(getIntent().getExtras());
+            getSupportActionBar().setTitle("Labels");
+
+            android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //transaction.addToBackStack("Labels shown");
+            transaction.replace(R.id.fragment_container, fragment).commit();
+        } else if (view_id == R.id.nav_day_settings) {
+            Intent intent = new Intent(this, SettingDay.class);
+            startActivity(intent);
+        } else if (view_id == R.id.nav_settings) {
+            Log.d(tag, "Settings clicked");
+        }
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Log.d(tag, "click item..." + id);
+        displayView(id);
+        return true;
+    }
 }

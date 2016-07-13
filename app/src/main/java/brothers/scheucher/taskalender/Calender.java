@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -12,12 +13,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -31,7 +34,7 @@ public class Calender extends Fragment {
     private static CalenderPagerAdapter calender_pager_adapter;
     private static int scroll_pos;
     private static ViewPager view_pager;
-    public static RelativeLayout ll;
+    public static CoordinatorLayout ll;
     protected static Activity fa;
     private static ArrayList<ScrollViewScalable> scroll_positions;
     public static boolean got_to_now;
@@ -45,14 +48,33 @@ public class Calender extends Fragment {
         super.onCreate(savedInstanceState);
         scroll_pos = 0;
         scroll_positions = new ArrayList<>();
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_calender, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_go_to_now) {
+            Log.d(tag, "going to now...");
+            Calender.goToNow();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(tag, "onCreateView");
         super.onCreate(savedInstanceState);
-        fa = super.getActivity();
-        ll = (RelativeLayout) inflater.inflate(R.layout.activity_calender, container, false);
+        ll = (CoordinatorLayout) inflater.inflate(R.layout.activity_calender, container, false);
 
         got_to_now = true;
 
@@ -60,8 +82,6 @@ public class Calender extends Fragment {
         view_pager = (ViewPager) ll.findViewById(R.id.day_pager);
         view_pager.setAdapter(calender_pager_adapter);
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
-
-
 
         return ll;
     }

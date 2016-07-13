@@ -2,7 +2,6 @@ package brothers.scheucher.taskalender;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.LinearLayout;
@@ -77,7 +76,7 @@ public class ScrollViewScalable extends ScrollView {
     }
 
     public void scalingChanged() {
-        Log.d(tag, "scalingChanging to " + TimeRank.scale_factor);
+        //Log.d(tag, "scalingChanging to " + TimeRank.scale_factor);
         if (this.height_container == null) {
             height_container = (LinearLayout)findViewById(R.id.height_container);
             initial_height = height_container.getLayoutParams().height;

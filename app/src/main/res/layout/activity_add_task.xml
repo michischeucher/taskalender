@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="brothers.scheucher.taskalender.AddTask"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     >
 
     <ScrollView
@@ -17,8 +19,6 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_margin"
         >
-
-
             <EditText
                 android:id="@+id/add_task_title"
                 android:hint="@string/title"
@@ -43,7 +43,7 @@
                 android:text="1 Std. 32 Min."
                 style="@style/NormalText"
                 />
-
+<!--
             <TextView
                 android:text="@string/earliest_start"
                 style="@style/DescriptionText"
@@ -77,7 +77,7 @@
                     android:visibility="invisible"
                     />
             </LinearLayout>
-
+-->
             <TextView
                 android:text="@string/deadline_description"
                 android:layout_weight="1"

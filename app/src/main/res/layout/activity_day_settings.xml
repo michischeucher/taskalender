@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="brothers.scheucher.taskalender.AddTask"
     >
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +16,44 @@
         android:paddingBottom="@dimen/touch_size"
         android:layout_margin="@dimen/activity_margin"
         >
+
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Arbeitstage"
+            />
+        <TextView
+            android:id="@+id/working_days"
+            style="@style/NormalText"
+            android:text="Montag - Sonntag"
+            />
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Frühster Start"
+            />
+        <TextView
+            android:id="@+id/earliest_start_time"
+            style="@style/NormalText"
+            android:text="8:00 Uhr"
+            />
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Bis spätestens"
+            />
+        <TextView
+            android:id="@+id/latest_end_time"
+            style="@style/NormalText"
+            android:text="20:00 Uhr"
+            />
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Gesamtarbeitszeit pro Tag: "
+            />
+        <TextView
+            style="@style/NormalText"
+            android:id="@+id/setting_day_duration"
+            android:text="6 Std. 30 Min."
+            />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -28,24 +65,6 @@
                 >
             </brothers.scheucher.taskalender.PieChart>
         </RelativeLayout>
-
-        <TextView
-            android:text="Gesamtzeit pro Tag: "
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/abc_text_size_small_material"
-            android:paddingTop="@dimen/description_distance_top"
-            android:paddingBottom="@dimen/description_distance_bottom"
-            />
-        <TextView
-            android:id="@+id/setting_day_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="6 Std. 30 Min."
-            android:textSize="@dimen/abc_text_size_medium_material"
-            android:textColor="@color/text_normal"
-            android:background="@null"
-            />
 
     </LinearLayout>
     </ScrollView>

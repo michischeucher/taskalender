@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:id="@+id/info_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:id="@+id/info_container"
     android:layout_width="match_parent"
     android:layout_height="32dp"
     android:orientation="horizontal"
@@ -10,8 +11,8 @@
 
     <TextView
         android:id="@+id/potential"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/NormalText"
+        android:onClick="handleClickOnPotential"
         />
     <!--
         android:text="Potential: 1.Std. 30 Min."/>

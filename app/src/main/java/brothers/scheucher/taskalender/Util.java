@@ -1,9 +1,18 @@
 package brothers.scheucher.taskalender;
 
+import android.graphics.drawable.GradientDrawable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -189,6 +198,14 @@ public class Util {
         return hour * 60 + minute;
     }
 
+    public static int getHourOfDay(GregorianCalendar date_with_time) {
+        return date_with_time.get(GregorianCalendar.HOUR_OF_DAY);
+    }
+    public static int getMinute(GregorianCalendar date_with_time) {
+        return date_with_time.get(GregorianCalendar.MINUTE);
+    }
+
+
     public static String getFormattedDuration(int minutes) {
         String ret = "";
         int duration_hours = minutes / 60;
@@ -258,6 +275,15 @@ public class Util {
             return false;
         }
     }
+
+    public static boolean earlierDateOrSame(GregorianCalendar earlier_date, GregorianCalendar date) {
+        if (earlier_date.compareTo(date) < 1) { //earlier date is earlier...
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     public static boolean isDarkColor(int color) {
         int r = 0xFF0000 & color;
@@ -365,5 +391,75 @@ public class Util {
         DisplayMetrics metrics = TimeRank.getContext().getResources().getDisplayMetrics();
         float fpixels = metrics.density * dp;
         return (int) (fpixels + 0.5f);
+    }
+
+
+    public static void setColorOfDrawable(LinearLayout background, int color) {
+        GradientDrawable sh = (GradientDrawable)background.getBackground();
+        sh.setColor(color);
+
+    }
+
+    public static void setSupportActionBarTitle(ViewEvent mActivity, ActionBar supportActionBar, String name) {
+        final FrameLayout frameLayout = new FrameLayout(mActivity);
+        FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
+        frameLayout.setLayoutParams(frameLayoutParams);
+
+
+        // Create new LinearLayout
+        final LinearLayout linearLayout = new LinearLayout(mActivity);
+        frameLayoutParams =new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPixels(78));
+        frameLayoutParams.gravity = Gravity.LEFT;
+        linearLayout.setLayoutParams(frameLayoutParams);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+
+        // Add textviews
+        final TextView textView1 = new TextView(mActivity);
+        LinearLayout.LayoutParams linearLayoutParams =new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        frameLayoutParams.gravity = Gravity.BOTTOM;
+        textView1.setLayoutParams(linearLayoutParams);
+        textView1.setText("Title");
+        textView1.setTextColor(ContextCompat.getColor(mActivity, R.color.materialcolorpicker__white));
+        textView1.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        linearLayout.addView(textView1);
+
+
+        final TextView textView2 = new TextView(mActivity);
+        linearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        textView2.setLayoutParams(linearLayoutParams);
+        textView2.setText("Subtitle");
+        textView2.setTextColor(ContextCompat.getColor(mActivity, R.color.materialcolorpicker__white));
+        textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        linearLayout.addView(textView2);
+
+        frameLayout.addView(linearLayout);
+
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout)mActivity.findViewById(R.id.toolbar_layout);
+        collapsingToolbar.addView(frameLayout);
+        final float SCALE_MIN=0.4f;
+        AppBarLayout appBarLayout = (AppBarLayout) mActivity.findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int offSet) {
+                float collapsedRatio = (float) offSet / appBarLayout.getTotalScrollRange();
+                linearLayout.setScaleX(1 + (collapsedRatio * SCALE_MIN));
+                linearLayout.setScaleY(1 + (collapsedRatio * SCALE_MIN));
+                FrameLayout.LayoutParams frameLayoutParams =new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPixels(78));
+                frameLayoutParams.gravity = Gravity.BOTTOM;
+                frameLayoutParams.setMargins(Math.round(dpToPixels(48) * (1+collapsedRatio)), 0, 0, Math.round(dpToPixels(15) * collapsedRatio));
+                linearLayout.setLayoutParams(frameLayoutParams);
+                // You can also setTransitionY/X, setAlpha, setColor etc.
+            }
+        });
+    }
+
+    private static int dpToPixels(int dp) {
+        DisplayMetrics displayMetrics = TimeRank.getContext().getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
     }
 }

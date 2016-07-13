@@ -1,6 +1,7 @@
 package brothers.scheucher.taskalender;
 
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -22,6 +24,12 @@ public class SettingDay extends ActionBarActivity {
     private Context context;
     private PieChart setting_day_chart;
     private TextView duration_view;
+    private TextView earliest_start_view;
+    private TextView latest_end_view;
+    private TextView working_days_view;
+
+    private GregorianCalendar earliest_start;
+    private GregorianCalendar latest_end;
 
     private DaySettingObject day_setting;
     private Duration rest_duration;
@@ -30,18 +38,27 @@ public class SettingDay extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting_day);
+        setContentView(R.layout.activity_day_settings);
         this.context = this;
         this.day_setting = TimeRank.getDaySettingObject(new GregorianCalendar());
 
         //GETTING VIEWS
+        working_days_view = ((TextView)findViewById(R.id.working_days));
+        earliest_start_view = ((TextView)findViewById(R.id.earliest_start_time));
+        latest_end_view = ((TextView)findViewById(R.id.latest_end_time));
         duration_view = ((TextView)findViewById(R.id.setting_day_duration));
 
         LinearLayout setting_day_content = ((LinearLayout)findViewById(R.id.setting_day_content));
 
+        earliest_start = new GregorianCalendar();
+        latest_end = new GregorianCalendar();
+        Util.setTime(earliest_start, day_setting.getEarliest_minute() / 60, day_setting.getEarliest_minute() % 60);
+        Util.setTime(latest_end, day_setting.getLatest_minute() / 60, day_setting.getLatest_minute() % 60);
 
         //SETTING VALUES
         duration_view.setText(Util.getFormattedDuration(day_setting.getTotalDurationInMinutes()));
+        earliest_start_view.setText(Util.getFormattedTime(earliest_start));
+        latest_end_view.setText(Util.getFormattedTime(latest_end));
         sum_distributed_duration = new Duration(0);
 
         //SETTING LISTENERS
@@ -59,6 +76,21 @@ public class SettingDay extends ActionBarActivity {
                     }
                 });
                 duration_dialog.show();
+            }
+        });
+
+        earliest_start_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(earliest_start_view, earliest_start), Util.getHourOfDay(earliest_start), Util.getMinute(earliest_start), true);
+                dialog.show();
+            }
+        });
+        latest_end_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(latest_end_view, latest_end), Util.getHourOfDay(latest_end), Util.getMinute(latest_end), true);
+                dialog.show();
             }
         });
 
@@ -147,6 +179,8 @@ public class SettingDay extends ActionBarActivity {
         if (id == R.id.action_save) {
             MyConstraint constraint = new MyConstraint();
             day_setting.addConstraint(constraint);
+            day_setting.setEarliest_minute(Util.getMinuteOfDay(earliest_start));
+            day_setting.setLatest_minute(Util.getMinuteOfDay(latest_end));
             day_setting.save(this);
             TimeRank.addDaySettingObject(day_setting);
             TimeRank.createCalculatingJob();
@@ -157,4 +191,19 @@ public class SettingDay extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private class onTimeSetListener implements TimePickerDialog.OnTimeSetListener {
+        private TextView text_view;
+        private GregorianCalendar time;
+
+        public onTimeSetListener(TextView view, GregorianCalendar time) {
+            this.text_view = view;
+            this.time = time;
+        }
+
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            Util.setTime(time, hourOfDay, minute);
+            this.text_view.setText(Util.getFormattedTime(time));
+        }
+    }
 }

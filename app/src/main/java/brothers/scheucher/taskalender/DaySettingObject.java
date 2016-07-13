@@ -10,9 +10,10 @@ public class DaySettingObject {
     private static final String tag = "DaySettingObject";
 
     private int id;
-    private Duration total_duration; //in minutes
+    private Duration total_duration;
     private int earliest_minute;
     private int latest_minute;
+
     private ArrayList<Pair<Label, Duration>> labels_durations;
 
     //database

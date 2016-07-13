@@ -10,11 +10,5 @@
         android:text="Verbleibende Dauer: "
         style="@style/DescriptionText"
         />
-    <TextView
-        android:id="@+id/text_of_item"
-        style="@style/NormalText"
-        android:text="1 Std. 32 Min."
-        android:layout_below="@id/description_of_item"
-        />
 
 </RelativeLayout>

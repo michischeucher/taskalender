@@ -26,7 +26,6 @@ public class AddTask extends AppCompatActivity {
     private Task task;
     private Context context;
 
-    private TextView earliest_start_date;
     private TextView deadline_date_view;
     private TextView add_task_label;
     private TextView add_task_label_color;
@@ -54,11 +53,11 @@ public class AddTask extends AppCompatActivity {
         } else {
             task = new Task();
             Log.d(tag, "created new task");
+            findViewById(R.id.add_task_title).requestFocus();
         }
 
         //GETTING VIEWS
         TextView duration_view = ((TextView) findViewById(R.id.add_task_duration));
-        earliest_start_date = ((TextView) findViewById(R.id.add_task_earliest_start_date));
         deadline_date_view = ((TextView)findViewById(R.id.add_task_deadline_date));
         TextView deadline_time_view = ((TextView) findViewById(R.id.add_task_deadline_time));
         LinearLayout add_task_label_container = ((LinearLayout) findViewById(R.id.add_task_label_container));
@@ -70,13 +69,10 @@ public class AddTask extends AppCompatActivity {
         duration_dialog = new DurationPickerDialog(AddTask.this, duration_view, task.getDuration());
         duration_dialog.setTitle("Verbleibende Dauer");
 
-
-
         //SETTING VIEWS
         ((TextView)findViewById(R.id.add_task_title)).setText(task.getName());
         ((TextView)findViewById(R.id.add_task_notice)).setText(task.getNotice());
         duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
-        earliest_start_date.setText(Util.getFormattedDate(task.getEarliestStart()));
         deadline_date_view.setText(Util.getFormattedDate(task.getDeadline()));
         deadline_time_view.setText(Util.getFormattedTime(task.getDeadline()));
 
@@ -99,12 +95,6 @@ public class AddTask extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showDurationPicker();
-            }
-        });
-        earliest_start_date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker(earliest_start_date, task.getEarliestStart());
             }
         });
         deadline_date_view.setOnClickListener(new View.OnClickListener() {
@@ -249,6 +239,9 @@ public class AddTask extends AppCompatActivity {
             task.save(this);
             TimeRank.addTaskToList(task);
             TimeRank.createCalculatingJob();
+
+            MyNotifications.createNotification(this);
+
             finish();
             return true;
         }
@@ -278,10 +271,8 @@ public class AddTask extends AppCompatActivity {
     private void checkCorrectValues() {
         if (task.getEarliestStart().compareTo(task.getDeadline()) == 1) {
             deadline_date_view.setTextColor(0xFFFF0000);
-            earliest_start_date.setTextColor(0xFFFF0000);
         } else {
             deadline_date_view.setTextColor(0xFF000000);
-            earliest_start_date.setTextColor(0xFF000000);
         }
     }
 

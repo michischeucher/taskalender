@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:onClick="handleClickOnEvent"
+    android:background="@drawable/rounded_corners"
     >
     <TextView
         android:id="@+id/event_name"

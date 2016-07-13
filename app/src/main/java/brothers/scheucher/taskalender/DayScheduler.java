@@ -92,4 +92,12 @@ public class DayScheduler {
         }
         return ret;
     }
+
+    public void addBlockingTime(GregorianCalendar date, int start_minute, int end_minute) {
+        GregorianCalendar start = (GregorianCalendar)date.clone();
+        Util.setTime(start, start_minute / 60, start_minute % 60);
+        GregorianCalendar end = (GregorianCalendar)date.clone();
+        Util.setTime(end, end_minute / 60, end_minute % 60);
+        addBlockingTime(start, end);
+    }
 }

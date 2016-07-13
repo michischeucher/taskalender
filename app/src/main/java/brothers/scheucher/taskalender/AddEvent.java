@@ -41,6 +41,7 @@ public class AddEvent extends AppCompatActivity {
             event = TimeRank.getEvent(id);
         } else {
             event = new MyEvent();
+            findViewById(R.id.add_event_title).requestFocus();
         }
 
         ActionBar actionBar = getSupportActionBar();

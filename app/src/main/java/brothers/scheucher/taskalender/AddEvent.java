@@ -36,11 +36,16 @@ public class AddEvent extends AppCompatActivity {
         setContentView(R.layout.activity_add_event);
 
         Bundle b = getIntent().getExtras();
+        int current_date_offset = 0;
         if (b != null) {
             int id = b.getInt("id");
             event = TimeRank.getEvent(id);
-        } else {
+            current_date_offset = b.getInt("current_date_offset");
+        }
+        if (event == null) {
             event = new MyEvent();
+            event.getStart().add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
+            event.getEnd().add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
             findViewById(R.id.add_event_title).requestFocus();
         }
 

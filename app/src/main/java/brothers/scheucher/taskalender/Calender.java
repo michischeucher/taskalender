@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -21,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,10 +34,13 @@ public class Calender extends Fragment {
     private static CalenderPagerAdapter calender_pager_adapter;
     private static int scroll_pos;
     private static ViewPager view_pager;
-    public static CoordinatorLayout ll;
+    public static RelativeLayout ll;
     protected static Activity fa;
     private static ArrayList<ScrollViewScalable> scroll_positions;
     public static boolean got_to_now;
+
+    Button new_button;
+    LinearLayout new_button_option_view;
 
     public Calender() {
         // Required empty public constructor
@@ -74,7 +77,7 @@ public class Calender extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ll = (CoordinatorLayout) inflater.inflate(R.layout.activity_calender, container, false);
+        ll = (RelativeLayout) inflater.inflate(R.layout.activity_calender, container, false);
 
         got_to_now = true;
 
@@ -83,7 +86,79 @@ public class Calender extends Fragment {
         view_pager.setAdapter(calender_pager_adapter);
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
 
+        new_button = (Button)ll.findViewById(R.id.new_button);
+        new_button_option_view = (LinearLayout) ll.findViewById(R.id.new_button_options);
+
+        new_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new click");
+
+                toggleOptions();
+            }
+        });
+
+        Button new_event = ((Button)ll.findViewById(R.id.new_event_button));
+        new_event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new event");
+                int current_date_offset = view_pager.getCurrentItem() - MAX_SWIPES_LEFT_RIGHT;
+                Log.d(tag, "current date offset = " + current_date_offset);
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("current_date_offset", current_date_offset);
+
+                Intent intent = new Intent(getActivity(), AddEvent.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                toggleOptions();
+            }
+        });
+
+        Button new_task = ((Button)ll.findViewById(R.id.new_task_button));
+        new_task.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new task");
+                Intent intent = new Intent(getActivity(), AddTask.class);
+                startActivity(intent);
+                toggleOptions();
+            }
+        });
+
+        Button new_label = ((Button)ll.findViewById(R.id.new_label_button));
+        new_label.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new label");
+                Intent intent = new Intent(getActivity(), AddLabel.class);
+                startActivity(intent);
+
+                toggleOptions();
+            }
+        });
+
         return ll;
+    }
+
+    private void toggleOptions() {
+        if (new_button_option_view.getVisibility() == View.VISIBLE) {
+            new_button_option_view.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button));
+            }
+            new_button.setText("+");
+        } else {
+            new_button_option_view.setVisibility(View.VISIBLE);
+            //tooo new...
+            // ((Button)findViewById(R.id.calender_day_new_button)).setBackground(getDrawable(R.drawable.rounded_button_inactive));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button_inactive));
+            }
+            new_button.setText("-");
+        }
+
     }
 
     @Override
@@ -164,10 +239,6 @@ public class Calender extends Fragment {
     public static class CalenderDayFragment extends Fragment {
         public static final String ARG_SECTION_NUMBER = "section_number";
 
-        private Button new_button;
-        private Button new_event;
-        private Button new_task;
-        private Button new_label;
         private View calender_day;
         private LinearLayout calender_day_events_tasks;
         private LinearLayout top_container_events;
@@ -235,60 +306,6 @@ public class Calender extends Fragment {
                 calender_day_date_view.setTextColor(0xFF0000FF);
                 calender_day_of_week_view.setTextColor(0xFF0000FF);
             }
-
-            new_button = (Button)calender_day.findViewById(R.id.calender_day_new_button);
-            new_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(tag, "new click");
-                    LinearLayout new_button_option_view = (LinearLayout) calender_day.findViewById(R.id.calender_day_new_button_options);
-
-                    if (new_button_option_view.getVisibility() == View.VISIBLE) {
-                        new_button_option_view.setVisibility(View.GONE);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button));
-                        }
-                        new_button.setText("+");
-                    } else {
-                        new_button_option_view.setVisibility(View.VISIBLE);
-                        //tooo new...
-                        // ((Button)findViewById(R.id.calender_day_new_button)).setBackground(getDrawable(R.drawable.rounded_button_inactive));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button_inactive));
-                        }
-                        new_button.setText("-");
-                    }
-                }
-            });
-
-            new_event = ((Button)calender_day.findViewById(R.id.calender_day_new_event));
-            new_event.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(tag, "new event");
-                    Intent intent = new Intent(getActivity(), AddEvent.class);
-                    startActivity(intent);
-                }
-            });
-            new_task = ((Button)calender_day.findViewById(R.id.calender_day_new_task));
-            new_task.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(tag, "new task");
-                    Intent intent = new Intent(getActivity(), AddTask.class);
-                    startActivity(intent);
-                }
-            });
-
-            new_label = ((Button)calender_day.findViewById(R.id.calender_day_new_label));
-            new_label.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(tag, "new label");
-                    Intent intent = new Intent(getActivity(), AddLabel.class);
-                    startActivity(intent);
-                }
-            });
 
             return calender_day;
         }

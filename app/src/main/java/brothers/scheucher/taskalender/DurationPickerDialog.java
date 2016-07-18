@@ -273,6 +273,9 @@ public class DurationPickerDialog extends Dialog {
     @Override
     protected void onStart() {
         duration_current.setDuration(duration_result.getDuration());
+        if (this.duration_current.getDuration() == 0) {
+            this.duration_current.setDuration(Settings.STANDARD_DURATION_TASK);
+        }
         settingFieldsBecauseOfData();
         hour_touch_difference = -1000;
         minute_touch_difference = -1000;

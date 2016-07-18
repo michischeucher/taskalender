@@ -33,6 +33,7 @@ public class LabelFragment extends Fragment {
     public static LabelFragment newInstance(int label_id) {
         LabelFragment fragment = new LabelFragment();
         Bundle args = new Bundle();
+        Log.d(tag, "label_id = " + label_id);
         args.putInt(ARG_LABEL_ID, label_id);
         fragment.setArguments(args);
         return fragment;
@@ -158,8 +159,9 @@ public class LabelFragment extends Fragment {
             task_list.addView(row);
         }
 
-        for (final Task task : task_array) {
-            LayoutInflater inflater = (LayoutInflater) context
+        for (int i = (task_array.size() - 1); i >= 0; i--) {
+            final Task task = task_array.get(i);
+            final LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             View rowView = inflater.inflate(R.layout.task_in_list, task_list, false);

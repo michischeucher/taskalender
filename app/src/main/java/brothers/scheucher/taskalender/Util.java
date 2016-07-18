@@ -32,7 +32,7 @@ public class Util {
 
     public static String DateToString(GregorianCalendar date) {
         if (date == null) {
-            return "";
+            return "-";
         }
         int year = date.get(GregorianCalendar.YEAR);
         int month = date.get(GregorianCalendar.MONTH);
@@ -46,6 +46,10 @@ public class Util {
     }
 
     public static GregorianCalendar StringToDate(String date_string) {
+        if (date_string.equals("-")) {
+            return null;
+        }
+        Log.d(tag, "StringToDate: " + date_string);
         String[] parts = date_string.split("-");
         int year = 0;
         int month = 0;
@@ -72,6 +76,9 @@ public class Util {
     }
 
     public static String getFormattedDate(GregorianCalendar date) {
+        if (date == null) {
+            return "Kein Datum";
+        }
         DateFormat df = new SimpleDateFormat("ccc, dd.MM.yyyy");
         String dateFormatted = df.format(date.getTime());
         GregorianCalendar c = new GregorianCalendar();
@@ -96,16 +103,41 @@ public class Util {
     }
 
     public static String getFormattedTime(GregorianCalendar date) {
+        if (date == null) {
+            return "-:- Uhr";
+        }
         return getFormattedTimeInner(date) + " Uhr";
     }
 
     public static String getFormattedDateTime(GregorianCalendar date) {
-        return getFormattedDate(date) + ", " + getFormattedTime(date);
+        if (date == null) {
+            return "Kein Datum";
+        }
+        if (Util.isNearlyNow(date)) {
+            return "Jetzt";
+        } else {
+            return getFormattedDate(date) + ", " + getFormattedTime(date);
+        }
+    }
+
+    private static boolean isNearlyNow(GregorianCalendar date) {
+        GregorianCalendar now = new GregorianCalendar();
+        if (Math.abs(date.getTimeInMillis() - now.getTimeInMillis()) / 1000 / 60 < Settings.THRESHOLD_MINUTES_FOR_NOW) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static String getFormattedDateTimeToTime(GregorianCalendar first_date, GregorianCalendar second_date) {
         if (!isSameDate(first_date, second_date)) {
             Log.e(tag, "getFormattedDateTimeToTime... wtf");
+        }
+        GregorianCalendar now = new GregorianCalendar();
+        if (isNearlyNow(first_date)) {
+            return "Jetzt - " + getFormattedTime(second_date);
+        } else if (isNearlyNow(second_date)) {
+            return getFormattedTime(first_date) + " - Jetzt";
         }
         return getFormattedDate(first_date) + ", " + getFormattedTimeInner(first_date) + "-" + getFormattedTime(second_date);
     }
@@ -120,6 +152,11 @@ public class Util {
     }
 
     public static void setDate(GregorianCalendar date, int year, int month, int day) {
+        if (date == null) {
+            date = new GregorianCalendar();
+            date.set(GregorianCalendar.HOUR_OF_DAY, 23);
+            date.set(GregorianCalendar.MINUTE, 0);
+        }
         date.set(GregorianCalendar.YEAR, year);
         date.set(GregorianCalendar.MONTH, month);
         date.set(GregorianCalendar.DAY_OF_MONTH, day);
@@ -131,6 +168,9 @@ public class Util {
     }
 
     public static boolean isSameDate(GregorianCalendar date, GregorianCalendar other_date) {
+        if (date == null || other_date == null) {
+            return false;
+        }
         if (date.get(GregorianCalendar.YEAR) == other_date.get(GregorianCalendar.YEAR)
                 && date.get(GregorianCalendar.DAY_OF_YEAR) == other_date.get(GregorianCalendar.DAY_OF_YEAR)) {
             return true;
@@ -208,18 +248,23 @@ public class Util {
 
     public static String getFormattedDuration(int minutes) {
         String ret = "";
+        if (minutes < 0) {
+            ret += "-";
+            minutes *= (-1);
+        }
+
         int duration_hours = minutes / 60;
         int duration_minutes = minutes % 60;
 
-        if (duration_hours > 0) {
+        if (duration_hours != 0) {
             ret += duration_hours + " Std. ";
         }
 
-        if (duration_minutes > 0) {
+        if (duration_minutes != 0) {
             ret += duration_minutes + " Min.";
         }
 
-        if (duration_hours <= 0 && duration_minutes <= 0) {
+        if (duration_hours == 0 && duration_minutes == 0) {
             ret = "Keine Dauer";
         }
         return ret;
@@ -227,6 +272,9 @@ public class Util {
     public static String getFormattedPotential(int minutes) {
         String ret = "";
         boolean negative = false;
+        if (minutes == 0) {
+            return "Kein Potential";
+        }
         if (minutes < 0) {
             negative = true;
             ret += "ACHTUNG: ";
@@ -269,6 +317,12 @@ public class Util {
     }
 
     public static boolean earlierDate(GregorianCalendar earlier_date, GregorianCalendar date) {
+        if (earlier_date == null) {
+            return false;
+        }
+        if (date == null) {
+            return true;
+        }
         if (earlier_date.compareTo(date) == -1) { //earlier date is earlier...
             return true;
         } else {
@@ -309,6 +363,9 @@ public class Util {
 
     public static ArrayList<GregorianCalendar> getListOfDates(GregorianCalendar start_date, GregorianCalendar end_date) {
         ArrayList<GregorianCalendar> dates = new ArrayList<>();
+        if (start_date == null || end_date == null) {
+            return dates;
+        }
         GregorianCalendar current_date = (GregorianCalendar)start_date.clone();
         GregorianCalendar end = (GregorianCalendar)end_date.clone();
 

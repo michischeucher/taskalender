@@ -12,18 +12,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String tag = "MainActivity";
     private DrawerLayout drawer_layout;
+    private static TextView potential_text_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        potential_text_view = (TextView)(findViewById(R.id.potential));
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,6 +48,12 @@ public class MainActivity extends AppCompatActivity
         //first fragment
         displayView(R.id.nav_day);
         navigationView.setCheckedItem(R.id.nav_day);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        notifyChanges();
     }
 
     @Override
@@ -110,8 +121,7 @@ public class MainActivity extends AppCompatActivity
             //transaction.addToBackStack("Kalender shown");
             transaction.replace(R.id.fragment_container, fragment).commit();
         } else if (view_id == R.id.nav_task) {
-            LabelFragment fragment = LabelFragment.newInstance(-2);
-            fragment.setArguments(getIntent().getExtras());
+            LabelFragment fragment = LabelFragment.newInstance(-1);
             getSupportActionBar().setTitle("Labels");
 
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -132,5 +142,17 @@ public class MainActivity extends AppCompatActivity
         Log.d(tag, "click item..." + id);
         displayView(id);
         return true;
+    }
+
+    public static void notifyChanges() {
+        if (potential_text_view != null) {
+            int potential = TimeRank.getPotential();
+            potential_text_view.setText(Util.getFormattedPotential(potential));
+            if (potential < 0) {
+                potential_text_view.setTextColor(Settings.TEXT_COLOR_ATTENTION);
+            } else if(potential > 0) {
+                potential_text_view.setTextColor(Settings.TEXT_COLOR_PERFECT);
+            }
+        }
     }
 }

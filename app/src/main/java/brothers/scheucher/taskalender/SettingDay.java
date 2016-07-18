@@ -183,7 +183,8 @@ public class SettingDay extends ActionBarActivity {
             day_setting.setLatest_minute(Util.getMinuteOfDay(latest_end));
             day_setting.save(this);
             TimeRank.addDaySettingObject(day_setting);
-            TimeRank.createCalculatingJob();
+            TimeRank.calculateDays();
+//            TimeRank.createCalculatingJob();
             finish();
             return true;
         }

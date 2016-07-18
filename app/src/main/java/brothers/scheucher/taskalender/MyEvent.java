@@ -2,7 +2,6 @@ package brothers.scheucher.taskalender;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 /**
@@ -272,10 +271,6 @@ public class MyEvent implements Comparable {
         return this.start.compareTo(other.start);
     }
 
-    //returns a list of dates e.g. if start is 1.3. and end of event is 4.3. this returns 1.3,2.3,3.3,4.3
-    public ArrayList<GregorianCalendar> getDates() {
-        return Util.getListOfDates(this.start, this.end);
-    }
 
     public boolean isBlocking() {
         return !availability;

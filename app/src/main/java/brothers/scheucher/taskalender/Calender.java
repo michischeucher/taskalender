@@ -242,7 +242,6 @@ public class Calender extends Fragment {
         private View calender_day;
         private LinearLayout calender_day_events_tasks;
         private LinearLayout top_container_events;
-        private TextView potential_text_view;
         protected LayoutInflater inflater;
         private GregorianCalendar current_date;
         private static LinearLayout height_container;
@@ -258,7 +257,6 @@ public class Calender extends Fragment {
             calender_day = inflater.inflate(R.layout.calender_day, container, false);
             calender_day_events_tasks = (LinearLayout)(calender_day.findViewById(R.id.calender_day_events_tasks));
             top_container_events = (LinearLayout)(calender_day.findViewById(R.id.top_container_events));
-            potential_text_view = (TextView)(calender_day.findViewById(R.id.potential));
             height_container = (LinearLayout)(calender_day.findViewById(R.id.height_container));
             day_view_scrolling = (ScrollViewScalable)(calender_day.findViewById(R.id.day_view_scrolling));
 
@@ -324,7 +322,6 @@ public class Calender extends Fragment {
             }
             Log.d(tag, "Start drawing events for " + Util.getFormattedDate(date) + " #events today = " + day.getEvents().size());
 
-            potential_text_view.setText(day.getPotential());
             day.calculateBlocksAndColoumns();
             day.drawEvents(calender_day_events_tasks, inflater);
             day.drawWholeDayEvents(height_container, top_container_events, inflater);

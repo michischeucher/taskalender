@@ -1,6 +1,5 @@
 package brothers.scheucher.taskalender;
 
-import java.sql.Time;
 import java.util.GregorianCalendar;
 
 /**
@@ -19,6 +18,12 @@ public class Settings {
     public static final int transparent_factor_urgent = 0xFF;
     public static final int hours_before_deadline_no_problem = 180; //hours before deadline...
     public static final int transparent_factor_no_problem = 0x40;
+    public static final long THRESHOLD_MINUTES_FOR_NOW = 5; //when it is 2:34 and the date is 2:37 it is NOW ;)
+    public static final int TEXT_COLOR_ATTENTION = 0xFFFF0000;
+    public static final int TEXT_COLOR_PERFECT = 0xFF00B000;
+    public static final int STANDARD_DURATION_TASK = 60;
+    public static final int STANDARD_DEADLINE_HOUR_IF_DATE_SET = 23;
+    public static final int STANDARD_DEADLINE_MINUTE_IF_DATE_SET = 0;
 
     public static int getPause_before_event() {
         return pause_before_event;

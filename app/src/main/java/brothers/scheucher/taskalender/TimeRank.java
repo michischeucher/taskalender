@@ -408,7 +408,12 @@ public class TimeRank {
 
         //first block
         TaskBlock block = new TaskBlock();
-        block.setEnd((GregorianCalendar) tasks.get(0).getDeadline().clone());
+        if (tasks.get(0).getDeadline() == null) {
+            block.setStart(null);
+            block.setEnd(null);
+        } else {
+            block.setEnd((GregorianCalendar) tasks.get(0).getDeadline().clone());
+        }
         task_blocks.add(block);
 
         boolean last_task = false;
@@ -418,6 +423,17 @@ public class TimeRank {
 
         for (int i = 0; i < TimeRank.getTasks().size(); i++) {
             Task current_task = tasks.get(i);
+            Log.d(tag, "Tasking" + current_task.description());
+            if (current_task.getDeadline() == null) {
+                block.addTask(current_task);
+                if ((i+1) < tasks.size() &&
+                        tasks.get(i+1).getDeadline() != null) { //last task without deadline...
+                    block = new TaskBlock();
+                    task_blocks.add(block);
+                    block.setEnd((GregorianCalendar) tasks.get(i+1).getDeadline().clone());
+                }
+                continue;
+            }
             current_task.setOverlapping_minutes(block.getOverlapping_time());
             block.addTask(current_task);
 
@@ -488,5 +504,15 @@ public class TimeRank {
     public static void restoreScaleFactor() {
         SharedPreferences settings = context.getSharedPreferences("Settings", 0);
         scale_factor = settings.getFloat("ScaleFactor", 1);
+    }
+
+    public static int getPotential() {
+        if (task_blocks.size() > 0) {
+            TaskBlock tb = task_blocks.get(task_blocks.size() - 1);
+            if (tb != null) {
+                return tb.getPotential();
+            }
+        }
+        return 0;
     }
 }

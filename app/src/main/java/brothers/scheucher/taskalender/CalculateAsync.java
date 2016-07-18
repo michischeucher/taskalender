@@ -19,5 +19,7 @@ public class CalculateAsync extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(aVoid);
         Log.d(tag, "CalculateAsync finished!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         Calender.notifyChanges();
+        MainActivity.notifyChanges();
+        PotentialActivity.notifyChanges();
     }
 }

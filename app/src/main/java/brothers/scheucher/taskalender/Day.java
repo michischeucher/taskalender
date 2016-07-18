@@ -261,6 +261,7 @@ public class Day {
         LinearLayout event;
 
         GregorianCalendar last_block_end = (GregorianCalendar) this.start.clone();
+        Log.d(tag, "draw events for " + description());
         //draw events in that day
         for (Block b : this.event_blocks) {
             if (Util.earlierDate(last_block_end, b.getStart())) {
@@ -278,17 +279,19 @@ public class Day {
             for (Column c : b.getColumns()) {
                 event_coloumn = (LinearLayout) inflater.inflate(R.layout.event_coloumn, event_block, false);
                 event_coloumn.setWeightSum(b.getDuration());
+                Log.d(tag, "coloumn duration = " + b.getDuration());
                 event_block.addView(event_coloumn);
 
                 GregorianCalendar last_event_end = (GregorianCalendar) b.getStart().clone();
                 for (MyEvent e : c.getEvents()) {
+                    Log.d(tag, e.description());
                     if (Util.earlierDate(last_event_end, e.getStart())) {
                         //create empty event...
                         event = (LinearLayout) inflater.inflate(R.layout.event_empty, event_coloumn, false);
                         Util.setWeight(event, Util.getMinutesBetweenDates(last_event_end, e.getStart()));
                         event_coloumn.addView(event);
                     }
-                    last_event_end = (GregorianCalendar) e.getEnd().clone();
+
 
                     event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
                     ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd()));
@@ -306,8 +309,10 @@ public class Day {
                         event.setTag(R.string.id, e.getId());
                     }
 
+                    last_event_end = (GregorianCalendar) e.getEnd().clone();
                     int duration = e.getDurationInMinutes();
                     if (duration < MIN_DISPLAY_DURATION_FOR_ONE_EVENT) {
+                        last_event_end.add(GregorianCalendar.MINUTE, MIN_DISPLAY_DURATION_FOR_ONE_EVENT - duration);
                         duration = MIN_DISPLAY_DURATION_FOR_ONE_EVENT;
                     }
                     Util.setWeight(event, duration);
@@ -315,6 +320,8 @@ public class Day {
                 }
             }
         }
+
+        Log.d(tag, "finished drawing events for " + description());
 
 
     }

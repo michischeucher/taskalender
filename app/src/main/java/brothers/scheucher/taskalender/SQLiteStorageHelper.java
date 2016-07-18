@@ -104,7 +104,6 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(Task.DB_COL_NAME, task.getName());
         values.put(Task.DB_COL_NOTICE, task.getNotice());
         values.put(Task.DB_COL_DURATION, task.getRemaining_duration());
-        values.put(Task.DB_COL_EARLIEST_START, Util.DateToString(task.getEarliestStart()));
         values.put(Task.DB_COL_DEADLINE, Util.DateToString(task.getDeadline()));
         Log.d(tag, "saved date = "+ Util.DateToString((task.getDeadline())));
         values.put(Task.DB_COL_PRIORITY, task.getPriority());
@@ -298,7 +297,6 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             task.setName(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_NAME)));
             task.setNotice(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_NOTICE)));
             task.setRemaining_duration(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_DURATION)));
-            task.setEarliestStart(Util.StringToDate(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_EARLIEST_START))));
             task.setDeadline(Util.StringToDate(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_DEADLINE))));
             task.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_PRIORITY)));
             task.setLabelString(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_LABELS)));

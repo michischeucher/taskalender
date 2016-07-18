@@ -1,6 +1,12 @@
 package brothers.scheucher.taskalender;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -52,11 +58,9 @@ public class Task implements Comparable {
         this.earliest_start = new GregorianCalendar();
         this.earliest_start.set(GregorianCalendar.HOUR, 0);
         this.earliest_start.set(GregorianCalendar.MINUTE, 0);
-        this.deadline = new GregorianCalendar();
-        this.deadline.set(GregorianCalendar.HOUR_OF_DAY, 23);
-        this.deadline.set(GregorianCalendar.MINUTE, 0);
+        this.deadline = null;
         this.remaining_duration = new Duration(0);
-        this.label_ids = new ArrayList<Integer>();
+        this.label_ids = new ArrayList<>();
 
         this.overlapping_minutes = 0;
         this.already_distributed_duration = 0;
@@ -66,7 +70,7 @@ public class Task implements Comparable {
     public Task(int id) {
         this.id = id;
         this.earliest_start = new GregorianCalendar();
-        this.deadline = new GregorianCalendar();
+        this.deadline = null;
         this.already_distributed_duration = 0;
         this.overlapping_minutes = 0;
         this.remaining_duration = new Duration(0);
@@ -210,6 +214,11 @@ public class Task implements Comparable {
     @Override
     public int compareTo(Object another) {
         Task other = (Task)another;
+        if (this.deadline == null) {
+            return 1;
+        } else if (other.deadline == null) {
+            return -1;
+        }
         return this.deadline.compareTo(other.deadline);
     }
 
@@ -222,10 +231,18 @@ public class Task implements Comparable {
 
 
     public void setDeadline(int hourOfDay, int minute) {
+        if (this.deadline == null) {
+            deadline = new GregorianCalendar();
+        }
         Util.setTime(this.deadline, hourOfDay, minute);
     }
 
     public void setDeadline(int year, int monthOfYear, int dayOfMonth) {
+        if (this.deadline == null) {
+            this.deadline = new GregorianCalendar();
+            this.deadline.set(GregorianCalendar.HOUR_OF_DAY, Settings.STANDARD_DEADLINE_HOUR_IF_DATE_SET);
+            this.deadline.set(GregorianCalendar.MINUTE,Settings.STANDARD_DEADLINE_MINUTE_IF_DATE_SET);
+        }
         Util.setDate(this.deadline, year, monthOfYear, dayOfMonth);
     }
 
@@ -281,5 +298,41 @@ public class Task implements Comparable {
         }
         Duration duration = new Duration(worked_minutes);
         return duration;
+    }
+
+    public View createTaskInListView(LayoutInflater inflater, LinearLayout parent) {
+        final Task task = this;
+
+        View rowView = inflater.inflate(R.layout.task_in_list, parent, false);
+
+        TextView name_view = (TextView) rowView.findViewById(R.id.task_name);
+        name_view.setText(task.getName());
+        TextView duration_view = ((TextView)rowView.findViewById(R.id.task_duration));
+        duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
+        TextView notice_view = (TextView)rowView.findViewById(R.id.task_notice);
+        if (!task.getNotice().equals("")) {
+            notice_view.setVisibility(TextView.VISIBLE);
+            notice_view.setText(task.getNotice());
+        }
+
+        Util.setColorOfDrawable(rowView, 0xA0000000 | task.getColor());
+        if (Util.isDarkColor(task.getColor())) {
+            name_view.setTextColor(0xFFFFFFFF);
+            duration_view.setTextColor(0xFFFFFFFF);
+            notice_view.setTextColor(0xFFFFFFFF);
+        }
+
+        rowView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TimeRank.getContext(), ViewTask.class);
+                Bundle b = new Bundle();
+                b.putInt("id", task.getId());
+                intent.putExtras(b);
+                TimeRank.getContext().startActivity(intent);
+            }
+        });
+
+        return rowView;
     }
 }

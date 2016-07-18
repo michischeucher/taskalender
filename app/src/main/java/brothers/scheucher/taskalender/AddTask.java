@@ -100,10 +100,9 @@ public class AddTask extends AppCompatActivity {
         deadline_date_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePicker(deadline_date_view, task.getDeadline());
+                showDatePicker(v);
             }
         });
-
 
         deadline_time_view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,22 +188,32 @@ public class AddTask extends AppCompatActivity {
     }
 
     private void showDurationPicker() {
+
         duration_dialog.show();
     }
 
-    public void showDatePicker(TextView view, GregorianCalendar date) {
+    public void showDatePicker(View view) {
         //Log.d(tag, "showDatePicker - start");
-        int year = date.get(GregorianCalendar.YEAR);
-        int month = date.get(GregorianCalendar.MONTH);
-        int day = date.get(GregorianCalendar.DAY_OF_MONTH);
+        GregorianCalendar deadline = task.getDeadline();
+        if (deadline == null) {
+            deadline = new GregorianCalendar();
+        }
+        int year = deadline.get(GregorianCalendar.YEAR);
+        int month = deadline.get(GregorianCalendar.MONTH);
+        int day = deadline.get(GregorianCalendar.DAY_OF_MONTH);
 
-        DatePickerDialog dialog = new DatePickerDialog(this, new onDateSetListener(view, date), year, month, day);
+        DatePickerDialog dialog = new DatePickerDialog(this, new onDateSetListener(), year, month, day);
         dialog.show();
     }
 
     public void showTimePicker(View view) {
         //Log.d(tag, "showTimePicker");
         GregorianCalendar deadline = task.getDeadline();
+        if (deadline == null) {
+            deadline = new GregorianCalendar();
+            deadline.set(GregorianCalendar.MINUTE, 0);
+            deadline.add(GregorianCalendar.HOUR_OF_DAY, 1);
+        }
         int minute = deadline.get(GregorianCalendar.MINUTE);
         int hour = deadline.get(GregorianCalendar.HOUR_OF_DAY);
         TimePickerDialog dialog = new TimePickerDialog(this, new onTimeSetListener(), hour, minute, true);
@@ -250,30 +259,16 @@ public class AddTask extends AppCompatActivity {
 
     private class onDateSetListener implements DatePickerDialog.OnDateSetListener {
 
-        private TextView view;
-        private GregorianCalendar date;
-
-        public onDateSetListener(TextView view, GregorianCalendar date) {
-            this.view = view;
-            this.date = date;
-        }
-
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 //            Log.d(tag, "year = " + year + " month = " + monthOfYear + " day = " + dayOfMonth);
-            Util.setDate(this.date, year, monthOfYear, dayOfMonth);
-            this.view.setText(Util.getFormattedDate(this.date));
-            checkCorrectValues();
+            task.setDeadline(year,monthOfYear,dayOfMonth);
+            //Util.setDate(this.date, year, monthOfYear, dayOfMonth);
+            ((TextView)findViewById(R.id.add_task_deadline_time)).setText(Util.getFormattedTime(task.getDeadline()));
+            ((TextView)findViewById(R.id.add_task_deadline_date)).setText(Util.getFormattedDate(task.getDeadline()));
         }
     }
 
-    private void checkCorrectValues() {
-        if (task.getEarliestStart().compareTo(task.getDeadline()) == 1) {
-            deadline_date_view.setTextColor(0xFFFF0000);
-        } else {
-            deadline_date_view.setTextColor(0xFF000000);
-        }
-    }
 
     private class onTimeSetListener implements TimePickerDialog.OnTimeSetListener {
 
@@ -283,6 +278,8 @@ public class AddTask extends AppCompatActivity {
             task.setDeadline(hourOfDay, minute);
             Log.d(tag, "deadline is now = " + Util.getFormattedDateTime(task.getDeadline()));
             ((TextView)findViewById(R.id.add_task_deadline_time)).setText(Util.getFormattedTime(task.getDeadline()));
+            ((TextView)findViewById(R.id.add_task_deadline_date)).setText(Util.getFormattedDate(task.getDeadline()));
+
         }
     }
 }

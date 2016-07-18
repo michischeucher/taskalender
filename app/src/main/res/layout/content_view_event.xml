@@ -48,7 +48,10 @@
                     android:id="@+id/view_event_fields_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"/>
+                    android:orientation="vertical"
+                    android:layout_marginLeft="@dimen/activity_margin"
+                    android:layout_marginRight="@dimen/activity_margin"
+                    />
             </LinearLayout>
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/edit_button"

@@ -153,9 +153,13 @@ public class LabelFragment extends Fragment {
         }
 
         ArrayList<Task> task_array = TimeRank.getTasks(label_id);
-        if (task_array.size() != 0) {
+        if (task_array.size() != 0 && label_id == -1) {
             View row = inflater.inflate(R.layout.text_description, null, false);
-            ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben mit diesem Label: ");
+            ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben ohne Label");
+            task_list.addView(row);
+        } else if (task_array.size() != 0) {
+            View row = inflater.inflate(R.layout.text_description, null, false);
+            ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben mit diesem Label");
             task_list.addView(row);
         }
 

@@ -285,25 +285,28 @@ public class TimeRank {
         return null;
     }
 
-    public static ArrayList<Label> getLabelSequence() {
+    public static ArrayList<Label> getLabelSequence(Label me) {
         Collections.sort(labels);
         ArrayList<Label> ret = new ArrayList<Label>();
 
         for (Label l : labels) {
-            if (l.getParent() == null) { //only top level labels
-                ret.addAll(getRecursiveLabelStructure(l));
+            if (l.getParent() == null && l != me) { //only top level labels
+                ret.addAll(getRecursiveLabelStructure(l, me));
             }
         }
         return ret;
     }
 
-    private static ArrayList<Label> getRecursiveLabelStructure(Label label) {
+    private static ArrayList<Label> getRecursiveLabelStructure(Label label, Label me) {
         Log.d(tag, "getRecursiveLabelStructure called");
         ArrayList<Label> ret = new ArrayList<>();
         ArrayList<Label> childs = label.getChildLabels();
+        if (label == me) {
+            return ret;
+        }
         ret.add(label);
         for (Label l : childs) {
-            ret.addAll(getRecursiveLabelStructure(l));
+            ret.addAll(getRecursiveLabelStructure(l, me));
         }
         return ret;
     }
@@ -385,7 +388,7 @@ public class TimeRank {
     }
 
     public static void calculateDays() {
-        Log.d(tag, "# START createCalculatingJob()");
+        Log.d(tag, "# START calculateDays()");
 
         //START from last deadline... calculating blocks
         if (tasks.size() <= 0) {
@@ -395,15 +398,7 @@ public class TimeRank {
             t.resetJustForCalculations();
         }
 
-        //creating all days where there is a event
         days.clear();
-        /*for (MyEvent event : events) {
-            for (GregorianCalendar date : event.getDates()) {
-                if (TimeRank.getDay(date) == null) {
-                    TimeRank.createDay(date);
-                }
-            }
-        }*/
 
         Log.d(tag, "##### START CALCULATING BLOCKS #####");
         Collections.sort(tasks, Collections.reverseOrder());
@@ -426,11 +421,18 @@ public class TimeRank {
             current_task.setOverlapping_minutes(block.getOverlapping_time());
             block.addTask(current_task);
 
-            if ((i + 1) < TimeRank.getTasks().size()) {
-                earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
-            } else { // if last task there is only now... ;)
-                earlier_date = new GregorianCalendar();
+            if ((i + 1) >= TimeRank.getTasks().size()) {
                 last_task = true;
+            }
+
+            if (Util.earlierDate(current_task.getDeadline(), new GregorianCalendar())) {
+                //DL in der Vergangenheit
+                earlier_date = (GregorianCalendar)current_task.getDeadline().clone();
+            } else if (last_task) {
+                //kein vergangener Task:
+                earlier_date = new GregorianCalendar();
+            } else {
+                earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
             }
 
             possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date);
@@ -464,6 +466,9 @@ public class TimeRank {
         for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
             TaskBlock tb = task_blocks.get(i);
             tb.calculateTaskFillingFactors();
+
+            Log.d(tag, tb.description());
+
             if (i == (task_blocks.size() - 1)) { //first block must start with today
                 last_day_where_time_left = tb.addTasksToDays(new GregorianCalendar());
             } else { //otherwise it starts with the end of the other block

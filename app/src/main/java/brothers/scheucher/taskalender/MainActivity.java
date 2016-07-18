@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity
             //transaction.addToBackStack("Kalender shown");
             transaction.replace(R.id.fragment_container, fragment).commit();
         } else if (view_id == R.id.nav_task) {
-            LabelFragment fragment = LabelFragment.newInstance(-1);
+            LabelFragment fragment = LabelFragment.newInstance(-2);
             fragment.setArguments(getIntent().getExtras());
             getSupportActionBar().setTitle("Labels");
 

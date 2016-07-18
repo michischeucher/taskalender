@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginBottom="12dp"
+    android:background="@drawable/rounded_corners"
     >
     <TextView
         android:id="@+id/task_name"
@@ -12,7 +13,33 @@
         style="@style/NormalText"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:padding="3dp"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:paddingBottom="2dp"
         />
+    <TextView
+        android:id="@+id/task_notice"
+        android:visibility="gone"
 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="italic"
+        android:singleLine="true"
+        android:paddingBottom="2dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        style="@style/SmallText"
+        />
+    <TextView
+        android:id="@+id/task_duration"
+        android:text="1 Std."
+        style="@style/SmallText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        />
 </LinearLayout>

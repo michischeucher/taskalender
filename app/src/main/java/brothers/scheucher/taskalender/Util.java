@@ -292,7 +292,7 @@ public class Util {
         g = g >> 8;
         int b = 0x0000FF & color;
 //        Log.d(tag, "color = " + color + " is r = " + r + " g = " + g + " b = " + b);
-        if ((r + g + b) < 430) {
+        if ((r + g + b) < 400) {
 //            Log.d(tag, "is dark");
             return true;
         } else {
@@ -394,7 +394,7 @@ public class Util {
     }
 
 
-    public static void setColorOfDrawable(LinearLayout background, int color) {
+    public static void setColorOfDrawable(View background, int color) {
         GradientDrawable sh = (GradientDrawable)background.getBackground();
         sh.setColor(color);
 

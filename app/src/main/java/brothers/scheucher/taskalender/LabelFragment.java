@@ -99,7 +99,7 @@ public class LabelFragment extends Fragment {
             child_labels = TimeRank.getLabel(label_id).getChildLabels();
         }
 
-        if (child_labels.size() != 0) {
+        if (child_labels.size() != 0 && label_id != -1) {
             View row = inflater.inflate(R.layout.text_description, null, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Untergeordnete Labels: ");
             label_view.addView(row);
@@ -165,17 +165,23 @@ public class LabelFragment extends Fragment {
             View rowView = inflater.inflate(R.layout.task_in_list, task_list, false);
 
             TextView name_view = (TextView) rowView.findViewById(R.id.task_name);
-
             name_view.setText(task.getName());
-
-
-
-            name_view.setBackgroundColor(0xA0000000 | task.getColor());
-            if (Util.isDarkColor(task.getColor())) {
-                name_view.setTextColor(0xFFFFFFFF);
+            TextView duration_view = ((TextView)rowView.findViewById(R.id.task_duration));
+            duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
+            TextView notice_view = (TextView)rowView.findViewById(R.id.task_notice);
+            if (!task.getNotice().equals("")) {
+                notice_view.setVisibility(TextView.VISIBLE);
+                notice_view.setText(task.getNotice());
             }
 
-            name_view.setOnClickListener(new View.OnClickListener() {
+            Util.setColorOfDrawable(rowView, 0xA0000000 | task.getColor());
+            if (Util.isDarkColor(task.getColor())) {
+                name_view.setTextColor(0xFFFFFFFF);
+                duration_view.setTextColor(0xFFFFFFFF);
+                notice_view.setTextColor(0xFFFFFFFF);
+            }
+
+            rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, ViewTask.class);
@@ -185,6 +191,7 @@ public class LabelFragment extends Fragment {
                     context.startActivity(intent);
                 }
             });
+
             task_list.addView(rowView);
         }
     }

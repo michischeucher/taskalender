@@ -3,6 +3,7 @@ package brothers.scheucher.taskalender;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
@@ -109,21 +110,25 @@ public class TaskBlock implements Comparable {
         Log.d(tag, "##TASK BLOCK: " + this.description());
         Day last_day_where_time_left = null;
         Day day = null;
-        for (GregorianCalendar current_date : Util.getListOfDates(start_date, this.end)) {
+        GregorianCalendar current_date = (GregorianCalendar)start_date.clone();
+        while (true) { //GregorianCalendar current_date : Util.getListOfDates(start_date, this.end)) {
             day = TimeRank.getDay(current_date);
             if (day == null) {
                 day = TimeRank.createDay(current_date);
                 TimeRank.addDayToList(day);
             }
-            Log.d(tag, "#addTasksToDay: " + day.description());
+            Log.d(tag, "addTasksToDay: " + day.description());
             for (int i = tasks.size() - 1; i >= 0; i--) {
                 day.addTask(tasks.get(i));
             }
             if (day.getPossibleWorkTime(day.getStart(), day.getEnd()) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
+                Log.d(tag, "######################### right....!!!!");
                 return day;
             }
+            current_date.add(Calendar.DAY_OF_YEAR,1);
         }
-        return day;
+//        Log.d(tag, "######################### wrong....!!!!");
+//        return day;
     }
 
     public String description() {

@@ -117,8 +117,7 @@ public class AddTask extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(tag, "Click On Label Selection...");
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-                final ArrayList<Label> label_sequence = TimeRank.getLabelSequence();
+                final ArrayList<Label> label_sequence = TimeRank.getLabelSequence(null);
                 selected_labels = new boolean[label_sequence.size()];
                 ArrayList<String> label_sequence_strings = new ArrayList<>();
                 int i = 0;

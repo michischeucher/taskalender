@@ -25,22 +25,26 @@ public class Day {
     private static final int MIN_DISPLAY_DURATION_FOR_ONE_EVENT = 30;
 
     public Day(GregorianCalendar date) {
-        this.start = date;
+        this.start = (GregorianCalendar)date.clone();
         Util.setTime(this.start, 0, 0);
         this.end = (GregorianCalendar)start.clone();
         this.end.add(GregorianCalendar.DAY_OF_YEAR, 1);
         this.events = new ArrayList<>();
-        this.scheduler = new DayScheduler(date);
+        this.scheduler = new DayScheduler(this.start);
         GregorianCalendar now = new GregorianCalendar();
         if (Util.isSameDate(this.start, now)) {
             //if today: past is not possible...!
             GregorianCalendar today_start = new GregorianCalendar();
             Util.setTime(today_start, 0, 0);
             scheduler.addBlockingTime(today_start, now);
+        } else if (Util.earlierDate(this.start, now)) {
+            scheduler.addBlockingTime(this.start, 0, 60*24);
         }
+
+
         this.event_blocks = new ArrayList<>();
         this.events_whole_day = new ArrayList<>();
-        this.day_settings = TimeRank.getDaySettingObject(date);
+        this.day_settings = TimeRank.getDaySettingObject(this.start);
 
         GregorianCalendar earliest_start_date = (GregorianCalendar)start.clone();
         earliest_start_date.add(GregorianCalendar.MINUTE, day_settings.getEarliest_minute());
@@ -115,7 +119,7 @@ public class Day {
 
     private int checkAvailableWorkTime(int available_work_time) {
         int already_worked = calculateWorkedTime();
-        Log.d(tag, "already worked: " + description() + already_worked);
+        Log.d(tag, description() + " already worked = " + already_worked);
         if (available_work_time > (day_settings.getTotalDurationInMinutes() - already_worked)) {
             return (day_settings.getTotalDurationInMinutes() - already_worked);
         } else {

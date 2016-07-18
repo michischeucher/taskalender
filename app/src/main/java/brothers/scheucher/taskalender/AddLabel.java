@@ -64,11 +64,17 @@ public class AddLabel extends AppCompatActivity {
         }
         ((TextView) findViewById(R.id.add_label_title)).setText(label.getName());
 
+        if (label.getParent() != null) {
+            parent_label.setText(label.getParent().getName());
+            parent_label_color.setBackgroundColor(0xFF000000 | label.getParent().getColor());
+        }
+
         parent_label_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                final ArrayList<Label> label_sequence = TimeRank.getLabelSequence();
+                Label me = TimeRank.getLabel(label.getId());
+                final ArrayList<Label> label_sequence = TimeRank.getLabelSequence(me);
                 label_sequence.add(new Label(-1, "kein Label", 0x00FFFFFF));
                 ArrayList<String> label_sequence_strings = new ArrayList<>();
                 int i = 0;

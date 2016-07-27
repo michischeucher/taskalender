@@ -197,7 +197,7 @@ public class MyEvent implements Comparable {
     }
 
     public String description() {
-        return "name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end) + " availability: " + this.availability;
+        return "id: " + id + " name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end) + " availability: " + this.availability;
     }
 
     public int getId() {

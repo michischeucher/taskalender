@@ -108,6 +108,7 @@ public class Calender extends Fragment {
 
                 Bundle bundle = new Bundle();
                 bundle.putInt("current_date_offset", current_date_offset);
+                bundle.putInt("id", -1);
 
                 Intent intent = new Intent(getActivity(), AddEvent.class);
                 intent.putExtras(bundle);
@@ -323,6 +324,9 @@ public class Calender extends Fragment {
             Log.d(tag, "Start drawing events for " + Util.getFormattedDate(date) + " #events today = " + day.getEvents().size());
 
             day.calculateBlocksAndColoumns();
+
+            day.drawNowIndicator(calender_day.findViewById(R.id.now_view_container));
+            day.drawEarliestStartLatestEndIndicators(calender_day.findViewById(R.id.earliest_start_latest_end_indicators));
             day.drawEvents(calender_day_events_tasks, inflater);
             day.drawWholeDayEvents(height_container, top_container_events, inflater);
 

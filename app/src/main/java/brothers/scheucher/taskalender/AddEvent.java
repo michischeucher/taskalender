@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +49,8 @@ public class AddEvent extends AppCompatActivity {
             event.getEnd().add(GregorianCalendar.DAY_OF_YEAR, current_date_offset);
             findViewById(R.id.add_event_title).requestFocus();
         }
+
+        Log.d(tag, "AddEvent: " + event.description());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

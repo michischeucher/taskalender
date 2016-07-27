@@ -35,7 +35,6 @@ public class ViewEvent extends AppCompatActivity {
         if (b != null) {
             id = b.getInt("id");
             event = TimeRank.getEvent(id);
-            Log.d(tag, "fetched event");
         } else {
             //there is no task to view
             finish();

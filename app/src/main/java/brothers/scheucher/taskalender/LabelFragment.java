@@ -165,39 +165,7 @@ public class LabelFragment extends Fragment {
 
         for (int i = (task_array.size() - 1); i >= 0; i--) {
             final Task task = task_array.get(i);
-            final LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View rowView = inflater.inflate(R.layout.task_in_list, task_list, false);
-
-            TextView name_view = (TextView) rowView.findViewById(R.id.task_name);
-            name_view.setText(task.getName());
-            TextView duration_view = ((TextView)rowView.findViewById(R.id.task_duration));
-            duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
-            TextView notice_view = (TextView)rowView.findViewById(R.id.task_notice);
-            if (!task.getNotice().equals("")) {
-                notice_view.setVisibility(TextView.VISIBLE);
-                notice_view.setText(task.getNotice());
-            }
-
-            Util.setColorOfDrawable(rowView, 0xA0000000 | task.getColor());
-            if (Util.isDarkColor(task.getColor())) {
-                name_view.setTextColor(0xFFFFFFFF);
-                duration_view.setTextColor(0xFFFFFFFF);
-                notice_view.setTextColor(0xFFFFFFFF);
-            }
-
-            rowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, ViewTask.class);
-                    Bundle b = new Bundle();
-                    b.putInt("id", task.getId());
-                    intent.putExtras(b);
-                    context.startActivity(intent);
-                }
-            });
-
+            View rowView = task.createTaskInListView(inflater, task_list);
             task_list.addView(rowView);
         }
     }

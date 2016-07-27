@@ -1,6 +1,7 @@
 package brothers.scheucher.taskalender;
 
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -34,6 +36,8 @@ public class SettingDay extends ActionBarActivity {
     private DaySettingObject day_setting;
     private Duration rest_duration;
     private Duration sum_distributed_duration;
+    private TextView working_days;
+    public final static int NUM_DAYS_OF_WEEK = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,7 @@ public class SettingDay extends ActionBarActivity {
         earliest_start_view = ((TextView)findViewById(R.id.earliest_start_time));
         latest_end_view = ((TextView)findViewById(R.id.latest_end_time));
         duration_view = ((TextView)findViewById(R.id.setting_day_duration));
+        working_days = ((TextView)findViewById(R.id.working_days));
 
         LinearLayout setting_day_content = ((LinearLayout)findViewById(R.id.setting_day_content));
 
@@ -60,6 +65,7 @@ public class SettingDay extends ActionBarActivity {
         earliest_start_view.setText(Util.getFormattedTime(earliest_start));
         latest_end_view.setText(Util.getFormattedTime(latest_end));
         sum_distributed_duration = new Duration(0);
+        working_days.setText(day_setting.getWorkingDaysString());
 
         //SETTING LISTENERS
         duration_view.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +99,60 @@ public class SettingDay extends ActionBarActivity {
                 dialog.show();
             }
         });
+
+        working_days.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "Click On Label Selection...");
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                String[] working_days_strings = getResources().getStringArray(R.array.week_names);
+                final boolean[] selected_working_days = day_setting.getWorkingDaysBoolean();
+                final ArrayList<Integer> selected_item_index_list = new ArrayList<>();
+                for (int i = 0; i < selected_working_days.length; i++) {
+                    if (day_setting.isWorkingDay(i)) {
+                        selected_working_days[i++] = true;
+                    } else {
+                        selected_working_days[i++] = false;
+                    }
+                }
+                builder.setMultiChoiceItems(working_days_strings, selected_working_days, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            selected_working_days[which] = true;
+                        } else {
+                            selected_working_days[which] = false;
+                            boolean nothing_checked = true;
+                            for (int i = 0; i < selected_working_days.length; i++) {
+                                if (selected_working_days[i]) {
+                                    nothing_checked = false;
+                                }
+                            }
+                            if (nothing_checked) {
+                                MyNotifications.createToastShort("You must select at least one day");
+                                AlertDialog d = (AlertDialog) dialog;
+                                ListView v = d.getListView();
+                                v.setItemChecked(which, true);
+                                selected_working_days[which] = true;
+                            }
+                        }
+                    }
+                })
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                day_setting.setWorkingDays(selected_working_days);
+                                working_days.setText(day_setting.getWorkingDaysString());
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Log.d(tag, "cancelled");
+                            }
+                        });
+                builder.show();
+            }
+        });
+
 
 
         //ADDING ALL ROOT LABELS

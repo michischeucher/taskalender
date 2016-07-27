@@ -24,12 +24,12 @@ public class Task implements Comparable {
     private Duration remaining_duration;
     private GregorianCalendar earliest_start;
     private GregorianCalendar deadline;
+    private boolean done;
 
     private int overlapping_minutes; //just for calculation --- minutes overlapping with tasks in the future
     public int already_distributed_duration; //just for calculation
     public float filling_factor; //just for calculation
 
-    private String priority;
     private ArrayList<Integer> label_ids;
 
     //database
@@ -40,15 +40,14 @@ public class Task implements Comparable {
     public static final String DB_COL_DURATION = "TaskDuration";
     public static final String DB_COL_EARLIEST_START = "TaskEarliestStart";
     public static final String DB_COL_DEADLINE = "TaskDeadline";
-    public static final String DB_COL_PRIORITY = "TaskPriority";
     public static final String DB_COL_LABELS = "TaskLabels";
+    public static final String DB_COL_DONE = "TaskDone";
 
     public static final String task_duration_description = TimeRank.getContext().getResources().getString(R.string.task_duration_description);
     public static final String earliest_start_description = TimeRank.getContext().getResources().getString(R.string.earliest_start);
     public static final String deadline_description = TimeRank.getContext().getResources().getString(R.string.deadline_description);
     public static final String repeat_description = TimeRank.getContext().getResources().getString(R.string.repeat_description);
     public static final String label_description = TimeRank.getContext().getResources().getString(R.string.label_description);
-
 
     public Task() {
         int new_id = -1;
@@ -61,6 +60,7 @@ public class Task implements Comparable {
         this.deadline = null;
         this.remaining_duration = new Duration(0);
         this.label_ids = new ArrayList<>();
+        this.done = false;
 
         this.overlapping_minutes = 0;
         this.already_distributed_duration = 0;
@@ -76,6 +76,7 @@ public class Task implements Comparable {
         this.remaining_duration = new Duration(0);
         this.filling_factor = 0;
         this.label_ids = new ArrayList<Integer>();
+        this.done = false;
     }
 
     public void resetJustForCalculations() {
@@ -132,17 +133,9 @@ public class Task implements Comparable {
         this.deadline = deadline;
     }
 
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
-
     public String getLabelIdsString() {
         if (label_ids == null) {
-            label_ids = new ArrayList<Integer>();
+            label_ids = new ArrayList<>();
         }
         String ret_val = "";
         for (int label_id : label_ids) {
@@ -168,13 +161,13 @@ public class Task implements Comparable {
     }
     public void setLabelString(String label_string) {
         if (label_ids == null)
-            label_ids = new ArrayList<Integer>();
+            label_ids = new ArrayList<>();
         if (label_string == null)
             return;
 
         String[] labels = label_string.split(";");
         for (String label : labels) {
-            if (label != "") {
+            if (label.equals("")) {
                 label_ids.add(Integer.valueOf(label));
             }
         }
@@ -197,9 +190,7 @@ public class Task implements Comparable {
     }
 
     public void delete(Context context) {
-        if (id == -1) {
-            return;
-        } else {
+        if (id != -1) {
             SQLiteStorageHelper db_helper = SQLiteStorageHelper.getInstance(context, 1);
             db_helper.openDB();
             db_helper.deleteTask(this);
@@ -221,14 +212,6 @@ public class Task implements Comparable {
         }
         return this.deadline.compareTo(other.deadline);
     }
-
-    public GregorianCalendar cloneDeadline() {
-        if (deadline == null)
-            return null;
-        GregorianCalendar ret = (GregorianCalendar) deadline.clone();
-        return ret;
-    }
-
 
     public void setDeadline(int hourOfDay, int minute) {
         if (this.deadline == null) {
@@ -307,19 +290,24 @@ public class Task implements Comparable {
 
         TextView name_view = (TextView) rowView.findViewById(R.id.task_name);
         name_view.setText(task.getName());
-        TextView duration_view = ((TextView)rowView.findViewById(R.id.task_duration));
-        duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
         TextView notice_view = (TextView)rowView.findViewById(R.id.task_notice);
         if (!task.getNotice().equals("")) {
             notice_view.setVisibility(TextView.VISIBLE);
             notice_view.setText(task.getNotice());
         }
-
+        TextView duration_view = ((TextView)rowView.findViewById(R.id.task_duration));
+        duration_view.setText(Util.getFormattedDuration(task.getRemaining_duration()));
+        TextView deadline_view = (TextView)rowView.findViewById(R.id.task_deadline);
+        if (!(task.getDeadline() == null)) {
+            deadline_view.setVisibility(TextView.VISIBLE);
+            deadline_view.setText(Util.getFormattedDateTimeNotExact(task.getDeadline()));
+        }
         Util.setColorOfDrawable(rowView, 0xA0000000 | task.getColor());
         if (Util.isDarkColor(task.getColor())) {
             name_view.setTextColor(0xFFFFFFFF);
             duration_view.setTextColor(0xFFFFFFFF);
             notice_view.setTextColor(0xFFFFFFFF);
+            deadline_view.setTextColor(0xFFFFFFFF);
         }
 
         rowView.setOnClickListener(new View.OnClickListener() {
@@ -334,5 +322,25 @@ public class Task implements Comparable {
         });
 
         return rowView;
+    }
+
+    public int getDone() {
+        if (done) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(int done_int) {
+        if (done_int > 0) {
+            this.done = true;
+        } else {
+            this.done = false;
+        }
     }
 }

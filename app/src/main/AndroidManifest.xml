@@ -14,9 +14,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
         android:supportsRtl="true"
-        >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".AddTask"
             android:label="@string/title_activity_add_task">
@@ -50,7 +49,7 @@
         </activity>
         <activity
             android:name=".SettingDay"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".ViewTask"
             android:label="@string/title_activity_view_task"

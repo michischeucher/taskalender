@@ -449,6 +449,9 @@ public class TimeRank {
                 earlier_date = new GregorianCalendar();
             } else {
                 earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
+                if (Util.earlierDate(earlier_date, new GregorianCalendar())){
+                    earlier_date = new GregorianCalendar();
+                }
             }
 
             possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date);

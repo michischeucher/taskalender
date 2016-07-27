@@ -79,21 +79,41 @@ public class Util {
         if (date == null) {
             return "Kein Datum";
         }
-        DateFormat df = new SimpleDateFormat("ccc, dd.MM.yyyy");
-        String dateFormatted = df.format(date.getTime());
+
+        String dateFormatted = "";
+        dateFormatted = getDateShort(date);
+        if (dateFormatted.equals("")) {
+            DateFormat df = new SimpleDateFormat("ccc, dd.MM.yyyy");
+            dateFormatted = df.format(date.getTime());
+        }
+
+        return dateFormatted;
+    }
+
+    private static String getDateShort(GregorianCalendar date) {
+
         GregorianCalendar c = new GregorianCalendar();
+        c.add(GregorianCalendar.DAY_OF_YEAR, -2);
+        if (isSameDate(date,c)) {
+            return "Vorgestern";
+        }
+        c.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        if (isSameDate(date, c)) { //is yesterday
+            return "Gestern";
+        }
+        c.add(GregorianCalendar.DAY_OF_YEAR, 1);
         if (isSameDate(date, c)) {//is today
-            dateFormatted = "Heute";
+            return "Heute";
         }
         c.add(GregorianCalendar.DAY_OF_YEAR, 1);
         if (isSameDate(date, c)) { //is tomorrow
-            dateFormatted = "Morgen";
+            return "Morgen";
         }
-        c.add(GregorianCalendar.DAY_OF_YEAR, -2);
-        if (isSameDate(date, c)) { //is yesterday
-            dateFormatted = "Gestern";
+        c.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        if (isSameDate(date, c)) {
+            return "Übermorgen";
         }
-        return dateFormatted;
+        return "";
     }
 
     public static String getFormattedTimeInner(GregorianCalendar date) {
@@ -119,6 +139,50 @@ public class Util {
             return getFormattedDate(date) + ", " + getFormattedTime(date);
         }
     }
+
+    public static String getFormattedDateTimeNotExact(GregorianCalendar date) {
+        String ret = getDateShort(date);
+        if (!ret.equals("")) {
+            return ret + ", " + getFormattedTime(date);
+        }
+
+        GregorianCalendar now = new GregorianCalendar();
+        if (Util.earlierDate(date, now)) {
+            Util.setTime(now, 23,59);
+            ret += "Vor ";
+        } else {
+            Util.setTime(now, 0, 0);
+            ret += "In ";
+        }
+
+
+        int difference = getMinutesBetweenDates(now, date);
+        int months = difference / (60 * 24 * 30);
+        int weeks = difference / (60 * 24 * 7);
+        int days = difference / (60 * 24);
+
+        if (months == 1) {
+            return ret + "einem Monat";
+        }
+        if (months != 0) {
+            return ret + months + " Monaten";
+        }
+        if (weeks == 1) {
+            return ret + "einer Woche";
+        }
+        if (weeks != 0) {
+            return ret + weeks + " Wochen";
+        }
+        if (days == 1) {
+            return ret + "einem Tag";
+        }
+        if (days != 0) {
+            return ret + days + " Tagen";
+        }
+
+        return "FEHLER";
+    }
+
 
     private static boolean isNearlyNow(GregorianCalendar date) {
         GregorianCalendar now = new GregorianCalendar();
@@ -257,11 +321,11 @@ public class Util {
         int duration_minutes = minutes % 60;
 
         if (duration_hours != 0) {
-            ret += duration_hours + " Std. ";
+            ret += duration_hours + " Std.";
         }
 
         if (duration_minutes != 0) {
-            ret += duration_minutes + " Min.";
+            ret += " " + duration_minutes + " Min.";
         }
 
         if (duration_hours == 0 && duration_minutes == 0) {
@@ -518,5 +582,9 @@ public class Util {
         DisplayMetrics displayMetrics = TimeRank.getContext().getResources().getDisplayMetrics();
         int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
         return px;
+    }
+
+    public static int calculateWorkingDay(GregorianCalendar date) {
+        return (date.get(GregorianCalendar.DAY_OF_WEEK) + 5) % 7;
     }
 }

@@ -33,6 +33,19 @@
         style="@style/SmallText"
         />
     <TextView
+        android:id="@+id/task_deadline"
+        android:text="Morgen, 13:00 Uhr"
+        style="@style/SmallText"
+        android:textStyle="italic"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        />
+    <TextView
         android:id="@+id/task_duration"
         android:text="1 Std."
         style="@style/SmallText"
@@ -40,7 +53,6 @@
         android:layout_height="wrap_content"
         android:textAlignment="textEnd"
         android:paddingRight="5dp"
-        android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         />
 </LinearLayout>

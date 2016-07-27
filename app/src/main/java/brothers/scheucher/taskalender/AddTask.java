@@ -248,7 +248,8 @@ public class AddTask extends AppCompatActivity {
             TimeRank.addTaskToList(task);
             TimeRank.createCalculatingJob();
 
-            MyNotifications.createNotification(this);
+            MyNotifications.setAlarmNotification(this);
+//            MyNotifications.createNotification(this);
 
             finish();
             return true;

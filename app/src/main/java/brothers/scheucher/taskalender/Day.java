@@ -53,6 +53,10 @@ public class Day {
         GregorianCalendar latest_minute_date = (GregorianCalendar)start.clone();
         latest_minute_date.add(GregorianCalendar.MINUTE, day_settings.getLatest_minute());
         scheduler.addBlockingTime(latest_minute_date, end);
+
+        if (!day_settings.isWorkingDay(Util.calculateWorkingDay(date))) {
+            scheduler.addBlockingTime(start, end);
+        }
     }
 
     public GregorianCalendar getStart() {
@@ -112,16 +116,23 @@ public class Day {
             }
         }
 
+        Log.d(tag, "getPossibleWorkTime for " + description() + " worktime=" + sum_work_time);
         sum_work_time = checkAvailableWorkTime(sum_work_time);
 
+        Log.d(tag, "getPossibleWorkTime for " + description() + " worktime after checking=" + sum_work_time);
         return sum_work_time;
     }
 
     private int checkAvailableWorkTime(int available_work_time) {
         int already_worked = calculateWorkedTime();
         Log.d(tag, description() + " already worked = " + already_worked);
-        if (available_work_time > (day_settings.getTotalDurationInMinutes() - already_worked)) {
-            return (day_settings.getTotalDurationInMinutes() - already_worked);
+        int difference = day_settings.getTotalDurationInMinutes() - already_worked;
+        if (available_work_time > difference) {
+            if (difference > 0) {
+                return difference;
+            } else {
+                return 0;
+            }
         } else {
             return available_work_time;
         }
@@ -268,6 +279,7 @@ public class Day {
                 //create empty block...
                 event_block = (LinearLayout) inflater.inflate(R.layout.event_block, calender_day_events_tasks, false);
                 Util.setWeight(event_block, Util.getMinutesBetweenDates(last_block_end, b.getStart()));
+//                event_block.setBackgroundColor(0xFFFF0000);
                 calender_day_events_tasks.addView(event_block);
             }
             last_block_end = (GregorianCalendar) b.getEnd();
@@ -363,6 +375,45 @@ public class Day {
     public void addAllEvents(ArrayList<MyEvent> events) {
         for (MyEvent e : events) {
             addEvent(e);
+        }
+    }
+
+    public void drawEarliestStartLatestEndIndicators(View earliest_start_latest_end_indicators) {
+        View earliest_start_indicator = (View) earliest_start_latest_end_indicators.findViewById(R.id.earliest_start_indicator);
+        View between_indicators = (View) earliest_start_latest_end_indicators.findViewById(R.id.between_indicators);
+        View latest_end_indicator = (View) earliest_start_latest_end_indicators.findViewById(R.id.latest_end_indicator);
+
+        int earliest_minute = day_settings.getEarliest_minute();
+        int latest_minute = day_settings.getLatest_minute();
+        GregorianCalendar now = new GregorianCalendar();
+        int now_minute = Util.getMinuteOfDay(now);
+        if (Util.isSameDate(start, now)) {
+            earliest_minute = Math.max(earliest_minute, now_minute);
+            latest_minute = Math.max(latest_minute, now_minute);
+        }
+
+        if (!(day_settings.isWorkingDay(Util.calculateWorkingDay(start))) ||
+                Util.earlierDate(end, now)) {
+            Util.setWeight(earliest_start_indicator, 1440);
+            Util.setWeight(between_indicators, 0);
+            Util.setWeight(latest_end_indicator, 0);
+        } else {
+            Util.setWeight(earliest_start_indicator, earliest_minute);
+            Util.setWeight(between_indicators, latest_minute - earliest_minute);
+            Util.setWeight(latest_end_indicator, 60 * 24 - latest_minute);
+        }
+
+    }
+
+    public void drawNowIndicator(View now_view_container) {
+        View now_offset = now_view_container.findViewById(R.id.now_view_offset);
+        View now_indicator = now_view_container.findViewById(R.id.now_indicator);
+        if (Util.isSameDate(start, new GregorianCalendar())) {
+            Util.setWeight(now_indicator, 2);
+            Util.setWeight(now_offset, Util.getMinutesBetweenDates(start, new GregorianCalendar()));
+        } else {
+            Util.setWeight(now_indicator, 0);
+            Util.setWeight(now_offset, 0);
         }
     }
 

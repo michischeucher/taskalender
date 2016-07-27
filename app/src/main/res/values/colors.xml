@@ -12,5 +12,11 @@
     <color name="materialcolorpicker__black">#000000</color>
     <color name="materialcolorpicker__dialogcolor">#009688</color>
     <color name="text_normal">#000000</color>
+    <color name="no_tasktime">#e9e7e7</color>
+    <color name="tasktime">#5a37ff00</color>
+    <color name="accent_color">#08ff00</color>
+    <color name="accent_color_dark">#059c00</color>
+
+
 
 </resources>

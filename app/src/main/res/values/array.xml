@@ -5,4 +5,15 @@
         <item>Labels</item>
         <item>Keine Ahnung</item>
     </array>
+
+    <string-array name="week_names">
+        <item>Montag</item>
+        <item>Dienstag</item>
+        <item>Mittwoch</item>
+        <item>Donnerstag</item>
+        <item>Freitag</item>
+        <item>Samstag</item>
+        <item>Sonntag</item>
+    </string-array>
+
 </resources>

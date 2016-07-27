@@ -25,7 +25,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + Task.DB_COL_DURATION + " int, "
             + Task.DB_COL_DEADLINE + " text, "
             + Task.DB_COL_EARLIEST_START + " text, "
-            + Task.DB_COL_PRIORITY + " text, "
+            + Task.DB_COL_DONE + " int, "
             + Task.DB_COL_LABELS + " text ) ";
 
     private static final String EVENT_TABLE = "CREATE TABLE IF NOT EXISTS " + MyEvent.DB_TABLE + " ( "
@@ -47,7 +47,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + DaySettingObject.DB_COL_ID + " int, "
             + DaySettingObject.DB_COL_TOTALDURATION + " int, "
             + DaySettingObject.DB_COL_EARLIESTMINUTE + " int, "
-            + DaySettingObject.DB_COL_LATESTMINUTE + " int ) ";
+            + DaySettingObject.DB_COL_LATESTMINUTE + " int, "
+            + DaySettingObject.DB_COL_WORKING_DAYS + " text ) ";
 
     private static final String DROP_TASK_TABLE = "DROP TABLE IF EXISTS " + Task.DB_TABLE;
     private static final String DROP_EVENT_TABLE = "DROP TABLE IF EXISTS " + MyEvent.DB_TABLE;
@@ -106,7 +107,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(Task.DB_COL_DURATION, task.getRemaining_duration());
         values.put(Task.DB_COL_DEADLINE, Util.DateToString(task.getDeadline()));
         Log.d(tag, "saved date = "+ Util.DateToString((task.getDeadline())));
-        values.put(Task.DB_COL_PRIORITY, task.getPriority());
+        values.put(Task.DB_COL_DONE, task.getDone());
         values.put(Task.DB_COL_LABELS, task.getLabelIdsString());
 
         Cursor cursor = db.rawQuery("SELECT * from " + Task.DB_TABLE + " WHERE " +
@@ -262,6 +263,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(DaySettingObject.DB_COL_TOTALDURATION, dso.getTotalDurationInMinutes());
         values.put(DaySettingObject.DB_COL_EARLIESTMINUTE, dso.getEarliest_minute());
         values.put(DaySettingObject.DB_COL_LATESTMINUTE, dso.getLatest_minute());
+        values.put(DaySettingObject.DB_COL_WORKING_DAYS, dso.getWorkingDaysIdsString());
 
         Cursor cursor = db.rawQuery("SELECT * from " + DaySettingObject.DB_TABLE + " WHERE " +
                 DaySettingObject.DB_COL_ID + " = \"" + dso.getId() + "\"", null);
@@ -298,9 +300,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             task.setNotice(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_NOTICE)));
             task.setRemaining_duration(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_DURATION)));
             task.setDeadline(Util.StringToDate(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_DEADLINE))));
-            task.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_PRIORITY)));
             task.setLabelString(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_LABELS)));
-
+            task.setDone(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_DONE)));
             TimeRank.addTaskToList(task);
 
         }
@@ -362,6 +363,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             dso.setTotalDuration(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_TOTALDURATION)));
             dso.setEarliest_minute(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_EARLIESTMINUTE)));
             dso.setLatest_minute(cursor.getInt(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_LATESTMINUTE)));
+            dso.setWorkingDaysString(cursor.getString(cursor.getColumnIndexOrThrow(DaySettingObject.DB_COL_WORKING_DAYS)));
 
             Log.d(tag, "DaySettingObject read: " + dso.description());
             TimeRank.addDaySettingObject(dso);

@@ -67,7 +67,7 @@ public class TimeRank {
         calc_async.execute();
     }
 
-    private static int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date) {
+    private static int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
         int sum_work_time = 0;
 
         if (!(Util.isSameDate(start_date, end_date) && Util.isSameTime(start_date, end_date))) {//if there is really a slot! ;)
@@ -76,7 +76,9 @@ public class TimeRank {
                 if (day == null) {
                     day = TimeRank.createDay(current_date);
                 }
-                sum_work_time += day.getPossibleWorkTime(start_date, end_date);
+                int possible_work_time_in_that_day = day.getPossibleWorkTime(start_date, end_date, set_worked);
+                //day.addDistributedWorkTime(possible_work_time_in_that_day);
+                sum_work_time += possible_work_time_in_that_day;
             }
         }
         Log.d(tag, "getPossibleWorkTime for " + Util.getFormattedDateTime(start_date) + "-" + Util.getFormattedDateTime(end_date) + " = " + sum_work_time);
@@ -454,12 +456,12 @@ public class TimeRank {
                 }
             }
 
-            possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date);
+            possible_work_time_for_current_task = TimeRank.getPossibleWorkTime(current_task.getDeadline(), earlier_date, false);
             overlapping_time = current_task.getRemaining_duration() + current_task.getOverlapping_minutes() - possible_work_time_for_current_task;
 
             block.setOverlapping_time(overlapping_time);
             block.setStart(earlier_date);               //every time a new task added?! hmm...
-            block.setPotential((-1) * overlapping_time);//every time a new task added?! hmm...
+//            block.setPotential((-1) * overlapping_time);//every time a new task added?! hmm...
 
             if (overlapping_time < 0 && !last_task) { //if everything is possible in that block...
                 block = new TaskBlock();
@@ -469,16 +471,37 @@ public class TimeRank {
                 Log.d(tag, "########### PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
             }
         }
-
         Log.d(tag, "##### END CALCULATING BLOCKS #####");
 
-/*        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
+/*
+        Log.d(tag, "--- printing TaskBlocks --- size = " + task_blocks.size());
         for (TaskBlock tb : task_blocks) {
             Log.d(tag, "start: " + Util.getFormattedDateTime(tb.getStart()) + " end: " + Util.getFormattedDateTime(tb.getEnd()));
             Log.d(tag, "   potential: " + tb.getPotential() + " overlapping_time = " + tb.getOverlapping_time() +  " #tasks: " + tb.getTasks().size() + " tasks(remaining_durations) = " + tb.getRemainingDurationOfTasks());
         }
         Log.d(tag, "--- end printing TaskBlocks ---");
 */
+        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
+            TaskBlock tb = task_blocks.get(i);
+            int potential = TimeRank.getPossibleWorkTime(tb.getStart(), tb.getEnd(), true);
+            potential -= tb.getRemainingDurationOfTasks();
+            tb.setPotential(potential);//every time a new task added?! hmm...
+            Log.d(tag, "Potential = " + potential + " for tb = " + tb.description());
+        }
+        for (Day day : days) {
+            day.setDistributedMinutes(0);
+        }
+        for (int i = 0; i < task_blocks.size() - 1; i++) { //start with oldest block EXCEPT newest block!!!
+            TaskBlock tb = task_blocks.get(i);
+            int potential = tb.getPotential();
+            if (potential < 0) { //cannot be newest block!!
+                task_blocks.get(i+1).setPotential(task_blocks.get(i+1).getPotential() + potential);
+                tb.setPotential(0);
+            }
+        }
+
+
+
         //CALCULATING DAYS with TASKS...
         Log.d(tag, "##### START CALCULATING DAYS with TASKS #####");
         Day last_day_where_time_left = null;

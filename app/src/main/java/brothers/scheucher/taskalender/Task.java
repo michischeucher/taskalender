@@ -162,7 +162,7 @@ public class Task implements Comparable {
     public void setLabelString(String label_string) {
         if (label_ids == null)
             label_ids = new ArrayList<>();
-        if (label_string == null)
+        if (label_string == null || label_string.equals(""))
             return;
 
         String[] labels = label_string.split(";");

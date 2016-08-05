@@ -24,6 +24,9 @@ public class Day {
     private ArrayList<MyEvent> events_whole_day;
     private static final int MIN_DISPLAY_DURATION_FOR_ONE_EVENT = 30;
 
+    private int already_distributed; //just for calculation
+
+
     public Day(GregorianCalendar date) {
         this.start = (GregorianCalendar)date.clone();
         Util.setTime(this.start, 0, 0);
@@ -57,6 +60,7 @@ public class Day {
         if (!day_settings.isWorkingDay(Util.calculateWorkingDay(date))) {
             scheduler.addBlockingTime(start, end);
         }
+        this.already_distributed = 0;
     }
 
     public GregorianCalendar getStart() {
@@ -104,7 +108,7 @@ public class Day {
         sort(events);
     }
 
-    public int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date) {
+    public int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
         int sum_work_time = 0;
 
         TimeObj dates_to_check = new TimeObj(start_date, end_date);
@@ -117,23 +121,32 @@ public class Day {
         }
 
         Log.d(tag, "getPossibleWorkTime for " + description() + " worktime=" + sum_work_time);
-        sum_work_time = checkAvailableWorkTime(sum_work_time);
+        sum_work_time = checkAvailableWorkTime(sum_work_time, set_worked);
 
         Log.d(tag, "getPossibleWorkTime for " + description() + " worktime after checking=" + sum_work_time);
         return sum_work_time;
     }
 
-    private int checkAvailableWorkTime(int available_work_time) {
+    private int checkAvailableWorkTime(int available_work_time, boolean set_worked) {
         int already_worked = calculateWorkedTime();
         Log.d(tag, description() + " already worked = " + already_worked);
         int difference = day_settings.getTotalDurationInMinutes() - already_worked;
+        if (set_worked) {
+            difference -= this.already_distributed;
+        }
         if (available_work_time > difference) {
             if (difference > 0) {
+                if (set_worked) {
+                    this.already_distributed += difference;
+                }
                 return difference;
             } else {
                 return 0;
             }
         } else {
+            if (set_worked) {
+                this.already_distributed += available_work_time;
+            }
             return available_work_time;
         }
     }
@@ -154,9 +167,11 @@ public class Day {
         //Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
 
         int available_work_time = scheduler.getPossibleWorkTime();
-        available_work_time = checkAvailableWorkTime(available_work_time);
+        available_work_time = checkAvailableWorkTime(available_work_time, false);
+        Log.d(tag, "available work time = " + available_work_time);
 
         int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
+        Log.d(tag, "work time for that task = " + work_time_for_that_task);
         //Log.d(tag, "   worktime: " + work_time_for_that_task + " from overall available: " + available_work_time);
         if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
             work_time_for_that_task = task.getRemaining_duration() - task.already_distributed_duration; //rest of duration...
@@ -166,7 +181,7 @@ public class Day {
         }
         //Log.d(tag, "   worktime is now: " + work_time_for_that_task);
         while(work_time_for_that_task > 0) {
-            TimeObj free_slot = this.scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
+            TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
 
             MyEvent new_event = new MyEvent();
             new_event.setNot_created_by_user(true);
@@ -415,6 +430,14 @@ public class Day {
             Util.setWeight(now_indicator, 0);
             Util.setWeight(now_offset, 0);
         }
+    }
+
+    public void addDistributedWorkTime(int minutes_to_add) {
+        this.already_distributed += minutes_to_add;
+    }
+
+    public void setDistributedMinutes(int value) {
+        this.already_distributed = value;
     }
 
 

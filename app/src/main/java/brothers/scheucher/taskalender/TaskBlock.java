@@ -121,7 +121,7 @@ public class TaskBlock implements Comparable {
             for (int i = tasks.size() - 1; i >= 0; i--) {
                 day.addTask(tasks.get(i));
             }
-            if (day.getPossibleWorkTime(day.getStart(), day.getEnd()) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
+            if (day.getPossibleWorkTime(day.getStart(), day.getEnd(), false) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
                 Log.d(tag, "######################### right....!!!!");
                 return day;
             }

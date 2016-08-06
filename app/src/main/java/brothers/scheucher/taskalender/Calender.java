@@ -1,14 +1,10 @@
 package brothers.scheucher.taskalender;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,18 +24,14 @@ import java.util.GregorianCalendar;
 public class Calender extends Fragment {
     private static final String tag = "Calender";
 
-    private static final int MAX_SWIPES_LEFT_RIGHT = 50;
+    public static final int MAX_SWIPES_LEFT_RIGHT = 50;
 
     private static CalenderPagerAdapter calender_pager_adapter;
     private static int scroll_pos;
     private static ViewPager view_pager;
     public static RelativeLayout ll;
-    protected static Activity fa;
     private static ArrayList<ScrollViewScalable> scroll_positions;
     public static boolean got_to_now;
-
-    Button new_button;
-    LinearLayout new_button_option_view;
 
     public Calender() {
         // Required empty public constructor
@@ -86,81 +77,12 @@ public class Calender extends Fragment {
         view_pager.setAdapter(calender_pager_adapter);
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
 
-        new_button = (Button)ll.findViewById(R.id.new_button);
-        new_button_option_view = (LinearLayout) ll.findViewById(R.id.new_button_options);
-
-        new_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "new click");
-
-                toggleOptions();
-            }
-        });
-
-        Button new_event = ((Button)ll.findViewById(R.id.new_event_button));
-        new_event.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "new event");
-                int current_date_offset = view_pager.getCurrentItem() - MAX_SWIPES_LEFT_RIGHT;
-                Log.d(tag, "current date offset = " + current_date_offset);
-
-                Bundle bundle = new Bundle();
-                bundle.putInt("current_date_offset", current_date_offset);
-                bundle.putInt("id", -1);
-
-                Intent intent = new Intent(getActivity(), AddEvent.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                toggleOptions();
-            }
-        });
-
-        Button new_task = ((Button)ll.findViewById(R.id.new_task_button));
-        new_task.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "new task");
-                Intent intent = new Intent(getActivity(), AddTask.class);
-                startActivity(intent);
-                toggleOptions();
-            }
-        });
-
-        Button new_label = ((Button)ll.findViewById(R.id.new_label_button));
-        new_label.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "new label");
-                Intent intent = new Intent(getActivity(), AddLabel.class);
-                startActivity(intent);
-
-                toggleOptions();
-            }
-        });
+        Util.setNewButtonListeners(ll, getActivity(), view_pager);
 
         return ll;
     }
 
-    private void toggleOptions() {
-        if (new_button_option_view.getVisibility() == View.VISIBLE) {
-            new_button_option_view.setVisibility(View.GONE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button));
-            }
-            new_button.setText("+");
-        } else {
-            new_button_option_view.setVisibility(View.VISIBLE);
-            //tooo new...
-            // ((Button)findViewById(R.id.calender_day_new_button)).setBackground(getDrawable(R.drawable.rounded_button_inactive));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                new_button.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.rounded_button_inactive));
-            }
-            new_button.setText("-");
-        }
 
-    }
 
     @Override
     public void onResume() {

@@ -72,15 +72,7 @@ public class LabelFragment extends Fragment {
             ((TextView) ll.findViewById(R.id.label_hirarchy)).setText(label.getHirarchyString());
         }
 
-        new_button = ((Button) ll.findViewById(R.id.new_button));
-        new_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "new label");
-                Intent intent = new Intent(getActivity(), AddLabel.class);
-                startActivity(intent);
-            }
-        });
+        Util.setNewButtonListeners(ll, getActivity(), null);
 
         return ll;
     }

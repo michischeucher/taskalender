@@ -1,17 +1,24 @@
 package brothers.scheucher.taskalender;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -587,4 +594,83 @@ public class Util {
     public static int calculateWorkingDay(GregorianCalendar date) {
         return (date.get(GregorianCalendar.DAY_OF_WEEK) + 5) % 7;
     }
+
+    public static void toggleNewButtonOptions(View new_button_option_view, Button new_button, Activity activity) {
+        if (new_button_option_view.getVisibility() == View.VISIBLE) {
+            new_button_option_view.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                new_button.setBackground(ContextCompat.getDrawable(activity, R.drawable.rounded_button));
+            }
+            new_button.setText("+");
+        } else {
+            new_button_option_view.setVisibility(View.VISIBLE);
+            //tooo new...
+            // ((Button)findViewById(R.id.calender_day_new_button)).setBackground(getDrawable(R.drawable.rounded_button_inactive));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                new_button.setBackground(ContextCompat.getDrawable(activity, R.drawable.rounded_button_inactive));
+            }
+            new_button.setText("-");
+        }
+
+    }
+
+    public static void setNewButtonListeners(RelativeLayout ll, final Activity activity, final ViewPager view_pager) {
+        final Button new_button = (Button)ll.findViewById(R.id.new_button);
+        final LinearLayout new_button_option_view = (LinearLayout) ll.findViewById(R.id.new_button_options);
+
+        new_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new click");
+
+                Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
+            }
+        });
+
+        Button new_event = ((Button)ll.findViewById(R.id.new_event_button));
+        new_event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new event");
+                int current_date_offset = 0;
+                if (view_pager != null) {
+                    current_date_offset = view_pager.getCurrentItem() - Calender.MAX_SWIPES_LEFT_RIGHT;
+                }
+                Log.d(tag, "current date offset = " + current_date_offset);
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("current_date_offset", current_date_offset);
+                bundle.putInt("id", -1);
+
+                Intent intent = new Intent(activity, AddEvent.class);
+                intent.putExtras(bundle);
+                activity.startActivity(intent);
+                Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
+            }
+        });
+
+        Button new_task = ((Button)ll.findViewById(R.id.new_task_button));
+        new_task.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new task");
+                Intent intent = new Intent(activity, AddTask.class);
+                activity.startActivity(intent);
+                Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
+            }
+        });
+
+        Button new_label = ((Button)ll.findViewById(R.id.new_label_button));
+        new_label.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "new label");
+                Intent intent = new Intent(activity, AddLabel.class);
+                activity.startActivity(intent);
+
+                Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
+            }
+        });
+    }
+
 }

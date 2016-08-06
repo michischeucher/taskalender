@@ -47,16 +47,70 @@
 
     <Button
         android:id="@+id/new_button"
-        android:background="@drawable/rounded_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        style="@style/new_button"
         android:text="+"
-        android:textColor="#FFFFFF"
-        android:textSize="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="15dp"
-        android:layout_alignParentBottom="true"
+        android:onClick="handleClickOnNewButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <LinearLayout
+        android:id="@+id/new_button_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@+id/new_button"
         android:layout_alignParentRight="true"
-        />
+        android:visibility="gone"
+        >
+        <Button
+            android:id="@+id/new_task_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aufgabe hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+        <Button
+            android:id="@+id/new_event_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Termin hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+        <Button
+            android:id="@+id/new_label_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Label hinzufügen"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/button_overlay"
+            />
+
+    </LinearLayout>
 
 </RelativeLayout>

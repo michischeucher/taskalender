@@ -70,7 +70,14 @@ public class ViewTask extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Log.d(tag, "all_finished clicked");
+                if (task.isDone()) {
+                    task.setDone(false);
+                } else {
+                    task.setDone(true);
+                }
+                task.save(TimeRank.getContext());
                 toggleButtonOptions(button);
+                finish();
             }
         });
 
@@ -173,6 +180,16 @@ public class ViewTask extends ActionBarActivity {
             View row = inflater.inflate(R.layout.text_item_with_description, view_task_fields_container, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText(Task.label_description);
             ((TextView)row.findViewById(R.id.text_of_item)).setText(task.getLabelString());
+            view_task_fields_container.addView(row);
+        }
+        if (task.isDone()) {
+            View row = inflater.inflate(R.layout.text_item_with_description, view_task_fields_container, false);
+            ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgabe");
+            ((TextView)row.findViewById(R.id.text_of_item)).setText("Aufgabe ist erledigt! :)");
+
+            Button all_finished = (Button)view_task.findViewById(R.id.all_finished);
+            all_finished.setText("Aufgabe als nicht erledigt markieren");
+
             view_task_fields_container.addView(row);
         }
     }

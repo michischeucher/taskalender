@@ -25,10 +25,12 @@ public class Task implements Comparable {
     private GregorianCalendar earliest_start;
     private GregorianCalendar deadline;
     private boolean done;
+    private int repeat; //repeat that task every x hours
 
     private int overlapping_minutes; //just for calculation --- minutes overlapping with tasks in the future
     public int already_distributed_duration; //just for calculation
     public float filling_factor; //just for calculation
+    private boolean not_created_by_user; //if set, then this will not be saved!
 
     private ArrayList<Integer> label_ids;
 
@@ -65,6 +67,8 @@ public class Task implements Comparable {
         this.overlapping_minutes = 0;
         this.already_distributed_duration = 0;
         this.filling_factor = 0;
+        this.not_created_by_user = false;
+        this.repeat = 0;
     }
 
     public Task(int id) {
@@ -77,6 +81,8 @@ public class Task implements Comparable {
         this.filling_factor = 0;
         this.label_ids = new ArrayList<Integer>();
         this.done = false;
+        this.not_created_by_user = false;
+        this.repeat = 0;
     }
 
     public void resetJustForCalculations() {
@@ -341,6 +347,13 @@ public class Task implements Comparable {
             this.done = true;
         } else {
             this.done = false;
+        }
+    }
+    public void setDone(boolean done) {
+        this.done = done;
+        if (done) {
+            this.remaining_duration.setDuration(0);
+            TimeRank.createCalculatingJob();
         }
     }
 }

@@ -355,16 +355,17 @@ public class Util {
         int duration_minutes = minutes % 60;
 
         if (duration_hours > 0) {
-            ret += duration_hours + " Std. ";
+            ret += duration_hours + " Std.";
+        }
+
+        if (duration_hours > 0 && duration_minutes > 0) {
+            ret += " ";
         }
 
         if (duration_minutes > 0) {
             ret += duration_minutes + " Min.";
         }
 
-        if (duration_hours == 0 && duration_minutes == 0) {
-            ret += "0 Min.";
-        }
         if (negative) {
             ret += " in Verzug";
         } else {

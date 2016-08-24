@@ -97,6 +97,16 @@ public class TimeRank {
         return tasks;
     }
 
+    public static ArrayList<Task> getTasksNotDone() {
+        ArrayList<Task> tasks_not_done = new ArrayList<>();
+        for (Task t : tasks) {
+            if (!t.isDone()) {
+                tasks_not_done.add(t);
+            }
+        }
+        return tasks_not_done;
+    }
+
     public static void setTasks(ArrayList<Task> tasks) {
         TimeRank.tasks = tasks;
     }
@@ -425,6 +435,9 @@ public class TimeRank {
 
         for (int i = 0; i < TimeRank.getTasks().size(); i++) {
             Task current_task = tasks.get(i);
+            if (current_task.isDone()) {
+                continue;
+            }
             Log.d(tag, "Tasking" + current_task.description());
             if (current_task.getDeadline() == null) {
                 block.addTask(current_task);
@@ -483,10 +496,14 @@ public class TimeRank {
 */
         for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
             TaskBlock tb = task_blocks.get(i);
-            int potential = TimeRank.getPossibleWorkTime(tb.getStart(), tb.getEnd(), true);
-            potential -= tb.getRemainingDurationOfTasks();
-            tb.setPotential(potential);//every time a new task added?! hmm...
-            Log.d(tag, "Potential = " + potential + " for tb = " + tb.description());
+            if (tb.getStart() == null && tb.getEnd() == null) { //tasks without Deadlines
+                tb.setPotential(0);
+            } else {
+                int potential = TimeRank.getPossibleWorkTime(tb.getStart(), tb.getEnd(), true);
+                potential -= tb.getRemainingDurationOfTasks();
+                tb.setPotential(potential);
+                Log.d(tag, "Potential = " + potential + " for tb = " + tb.description());
+            }
         }
         for (Day day : days) {
             day.setDistributedMinutes(0);

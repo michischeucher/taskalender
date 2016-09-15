@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/accent_color</item>
         <item name="android:colorPrimaryDark">@color/accent_color_dark</item>
         <item name="android:colorAccent">@color/accent_color_dark</item>

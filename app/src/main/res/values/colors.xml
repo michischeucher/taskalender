@@ -16,13 +16,13 @@
 
     <color name="no_tasktime">#e9e7e7</color>
     <color name="tasktime">@color/accent_color</color>
-    <color name="button_color">#d4d4d4</color>
-    <color name="button_color_dark">#969696</color>
+    <color name="button_color">@color/accent_color_dark</color>
+    <color name="button_color_dark">@color/accent_color</color>
 
-    <color name="accent_color">#64dd17</color>
+    <color name="accent_color">#009688</color>
     <color name="accentColor">@color/accent_color</color>
-    <color name="accent_color_middle">#51b313</color>
-    <color name="accent_color_dark">#398c05</color>
+    <color name="accent_color_middle">#00897b</color>
+    <color name="accent_color_dark">#00695c</color>
 
     <color name="colorPrimary">@color/accent_color</color><!--Background color for AppBar-->
     <color name="colorPrimaryDark">@color/accent_color_dark</color><!--i ignore its use-->

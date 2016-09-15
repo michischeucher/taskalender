@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:id="@+id/add_event"
     android:padding="@dimen/activity_margin"
-    tools:context="brothers.scheucher.taskalender.AddTask"
+    tools:context="brothers.scheucher.taskbro.AddTask"
     android:focusable="true"
     android:focusableInTouchMode="true"
     >

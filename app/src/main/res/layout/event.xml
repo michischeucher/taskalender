@@ -3,19 +3,41 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:id="@+id/event"
-    android:layout_height="0dp"
+    android:layout_height="wrap_content"
     android:layout_weight="30"
     android:layout_width="match_parent"
     android:onClick="handleClickOnEvent"
     android:background="@drawable/rounded_corners"
+    android:orientation="horizontal"
     >
     <TextView
         android:id="@+id/event_name"
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:padding="5dp"
         android:layout_marginRight="5dp"
         android:text="Leerer Termin"
         android:textSize="11dp"
         />
+    <RelativeLayout
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:onClick="handleClickOnDoneToggle"
+        >
+        <ImageView
+            android:id="@+id/event_done"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:src="@drawable/abc_btn_check_to_on_mtrl_015"
+            />
+        <ImageView
+            android:id="@+id/event_not_done"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:src="@drawable/abc_btn_check_to_on_mtrl_000"
+            />
+    </RelativeLayout>
 </LinearLayout>

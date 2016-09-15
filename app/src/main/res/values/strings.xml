@@ -28,7 +28,7 @@
     <string name="title">Titel</string>
     <string name="title_activity_setting_day">Tages-Einstellungen</string>
     <string name="title_activity_view_task">ViewTask</string>
-    <string name="task_duration_description">Verbleibender Arbeitsaufwand</string>
+    <string name="task_duration_description">Arbeitsaufwand</string>
     <string name="earliest_start">Frühestmöglicher Start:</string>
     <string name="deadline_description">Deadline:</string>
     <string name="repeat_description">Wiederholung:</string>

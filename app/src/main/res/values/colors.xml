@@ -11,12 +11,21 @@
     <color name="materialcolorpicker__dribbledark">#c32361</color>
     <color name="materialcolorpicker__black">#000000</color>
     <color name="materialcolorpicker__dialogcolor">#009688</color>
+
     <color name="text_normal">#000000</color>
+
     <color name="no_tasktime">#e9e7e7</color>
-    <color name="tasktime">#5a37ff00</color>
-    <color name="accent_color">#08ff00</color>
-    <color name="accent_color_dark">#059c00</color>
+    <color name="tasktime">@color/accent_color</color>
+    <color name="button_color">#d4d4d4</color>
+    <color name="button_color_dark">#969696</color>
 
+    <color name="accent_color">#64dd17</color>
+    <color name="accentColor">@color/accent_color</color>
+    <color name="accent_color_middle">#51b313</color>
+    <color name="accent_color_dark">#398c05</color>
 
-
+    <color name="colorPrimary">@color/accent_color</color><!--Background color for AppBar-->
+    <color name="colorPrimaryDark">@color/accent_color_dark</color><!--i ignore its use-->
+    <color name="colorAccent">@color/accent_color</color>
+    <!--color effects, EditText, RadioButtons...-->
 </resources>

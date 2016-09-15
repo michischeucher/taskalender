@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:showIn="@layout/activity_view_event"
-    tools:context="brothers.scheucher.taskalender.ViewEvent"
+    tools:context="brothers.scheucher.taskbro.ViewEvent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
@@ -61,6 +61,7 @@
                 android:layout_marginBottom="-10dp"
                 android:clickable="true"
                 android:src="@android:drawable/ic_menu_edit"
+                app:backgroundTint="@color/button_color_dark"
                 app:layout_anchor="@id/viewA"
                 app:layout_anchorGravity="bottom|right|end"/>
 

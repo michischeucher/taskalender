@@ -57,13 +57,13 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <brothers.scheucher.taskalender.PieChart
+            <brothers.scheucher.taskbro.PieChart
                 android:id="@+id/setting_day_chart"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_centerHorizontal="true"
                 >
-            </brothers.scheucher.taskalender.PieChart>
+            </brothers.scheucher.taskbro.PieChart>
         </RelativeLayout>
 
     </LinearLayout>

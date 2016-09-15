@@ -37,9 +37,20 @@
             android:id="@+id/tasks_with_that_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="72dp"
             android:orientation="vertical">
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/done_tasks_with_that_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            />
 
     </LinearLayout>
 

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,14 @@ public class AddLabel extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             int id = b.getInt("id");
-            label = TaskBroContainer.getLabel(id);
+            int parent_label_id = b.getInt("parent_label_id");
+            if (id == -1) {
+                label = new Label();
+                label.setParent(parent_label_id);
+                findViewById(R.id.add_label_title).requestFocus();
+            } else {
+                label = TaskBroContainer.getLabel(id);
+            }
         } else {
             label = new Label();
             findViewById(R.id.add_label_title).requestFocus();
@@ -187,7 +195,19 @@ public class AddLabel extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_save) {
             View add_label_view = findViewById(R.id.add_label);
-            label.setName((String.valueOf(((TextView) add_label_view.findViewById(R.id.add_label_title)).getText())));
+            String label_name = ((TextView) add_label_view.findViewById(R.id.add_label_title)).getText().toString();
+            if (label_name.equals("")) {
+                Toast toast = Toast.makeText(this, "Bitte geben Sie einen Namen ein!", Toast.LENGTH_LONG);
+                toast.show();
+                return true;
+            }
+            if (!label.checkIfLabelNameExists(label_name)) {
+                Toast toast = Toast.makeText(this, "Dieser Name existiert bereits, bitte geben Sie einen anderen Namen ein!", Toast.LENGTH_LONG);
+                toast.show();
+                return true;
+
+            }
+            label.setName(label_name);
             label.save(this);
             TaskBroContainer.addLabelToList(label);
             finish();
@@ -196,4 +216,6 @@ public class AddLabel extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

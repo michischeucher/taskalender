@@ -79,7 +79,7 @@ public class Calender extends Fragment {
         view_pager.setAdapter(calender_pager_adapter);
         view_pager.setCurrentItem(MAX_SWIPES_LEFT_RIGHT);
 
-        Util.setNewButtonListeners(ll, getActivity(), view_pager);
+        Util.setNewButtonListeners(ll, getActivity(), view_pager, -1);
 
         return ll;
     }

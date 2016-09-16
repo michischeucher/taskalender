@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:textStyle="italic"
         android:singleLine="true"
-        android:paddingBottom="2dp"
+        android:paddingBottom="3dp"
         android:paddingRight="5dp"
         android:paddingLeft="5dp"
         style="@style/SmallText"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:textAlignment="textEnd"
         android:paddingRight="5dp"
-        android:paddingBottom="5dp"
+        android:paddingBottom="3dp"
         android:paddingLeft="5dp"
         />
     <TextView
@@ -54,5 +54,19 @@
         android:textAlignment="textEnd"
         android:paddingRight="5dp"
         android:paddingLeft="5dp"
+        android:paddingBottom="3dp"
+        />
+    <TextView
+        android:id="@+id/task_done"
+        android:text="Erledigt ✓"
+
+        android:visibility="gone"
+        style="@style/SmallText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:paddingBottom="3dp"
         />
 </LinearLayout>

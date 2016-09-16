@@ -25,6 +25,7 @@ public class WorkFinishedDialog extends Dialog {
     private MyEvent event;
     private Duration worked_duration;
     private Duration remaining_duration;
+    private boolean remaining_duration_modified = false;
 
     private RelativeLayout work_finished_dialog;
     private TextView start_time;
@@ -32,6 +33,14 @@ public class WorkFinishedDialog extends Dialog {
     private TextView date_view;
     private TextView worked_duration_view;
     protected TextView remaining_duration_view;
+
+    private String last_changed;
+    private String before_last_change;
+
+    private static final String START_TIME = "start_date";
+    private static final String END_TIME = "end_time";
+    private static final String DURATION = "duration";
+    public boolean was_ok = false;
 
     public WorkFinishedDialog(Activity a, Task task, int duration) {
         super(a);
@@ -41,6 +50,10 @@ public class WorkFinishedDialog extends Dialog {
         this.event = new MyEvent(duration, true);
         this.worked_duration = new Duration(duration);
         this.event.setTask(task);
+
+        last_changed = DURATION;
+        before_last_change = END_TIME;
+        was_ok = false;
     }
 
     @Override
@@ -62,14 +75,14 @@ public class WorkFinishedDialog extends Dialog {
         start_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePicker(start_time, event.getStart());
+                showTimePicker(start_time, event.getStart(), true);
             }
         });
         end_time = (TextView)work_finished_dialog.findViewById(R.id.end_time);
         end_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePicker(end_time, event.getEnd());
+                showTimePicker(end_time, event.getEnd(), false);
             }
         });
         worked_duration_view = (TextView)work_finished_dialog.findViewById(R.id.duration);
@@ -81,9 +94,22 @@ public class WorkFinishedDialog extends Dialog {
                 dialog.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        Util.setTime(event.getStart(), event.getEnd());
-                        event.getStart().add(GregorianCalendar.MINUTE, -worked_duration.getDuration());
-                        remaining_duration.setDuration(task.getRemaining_duration() - worked_duration.getDuration());
+                        if (last_changed.equals(START_TIME) || (last_changed.equals(DURATION) && before_last_change.equals(START_TIME))) {
+                            event.setEndWithDuration(worked_duration.getDuration());
+                        } else if (last_changed.equals(END_TIME) || (last_changed.equals(DURATION) && before_last_change.equals(END_TIME))) {
+                            Util.setTime(event.getStart(), event.getEnd());
+                            event.getStart().add(GregorianCalendar.MINUTE, -worked_duration.getDuration());
+                        }
+
+                        if (!last_changed.equals(DURATION)) {
+                            before_last_change = last_changed;
+                        }
+                        last_changed = DURATION;
+
+                        if (!remaining_duration_modified) {
+                            remaining_duration.setDuration(task.getRemaining_duration() - worked_duration.getDuration());
+                        }
+
                         setFieldsBecauseOfData();
                     }
                 });
@@ -95,6 +121,12 @@ public class WorkFinishedDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 DurationPickerDialog dialog = new DurationPickerDialog(activity, remaining_duration_view, remaining_duration);
+                dialog.setOnDismissListener(new OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        remaining_duration_modified = true;
+                    }
+                });
                 dialog.show();
             }
         });
@@ -117,6 +149,7 @@ public class WorkFinishedDialog extends Dialog {
                 event.save(TaskBroContainer.getContext());
                 TaskBroContainer.addEventToList(event);
                 TaskBroContainer.createCalculatingJob();
+                was_ok = true;
                 dismiss();
             }
         });
@@ -130,6 +163,7 @@ public class WorkFinishedDialog extends Dialog {
         start_time.setText(Util.getFormattedTime(event.getStart()));
         end_time.setText(Util.getFormattedTime(event.getEnd()));
         worked_duration_view.setText(Util.getFormattedDuration(worked_duration.getDuration()));
+
         remaining_duration_view.setText(Util.getFormattedDuration(remaining_duration.getDuration()));
     }
 
@@ -177,7 +211,7 @@ public class WorkFinishedDialog extends Dialog {
         }
     }
 
-    public void showTimePicker(View view, GregorianCalendar time) {
+    public void showTimePicker(View view, GregorianCalendar time, final boolean is_start_time) {
         //Log.d(tag, "showTimePicker");
         int minute = time.get(GregorianCalendar.MINUTE);
         int hour = time.get(GregorianCalendar.HOUR_OF_DAY);
@@ -185,10 +219,38 @@ public class WorkFinishedDialog extends Dialog {
         dialog.setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if (event.getEndMinute() > event.getStartMinute()) {
-                    worked_duration.setDuration(event.getEndMinute() - event.getStartMinute());
+                if (is_start_time && (last_changed.equals(END_TIME) || last_changed.equals(START_TIME) && before_last_change.equals(END_TIME) ) ||
+                        !is_start_time && (last_changed.equals(START_TIME) || last_changed.equals(END_TIME) && before_last_change.equals(START_TIME)) ) {
+                    if (event.getEndMinute() > event.getStartMinute()) {
+                        worked_duration.setDuration(event.getEndMinute() - event.getStartMinute());
+                    } else {
+                        worked_duration.setDuration(24 * 60 - (event.getStartMinute() - event.getEndMinute()));
+                    }
                 } else {
-                    worked_duration.setDuration(24 * 60 - (event.getStartMinute() - event.getEndMinute()));
+                    if (is_start_time && last_changed.equals(DURATION)) {
+                        event.setEndWithDuration(worked_duration.getDuration());
+                    } else if (!is_start_time && last_changed.equals(DURATION)) {
+                        event.setStart((GregorianCalendar)event.getEnd().clone());
+                        event.getStart().add(GregorianCalendar.MINUTE, -worked_duration.getDuration());
+                    } else {
+                        Log.d(tag, "ERROR: NOT that case implemented... is_start_time = " + is_start_time + " last_changed = " + last_changed + " before_last_changed = " + before_last_change);
+                    }
+                }
+
+                if (is_start_time) {
+                    if (!last_changed.equals(START_TIME)) {
+                        before_last_change = last_changed;
+                    }
+                    last_changed = START_TIME;
+                } else {
+                    if (!last_changed.equals(END_TIME)) {
+                        before_last_change = last_changed;
+                    }
+                    last_changed = END_TIME;
+                }
+
+                if (!remaining_duration_modified) {
+                    remaining_duration.setDuration(task.getRemaining_duration() - worked_duration.getDuration());
                 }
 
                 setFieldsBecauseOfData();

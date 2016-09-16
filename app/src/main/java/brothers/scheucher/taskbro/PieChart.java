@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -81,7 +82,7 @@ public class PieChart extends View {
 
         //CENTER POINT
         Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
+        paint.setColor(ContextCompat.getColor(TaskBroContainer.getContext(), R.color.accent_color));
         paint.setStyle(Paint.Style.FILL);
         canvas.drawCircle(centerX, centerY, 8, paint);
 

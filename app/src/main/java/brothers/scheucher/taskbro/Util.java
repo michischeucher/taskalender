@@ -375,6 +375,31 @@ public class Util {
         return ret;
     }
 
+    public static String getFormattedPotentialShort(int minutes) {
+        String ret = "";
+        boolean negative = false;
+        if (minutes == 0) {
+            return "--";
+        }
+        if (minutes < 0) {
+            ret += "-";
+            minutes *= (-1);
+        }
+        int duration_weeks = minutes / (60 * 24 * 7);
+        int duration_days = minutes / (60 * 24);
+        int duration_hours = minutes / 60;
+        if (duration_weeks != 0) {
+            ret += duration_weeks + " Wo.";
+        } else if (duration_days != 0) {
+            ret += duration_days + " T";
+        } else if (duration_hours != 0) {
+            ret += duration_hours + " Std";
+        } else {
+            ret += minutes + " Min";
+        }
+        return ret;
+    }
+
     //TOUCHING
     public static double getDegreesFromTouchEvent(View v, float x, float y){
         double delta_x = x - v.getWidth() /2;
@@ -618,7 +643,7 @@ public class Util {
 
     }
 
-    public static void setNewButtonListeners(RelativeLayout ll, final Activity activity, final ViewPager view_pager) {
+    public static void setNewButtonListeners(RelativeLayout ll, final Activity activity, final ViewPager view_pager, final int parent_label_id) {
         final Button new_button = (Button)ll.findViewById(R.id.new_button);
         final LinearLayout new_button_option_view = (LinearLayout) ll.findViewById(R.id.new_button_options);
 
@@ -659,6 +684,10 @@ public class Util {
             public void onClick(View v) {
                 Log.d(tag, "new task");
                 Intent intent = new Intent(activity, AddTask.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("id", -1);
+                bundle.putInt("parent_label_id", parent_label_id);
+                intent.putExtras(bundle);
                 activity.startActivity(intent);
                 Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
             }
@@ -670,11 +699,20 @@ public class Util {
             public void onClick(View v) {
                 Log.d(tag, "new label");
                 Intent intent = new Intent(activity, AddLabel.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("id", -1);
+                bundle.putInt("parent_label_id", parent_label_id);
+                intent.putExtras(bundle);
                 activity.startActivity(intent);
 
                 Util.toggleNewButtonOptions(new_button_option_view, new_button, activity);
             }
         });
     }
+
+    public static String removeSpaces(String text) {
+        return text.trim();
+    }
+
 
 }

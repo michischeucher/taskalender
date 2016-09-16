@@ -2,6 +2,7 @@ package brothers.scheucher.taskbro;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +46,7 @@ public class Task implements Comparable {
     public static final String DB_COL_DEADLINE = "TaskDeadline";
     public static final String DB_COL_LABELS = "TaskLabels";
     public static final String DB_COL_DONE = "TaskDone";
+    public static final String DB_COL_REPEAT = "TaskRepeat";
 
     public static final String task_duration_description = TaskBroContainer.getContext().getResources().getString(R.string.task_duration_description);
     public static final String earliest_start_description = TaskBroContainer.getContext().getResources().getString(R.string.earliest_start);
@@ -130,6 +132,9 @@ public class Task implements Comparable {
 
     public void setRemaining_duration(int remaining_duration) {
         this.remaining_duration.setDuration(remaining_duration);
+        if (remaining_duration > 0) {
+            this.done = false;
+        }
     }
 
     public GregorianCalendar getDeadline() {
@@ -239,11 +244,23 @@ public class Task implements Comparable {
     }
 
     public int getColor() {
+        checkLabelIds();
         if (this.label_ids.size() != 0) {
             return TaskBroContainer.getLabel(this.label_ids.get(0)).getColor();
         } else {
             return 0xE0E0E0;
         }
+    }
+
+    private void checkLabelIds() {
+        ArrayList<Integer> ids_to_delete = new ArrayList<>();
+        for (int i : label_ids) {
+            Label label = TaskBroContainer.getLabel(i);
+            if (label == null) {
+                ids_to_delete.add(i);
+            }
+        }
+        label_ids.removeAll(ids_to_delete);
     }
 
     public boolean hasLabel(int label_id) {
@@ -300,6 +317,8 @@ public class Task implements Comparable {
         TextView name_view = (TextView) rowView.findViewById(R.id.task_name);
         name_view.setText(task.getName());
         TextView notice_view = (TextView)rowView.findViewById(R.id.task_notice);
+        TextView done_view = ((TextView)rowView.findViewById(R.id.task_done));
+
         if (!task.getNotice().equals("")) {
             notice_view.setVisibility(TextView.VISIBLE);
             notice_view.setText(task.getNotice());
@@ -317,6 +336,15 @@ public class Task implements Comparable {
             duration_view.setTextColor(0xFFFFFFFF);
             notice_view.setTextColor(0xFFFFFFFF);
             deadline_view.setTextColor(0xFFFFFFFF);
+            done_view.setTextColor(0xFFFFFFFF);
+        }
+
+        if (task.isDone()) {
+            name_view.setPaintFlags(name_view.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            notice_view.setVisibility(TextView.GONE);
+            deadline_view.setVisibility(TextView.GONE);
+            duration_view.setVisibility(TextView.GONE);
+            done_view.setVisibility(TextView.VISIBLE);
         }
 
         rowView.setOnClickListener(new View.OnClickListener() {
@@ -348,6 +376,7 @@ public class Task implements Comparable {
     public void setDone(int done_int) {
         if (done_int > 0) {
             this.done = true;
+            this.remaining_duration.setDuration(0);
         } else {
             this.done = false;
         }
@@ -374,5 +403,12 @@ public class Task implements Comparable {
 
     public boolean isNotCreatedByUser() {
         return this.not_created_by_user;
+    }
+
+    public void addLabelId(int label_id_to_add) {
+        if (label_id_to_add == -1) {
+            return;
+        }
+        this.label_ids.add(label_id_to_add);
     }
 }

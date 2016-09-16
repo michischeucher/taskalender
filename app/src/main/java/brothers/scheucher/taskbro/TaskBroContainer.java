@@ -100,6 +100,19 @@ public class TaskBroContainer {
         return tasks_not_done;
     }
 
+    public static ArrayList<Task> getTasksNotDone(int label_id) {
+        ArrayList<Task> tasks_not_done = new ArrayList<>();
+        for (Task t : tasks) {
+            if (!t.isDone() && t.hasLabel(label_id)) {
+                tasks_not_done.add(t);
+            }
+            if (label_id == -1 && t.getLabelIds().size() == 0) {
+                tasks_not_done.add(t);
+            }
+        }
+        return tasks_not_done;
+    }
+
     public static ArrayList<Task> getTasksDone() {
         ArrayList<Task> tasks_done = new ArrayList<>();
         for (Task t : tasks) {
@@ -465,12 +478,17 @@ public class TaskBroContainer {
             return;
         }
         Collections.sort(tasks, Collections.reverseOrder());
+        ArrayList<Task> not_done_tasks = getTasksNotDone();
+        if (not_done_tasks.size() <= 0) {
+            return;
+        }
 
         //first block
         TaskBlock block = new TaskBlock();
         task_blocks.add(block);
-        if (tasks.get(0).getDeadline() != null) {
-            block.setEnd((GregorianCalendar) tasks.get(0).getDeadline().clone());
+
+        if (not_done_tasks.get(0).getDeadline() != null) {
+            block.setEnd((GregorianCalendar) not_done_tasks.get(0).getDeadline().clone());
         }
 
         boolean last_task = false;
@@ -478,26 +496,26 @@ public class TaskBroContainer {
         int possible_work_time_for_current_task;
         int overlapping_time;
 
-        for (int i = 0; i < tasks.size(); i++) {
-            Task current_task = tasks.get(i);
+        for (int i = 0; i < not_done_tasks.size(); i++) {
+            Task current_task = not_done_tasks.get(i);
             if (current_task.isDone() || current_task.getRepeat() != 0) {
                 continue;
             }
             //first block with tasks without deadlines:
             if (current_task.getDeadline() == null) {
                 block.addTask(current_task);
-                if ((i+1) < tasks.size() &&
-                        tasks.get(i+1).getDeadline() != null) { //last task without deadline...
+                if ((i+1) < not_done_tasks.size() &&
+                        not_done_tasks.get(i+1).getDeadline() != null) { //last task without deadline...
                     block = new TaskBlock();
                     task_blocks.add(block);
-                    block.setEnd((GregorianCalendar) tasks.get(i+1).getDeadline().clone());
+                    block.setEnd((GregorianCalendar) not_done_tasks.get(i+1).getDeadline().clone());
                 }
                 continue;
             }
             current_task.setOverlapping_minutes(block.getOverlapping_time());
             block.addTask(current_task);
 
-            if ((i + 1) >= TaskBroContainer.getTasks().size()) {
+            if ((i + 1) >= not_done_tasks.size()) {
                 last_task = true;
             }
 
@@ -508,7 +526,7 @@ public class TaskBroContainer {
                 //kein vergangener Task:
                 earlier_date = new GregorianCalendar();
             } else {
-                earlier_date = (GregorianCalendar)tasks.get(i + 1).getDeadline().clone();
+                earlier_date = (GregorianCalendar)not_done_tasks.get(i + 1).getDeadline().clone();
                 if (Util.earlierDate(earlier_date, new GregorianCalendar())){
                     earlier_date = new GregorianCalendar();
                 }

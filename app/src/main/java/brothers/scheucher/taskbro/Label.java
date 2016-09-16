@@ -59,7 +59,7 @@ public class Label implements Comparable {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public int getColor() {
@@ -159,8 +159,15 @@ public class Label implements Comparable {
     }
 
     public void setParent(int parent_id) {
+        if (parent_id == -1) {
+            return;
+        }
         Label parent = TaskBroContainer.getLabel(parent_id);
-        this.parent = parent;
+        if (parent == null) {
+            return;
+        } else {
+            this.parent = parent;
+        }
     }
 
     public void delete(Context context) {
@@ -201,4 +208,13 @@ public class Label implements Comparable {
         }
         return ret;
     }
-}
+
+    public boolean checkIfLabelNameExists(String label_name_to_check) {
+        String check_text = label_name_to_check.trim();
+        for (Label l : TaskBroContainer.getLabels()) {
+            if (l.getName().equals(check_text) && l != this) {
+                return false;
+            }
+        }
+        return true;
+    }}

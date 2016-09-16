@@ -52,11 +52,16 @@ public class AddTask extends AppCompatActivity {
         Log.d(tag, "Task == null");
         if (b != null) {
             int id = b.getInt("id");
-            task = TaskBroContainer.getTask(id);
-            Log.d(tag, "fetched task");
+            int parent_label_id = b.getInt("parent_label_id");
+            if (id == -1) {
+                task = new Task();
+                task.addLabelId(parent_label_id);
+                findViewById(R.id.add_task_title).requestFocus();
+            } else {
+                task = TaskBroContainer.getTask(id);
+            }
         } else {
             task = new Task();
-            Log.d(tag, "created new task");
             findViewById(R.id.add_task_title).requestFocus();
         }
 
@@ -320,9 +325,9 @@ public class AddTask extends AppCompatActivity {
 
             task.save(this);
             TaskBroContainer.addTaskToList(task);
-//            TaskBroContainer.createCalculatingJob();
+            TaskBroContainer.createCalculatingJob();
 
-            MyNotifications.setAlarmNotification(this);
+//            MyNotifications.setAlarmNotification(this);
 //            MyNotifications.createNotification(this);
 
             finish();

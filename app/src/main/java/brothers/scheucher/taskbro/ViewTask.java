@@ -92,8 +92,17 @@ public class ViewTask extends ActionBarActivity {
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
+                        WorkFinishedDialog wfd = (WorkFinishedDialog)dialog;
                         Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
-                        finish();
+                        if (wfd.was_ok) {
+                            finish();
+                        }
+                    }
+                });
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Log.d(tag, "Arbeitseintragen => ABGEBROCHEN...");
                     }
                 });
 

@@ -60,12 +60,18 @@ public class PotentialActivity extends AppCompatActivity {
     }
 
     private static void fillFieldsBecauseOfData() {
-
         if (task_block_container == null || inflater == null) {
             return;
         }
         task_block_container.removeAllViewsInLayout();
 
+        if (TaskBroContainer.getTaskBlocks().size() <= 0) {
+            View row = inflater.inflate(R.layout.text_item_with_description, task_block_container, false);
+            ((TextView) row.findViewById(R.id.description_of_item)).setText("Aufgaben");
+            ((TextView)row.findViewById(R.id.text_of_item)).setText("Es sind keine nicht erledigten Aufgaben vorhanden! :)");
+            task_block_container.addView(row);
+            return;
+        }
 
         for (int j = (TaskBroContainer.getTaskBlocks().size() - 1); j >= 0; j--) {
             TaskBlock tb = TaskBroContainer.getTaskBlocks().get(j);

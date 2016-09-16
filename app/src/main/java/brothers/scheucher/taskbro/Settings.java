@@ -21,9 +21,11 @@ public class Settings {
     public static final long THRESHOLD_MINUTES_FOR_NOW = 5; //when it is 2:34 and the date is 2:37 it is NOW ;)
     public static final int TEXT_COLOR_ATTENTION = 0xFFFF0000;
     public static final int TEXT_COLOR_PERFECT = 0xFF00B000;
+
     public static final int STANDARD_DURATION_TASK = 60;
     public static final int STANDARD_DEADLINE_HOUR_IF_DATE_SET = 23;
     public static final int STANDARD_DEADLINE_MINUTE_IF_DATE_SET = 0;
+
     public static final int STANDARD_EARLIEST_MINUTE = 60*8;
     public static final int STANDARD_LATEST_MINUTE = 60 * 21;
 

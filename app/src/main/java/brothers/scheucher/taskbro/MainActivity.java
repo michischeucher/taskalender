@@ -175,11 +175,12 @@ public class MainActivity extends AppCompatActivity
     public static void notifyChanges() {
         if (potential_text_view != null) {
             int potential = TaskBroContainer.getPotential();
-            potential_text_view.setText(Util.getFormattedPotential(potential));
+            potential_text_view.setText(Util.getFormattedPotentialShort(potential));
+            Log.d(tag, "PotentialShortVersion= " + Util.getFormattedPotentialShort(potential));
             if (potential < 0) {
                 potential_text_view.setTextColor(Settings.TEXT_COLOR_ATTENTION);
             } else if(potential > 0) {
-                potential_text_view.setTextColor(Settings.TEXT_COLOR_PERFECT);
+                potential_text_view.setTextColor(0xFFFFFFFF);
             }
         }
     }

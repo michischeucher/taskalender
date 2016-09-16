@@ -1,5 +1,7 @@
 package brothers.scheucher.taskbro;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -113,10 +115,12 @@ public class TaskBlock implements Comparable {
                 day = TaskBroContainer.createDay(current_date);
                 TaskBroContainer.addDayToList(day);
             }
+            Log.d(tag, "Day " + day.description() + " has possibleWorkTime " + day.getPossibleWorkTime(day.getStart(), day.getEnd(), false));
             for (int i = tasks.size() - 1; i >= 0; i--) {
                 day.addTask(tasks.get(i));
             }
             if (day.getPossibleWorkTime(day.getStart(), day.getEnd(), false) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
+                Log.d(tag, "Day " + day.description() + " is now full distributed");
                 return day;
             }
             current_date.add(Calendar.DAY_OF_YEAR,1);

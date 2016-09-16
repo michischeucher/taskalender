@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,14 +22,13 @@ public class LabelFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_LABEL_ID = "label_id_global";
-    private static boolean show_done_tasks;
+    private static boolean show_done_tasks = false;
 
     private int label_id_global = -1;
     private static Context context;
     private static View view;
     private static LayoutInflater inflater;
 
-    private Button new_button;
     private RelativeLayout ll;
 
     @Override
@@ -47,7 +45,6 @@ public class LabelFragment extends Fragment {
         Log.d(tag, "label_id = " + label_id);
         args.putInt(ARG_LABEL_ID, label_id);
         fragment.setArguments(args);
-        show_done_tasks = false;
         return fragment;
     }
 
@@ -108,11 +105,15 @@ public class LabelFragment extends Fragment {
         ll = (RelativeLayout) inflater.inflate(R.layout.activity_label_view, container, false);
 
         Label label = TaskBroContainer.getLabel(label_id_global);
+        int label_id;
         if (label != null) {
             ((TextView) ll.findViewById(R.id.label_hirarchy)).setText(label.getHirarchyString());
+            label_id = label.getId();
+        } else {
+            label_id = -1;
         }
 
-        Util.setNewButtonListeners(ll, getActivity(), null);
+        Util.setNewButtonListeners(ll, getActivity(), null, label_id);
 
         return ll;
     }
@@ -184,15 +185,21 @@ public class LabelFragment extends Fragment {
             return;
         }
 
-        ArrayList<Task> task_array = TaskBroContainer.getTasks(label_id_global);
-        if (task_array.size() != 0 && label_id_global == -1) {
+        ArrayList<Task> task_array = TaskBroContainer.getTasksNotDone(label_id_global);
+        if (label_id_global == -1) {
             View row = inflater.inflate(R.layout.text_description, null, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben ohne Label");
             task_list.addView(row);
-        } else if (task_array.size() != 0) {
+        } else {
             View row = inflater.inflate(R.layout.text_description, null, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben mit diesem Label");
             task_list.addView(row);
+        }
+
+        if (task_array.size() == 0) {
+            View rowView = inflater.inflate(R.layout.text_item, null, false);
+            ((TextView)rowView.findViewById(R.id.text_of_item)).setText("Keine nicht erledigten Aufgaben gefunden");
+            task_list.addView(rowView);
         }
 
         for (int i = (task_array.size() - 1); i >= 0; i--) {
@@ -240,6 +247,7 @@ public class LabelFragment extends Fragment {
         Log.d(tag, "onResume");
         updateLabelList();
         updateTaskList();
+        updateDoneTaskList();
         super.onResume();
     }
 

@@ -186,7 +186,6 @@ public class Day {
             new_event.setId(TaskBroContainer.getNewEventID());
             new_event.setNot_created_by_user(true);
             new_event.setTask(task);
-            new_event.setName(task.getName());
 
             new_event.setStart((GregorianCalendar) free_slot.start.clone());
             new_event.setStart(free_slot.start.get(Calendar.HOUR_OF_DAY), free_slot.start.get(Calendar.MINUTE));
@@ -325,14 +324,20 @@ public class Day {
                     if (Util.earlierDate(last_event_end, e.getStart())) {
                         //create empty event...
                         event = (LinearLayout) inflater.inflate(R.layout.event_empty, event_coloumn, false);
-                        Util.setWeight(event, (int) Util.getMinutesBetweenDates(last_event_end, e.getStart()));
+                        Util.setWeight(event, Util.getMinutesBetweenDates(last_event_end, e.getStart()));
                         event_coloumn.addView(event);
                     }
 
 
+                    String event_name = "";
+                    if (e.getTask() != null) {
+                        event_name = e.getTask().getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd()));
+                    } else {
+                        event_name = e.getName() + " - " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd());
+                    }
                     event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
-                    ((TextView) event.findViewById(R.id.event_name)).setText(e.getName() + " - " + Util.getFormattedDuration((int)Util.getMinutesBetweenDates(e.getStart(), e.getEnd())) + " " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd()));
-                    Util.setColorOfDrawable(event,e.getColor() | 0xFF000000);
+                    ((TextView) event.findViewById(R.id.event_name)).setText(event_name);
+                    Util.setColorOfDrawable(event, e.getColor() | 0xFF000000);
                     if (Util.isDarkColor(e.getColor())) {
                         ((TextView) event.findViewById(R.id.event_name)).setTextColor(0xFFFFFFFF);
                     }

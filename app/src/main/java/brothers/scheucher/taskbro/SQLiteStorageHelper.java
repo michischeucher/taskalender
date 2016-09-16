@@ -26,6 +26,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + Task.DB_COL_DEADLINE + " text, "
             + Task.DB_COL_EARLIEST_START + " text, "
             + Task.DB_COL_DONE + " int, "
+            + Task.DB_COL_REPEAT + " int, "
             + Task.DB_COL_LABELS + " text ) ";
 
     private static final String EVENT_TABLE = "CREATE TABLE IF NOT EXISTS " + MyEvent.DB_TABLE + " ( "
@@ -106,9 +107,10 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(Task.DB_COL_NOTICE, task.getNotice());
         values.put(Task.DB_COL_DURATION, task.getRemaining_duration());
         values.put(Task.DB_COL_DEADLINE, Util.DateToString(task.getDeadline()));
-        Log.d(tag, "saved date = "+ Util.DateToString((task.getDeadline())));
+        Log.d(tag, "saved date = " + Util.DateToString((task.getDeadline())));
         values.put(Task.DB_COL_DONE, task.getDone());
         values.put(Task.DB_COL_LABELS, task.getLabelIdsString());
+        values.put(Task.DB_COL_REPEAT, task.getRepeat());
 
         Cursor cursor = db.rawQuery("SELECT * from " + Task.DB_TABLE + " WHERE " +
                 Task.DB_COL_ID + " = \"" + task.getId() + "\"", null);
@@ -302,8 +304,8 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             task.setDeadline(Util.StringToDate(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_DEADLINE))));
             task.setLabelString(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_LABELS)));
             task.setDone(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_DONE)));
+            task.setRepeat(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_REPEAT)));
             TaskBroContainer.addTaskToList(task);
-
         }
         cursor.close();
         db.close();

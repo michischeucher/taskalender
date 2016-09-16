@@ -162,7 +162,7 @@ public class AddEvent extends AppCompatActivity {
             //Log.d(tag, "going to save event = " + event.description());
             event.save(this);
             TaskBroContainer.addEventToList(event);
-//            TaskBroContainer.createCalculatingJob();
+            TaskBroContainer.createCalculatingJob();
             finish();
             return true;
         }

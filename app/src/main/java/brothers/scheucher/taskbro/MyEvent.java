@@ -295,11 +295,10 @@ public class MyEvent implements Comparable {
             return this.color;
         }
         if (this.task != null) {
-            this.color = this.task.getColor();
+            return this.task.getColor();
         } else {
-            this.color = Util.getRandomColor();
+            return Util.getRandomColor();
         }
-        return this.color;
     }
 
     public TimeObj getTimeObj() {

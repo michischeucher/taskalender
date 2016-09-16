@@ -15,6 +15,11 @@ public class Duration {
     }
 
     public void setDuration(int minutes) {
+        if (minutes < 0) {
+            this.hours = 0;
+            this.minutes = 0;
+            return;
+        }
         this.hours = minutes / 60;
         this.minutes = minutes % 60;
     }

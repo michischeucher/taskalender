@@ -129,7 +129,7 @@ public class ViewTask extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         if (TaskBroContainer.getTask(id) == null) {
-            Log.d(tag, "Task doesn't exist anymore..." + task.description());
+            Log.d(tag, "Task doesn't exist anymore...");
             finish();
         } else {
             fillFieldsBecauseOfData();

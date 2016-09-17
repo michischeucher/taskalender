@@ -28,6 +28,7 @@ public class Task implements Comparable {
     private GregorianCalendar deadline;
     private boolean done;
     private int repeat; //repeat that task every x minutes
+    private boolean inactive; //when deleted
 
     private int overlapping_minutes; //just for calculation --- minutes overlapping with tasks in the future
     public int already_distributed_duration; //just for calculation
@@ -47,6 +48,7 @@ public class Task implements Comparable {
     public static final String DB_COL_LABELS = "TaskLabels";
     public static final String DB_COL_DONE = "TaskDone";
     public static final String DB_COL_REPEAT = "TaskRepeat";
+    public static final String DB_COL_INACTIVE = "TaskInactive";
 
     public static final String task_duration_description = TaskBroContainer.getContext().getResources().getString(R.string.task_duration_description);
     public static final String earliest_start_description = TaskBroContainer.getContext().getResources().getString(R.string.earliest_start);
@@ -72,6 +74,7 @@ public class Task implements Comparable {
         this.filling_factor = 0;
         this.not_created_by_user = false;
         this.repeat = 0;
+        this.inactive = false;
     }
 
     public Task(int id) {
@@ -86,6 +89,7 @@ public class Task implements Comparable {
         this.done = false;
         this.not_created_by_user = false;
         this.repeat = 0;
+        this.inactive = false;
     }
 
     public void resetJustForCalculations() {
@@ -189,7 +193,7 @@ public class Task implements Comparable {
     }
 
     public String description() {
-        return "id = " + id + " deadline = " + Util.getFormattedDateTime(deadline) + ", name = " + name + " duration in min = " + remaining_duration.description();
+        return "id = " + id + " deadline = " + Util.getFormattedDateTime(deadline) + ", name = " + name + " duration in min = " + remaining_duration.description() + " inactive = " + inactive;
     }
 
     public void save(Context context) {
@@ -434,5 +438,27 @@ public class Task implements Comparable {
         } else {
             return false;
         }
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+        TaskBroContainer.deleteTaskFromList(this);
+        TaskBroContainer.addTaskToList(this);
+    }
+
+    public boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(int inactive) {
+        if (inactive > 0) {
+            this.inactive = true;
+        } else {
+            this.inactive = false;
+        }
+    }
+
+    public boolean isInactive() {
+        return inactive;
     }
 }

@@ -265,8 +265,10 @@ public class AddTask extends AppCompatActivity {
         delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                task.delete(TaskBroContainer.getContext());
-                TaskBroContainer.deleteTaskFromList(task);
+                //task.delete(TaskBroContainer.getContext());
+                //TaskBroContainer.deleteTaskFromList(task);
+                task.setInactive(true);
+                task.save(TaskBroContainer.getContext());
                 TaskBroContainer.createCalculatingJob();
                 Calender.notifyChanges();
                 finish();

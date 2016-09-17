@@ -157,9 +157,11 @@ public class Day implements Comparable {
         DayScheduler scheduler = new DayScheduler(this.start);
         scheduler.addBlockingTime(this.start, 0, day_settings.getEarliest_minute());
         scheduler.addBlockingTime(this.start, day_settings.getLatest_minute(), 24 * 60);
-        for (MyEvent e : this.events) {
-            if (e.isBlocking()) {
-                scheduler.addBlockingTime(e.getStart(), e.getEnd());
+        synchronized (TaskBroContainer.getContext()) {
+            for (MyEvent e : this.events) {
+                if (e.isBlocking()) {
+                    scheduler.addBlockingTime(e.getStart(), e.getEnd());
+                }
             }
         }
         return 24 * 60 - scheduler.getPossibleWorkTime() - day_settings.getEarliest_minute() - (24 * 60 - day_settings.getLatest_minute());
@@ -375,7 +377,6 @@ public class Day implements Comparable {
                         if (e.getTask().hasRepeat()) {
                             ((TextView) event.findViewById(R.id.event_name)).setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.stat_notify_sync_noanim, 0);
                         }
-
                     } else {
                         event_name = e.getName() + " - " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd());
                     }
@@ -453,10 +454,6 @@ public class Day implements Comparable {
 
     public void addAllEvents(ArrayList<MyEvent> events) {
         for (MyEvent e : events) {
-            if (e.isAll_day() && Util.isSameDate(e.getEnd(), this.start)) {
-                Log.d(tag, "Event...");
-                continue;
-            }
             addEvent(e);
         }
     }

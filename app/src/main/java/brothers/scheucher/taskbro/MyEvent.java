@@ -17,6 +17,7 @@ public class MyEvent implements Comparable {
     private GregorianCalendar start;
     private GregorianCalendar end;
     private boolean availability;
+    private boolean inactive;
 
     private Task task;
     private boolean not_created_by_user; //if set, then this will not be saved!
@@ -35,6 +36,7 @@ public class MyEvent implements Comparable {
     public static final String DB_COL_TASK_ID = "EventTaskID";
     public static final String DB_COL_AVAILABILITY = "EventAvailability";
     public static final String DB_COL_PRIORITY = "EventPriority";
+    public static final String DB_COL_INACTIVE = "EventInactive";
     private boolean all_day;
 
     public MyEvent() {
@@ -53,6 +55,7 @@ public class MyEvent implements Comparable {
         this.color = -1;
         this.availability = false;
         this.all_day = false;
+        this.inactive = false;
     }
     public MyEvent(int id) {
         this.id = id;
@@ -70,6 +73,7 @@ public class MyEvent implements Comparable {
         this.color = -1;
         this.availability = false;
         this.all_day = false;
+        this.inactive = false;
     }
     public MyEvent(int duration, boolean is_task_event) {
         this.id = -1;
@@ -88,6 +92,7 @@ public class MyEvent implements Comparable {
         this.availability = false;
         checkBlocking();
         this.all_day = false;
+        this.inactive = false;
     }
     public MyEvent(long extern_id) {
         this.id = -1;
@@ -101,6 +106,7 @@ public class MyEvent implements Comparable {
         this.task = null;
         this.color = -1;
         this.availability = false;
+        this.inactive = false;
     }
 
 
@@ -201,7 +207,7 @@ public class MyEvent implements Comparable {
     }
 
     public String description() {
-        return "id: " + id + " name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end) + " availability: " + this.availability;
+        return "id: " + id + " name = " + name + " start = " + Util.getFormattedDateTime(start) + " end = " + Util.getFormattedDateTime(end) + " availability: " + this.availability + " inactive = " + inactive;
     }
 
     public int getId() {
@@ -339,5 +345,26 @@ public class MyEvent implements Comparable {
 
     public boolean isAll_day() {
         return all_day;
+    }
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+        TaskBroContainer.deleteEventFromList(this);
+        TaskBroContainer.addEventToList(this);
+    }
+
+    public boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(int inactive) {
+        if (inactive > 0) {
+            this.inactive = true;
+        } else {
+            this.inactive = false;
+        }
+    }
+
+    public boolean isInactive() {
+        return inactive;
     }
 }

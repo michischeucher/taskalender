@@ -249,6 +249,9 @@ public class Calender extends Fragment {
             }
             Log.d(tag, "Start drawing events for " + Util.getFormattedDate(date) + " #events today = " + day.getEvents().size());
 
+
+            TaskBroContainer.distributeTasksFromTaskBlocksTillDate(day.getStart());
+
             day.calculateBlocksAndColoumns();
 
             day.drawNowIndicator(calender_day.findViewById(R.id.now_view_container));

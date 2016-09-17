@@ -15,7 +15,9 @@ public class TaskBroContainer {
     private static final String tag = "TaskBroContainer";
 
     private static ArrayList<MyEvent> events;
+    private static ArrayList<MyEvent> inactive_events;
     private static ArrayList<Task> tasks;
+    private static ArrayList<Task> inactive_tasks;
     private static ArrayList<Day> days;
     private static ArrayList<Label> labels;
     private static ArrayList<DaySettingObject> day_settings;
@@ -39,10 +41,13 @@ public class TaskBroContainer {
         }
 
         events = new ArrayList<>();
+        inactive_events = new ArrayList<>();
         tasks = new ArrayList<>();
+        inactive_tasks = new ArrayList<>();
         labels = new ArrayList<>();
         days = new ArrayList<>();
         day_settings = new ArrayList<>();
+        repeating_tasks = new ArrayList<>();
 
         task_blocks = new ArrayList<>();
 
@@ -149,6 +154,11 @@ public class TaskBroContainer {
                     last_task_id = task.getId();
                 }
             }
+            for (Task task : inactive_tasks) {
+                if (task.getId() > last_task_id) {
+                    last_task_id = task.getId();
+                }
+            }
         }
         last_task_id += 1;
         return last_task_id;
@@ -158,6 +168,11 @@ public class TaskBroContainer {
             if (last_event_id == -1) {
                 synchronized(context) {
                     for (MyEvent event : events) {
+                        if (event.getId() > last_event_id) {
+                            last_event_id = event.getId();
+                        }
+                    }
+                    for (MyEvent event : inactive_events) {
                         if (event.getId() > last_event_id) {
                             last_event_id = event.getId();
                         }
@@ -195,26 +210,39 @@ public class TaskBroContainer {
 
 
     public static void addTaskToList(Task new_task) {
-        if (!tasks.contains(new_task)) {
-            tasks.add(new_task);
-            //printAllTasks();
+        if (new_task.isInactive()) {
+            if (!inactive_tasks.contains(new_task)) {
+                inactive_tasks.add(new_task);
+            }
         } else {
-            Log.d(tag, "new_task already in list: " + new_task.description());
+            if (!tasks.contains(new_task)) {
+                tasks.add(new_task);
+            }
         }
     }
+
     public static void deleteTaskFromList(Task task) {
         if (tasks.contains(task)) {
             tasks.remove(task);
+        }
+        if (inactive_tasks.contains(task)) {
+            inactive_tasks.remove(task);
         }
     }
 
 
     public static void addEventToList(MyEvent new_event) {
-        synchronized(context) {
-            if (!events.contains(new_event)) {
-                events.add(new_event);
-            } else {
-                Log.d(tag, "new_event already in list: " + new_event.description());
+        if (new_event.isInactive()) {
+            synchronized(context) {
+                if (!inactive_events.contains(new_event)) {
+                    inactive_events.add(new_event);
+                }
+            }
+        } else {
+            synchronized(context) {
+                if (!events.contains(new_event)) {
+                    events.add(new_event);
+                }
             }
         }
     }
@@ -222,6 +250,9 @@ public class TaskBroContainer {
         synchronized(context) {
             if (events.contains(event)) {
                 events.remove(event);
+            }
+            if (inactive_events.contains(event)) {
+                inactive_events.remove(event);
             }
         }
     }
@@ -366,18 +397,18 @@ public class TaskBroContainer {
     public static Day createDay(GregorianCalendar date) {
         Log.d(tag, "repeating createDay with date " + Util.getFormattedDate(date));
         Day new_day = new Day(date);
+
+        ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(new_day.getStart().getTimeInMillis() + 1000, new_day.getEnd().getTimeInMillis() - 1000);
         synchronized(context) {
+            events.addAll(events_from_other_calendars);
             for (MyEvent e : events) {
+                if (e.isAll_day() && Util.isSameDate(e.getEnd(), new_day.getStart())) {
+                    continue;
+                }
                 if (e.isRelevantFotThatDay(date)) {
                     new_day.addEvent(e);
                 }
             }
-        }
-
-        ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(new_day.getStart().getTimeInMillis(), new_day.getEnd().getTimeInMillis());
-        new_day.addAllEvents(events_from_other_calendars);
-        synchronized(context) {
-            events.addAll(new_day.getEvents());
         }
 
         days.add(new_day);
@@ -452,6 +483,7 @@ public class TaskBroContainer {
             events.removeAll(events_to_delete);
             days.clear();
             task_blocks.clear();
+            repeating_tasks.clear();
         }
     }
 
@@ -560,6 +592,7 @@ public class TaskBroContainer {
     }
 
     public static void calculateDays() {
+        Log.d(tag, "start calculating days");
         if (tasks.size() <= 0) { return; }
         resetForCalculation();
 
@@ -579,8 +612,8 @@ public class TaskBroContainer {
                 latest_date = (GregorianCalendar)d.getStart().clone();
             }
         }
-        distributeTasksFromTaskBlocksTillDate(latest_date);
-
+        //distributeTasksFromTaskBlocksTillDate(latest_date);
+        //Log.d(tag, "end calculating days, all distributed till " + Util.getFormattedDate(latest_date));
     }
 
     //DEBUGGING
@@ -592,7 +625,7 @@ public class TaskBroContainer {
     }
 
     public static ArrayList<Task> getRepeatingTasks() {
-        if (repeating_tasks != null) {
+        if (repeating_tasks.size() > 0) {
             return repeating_tasks;
         }
 
@@ -636,4 +669,5 @@ public class TaskBroContainer {
         }
         return latest_day;
     }
+
 }

@@ -27,6 +27,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + Task.DB_COL_EARLIEST_START + " text, "
             + Task.DB_COL_DONE + " int, "
             + Task.DB_COL_REPEAT + " int, "
+            + Task.DB_COL_INACTIVE + " int, "
             + Task.DB_COL_LABELS + " text ) ";
 
     private static final String EVENT_TABLE = "CREATE TABLE IF NOT EXISTS " + MyEvent.DB_TABLE + " ( "
@@ -37,6 +38,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             + MyEvent.DB_COL_END + " text, "
             + MyEvent.DB_COL_TASK_ID + " int, "
             + MyEvent.DB_COL_PRIORITY + " text, "
+            + MyEvent.DB_COL_INACTIVE + " int, "
             + MyEvent.DB_COL_AVAILABILITY + " int ) ";
 
     private static final String LABEL_TABLE = "CREATE TABLE IF NOT EXISTS " + Label.DB_TABLE + " ( "
@@ -111,6 +113,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(Task.DB_COL_DONE, task.getDone());
         values.put(Task.DB_COL_LABELS, task.getLabelIdsString());
         values.put(Task.DB_COL_REPEAT, task.getRepeat());
+        values.put(Task.DB_COL_INACTIVE, task.getInactive());
 
         Cursor cursor = db.rawQuery("SELECT * from " + Task.DB_TABLE + " WHERE " +
                 Task.DB_COL_ID + " = \"" + task.getId() + "\"", null);
@@ -163,6 +166,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
         values.put(MyEvent.DB_COL_END, Util.DateToString(event.getEnd()));
         values.put(MyEvent.DB_COL_PRIORITY, event.getPriority());
         values.put(MyEvent.DB_COL_AVAILABILITY, event.getAvailability());
+        values.put(MyEvent.DB_COL_INACTIVE, event.getInactive());
         if (event.getTask() != null) {
             values.put(MyEvent.DB_COL_TASK_ID, event.getTask().getId());
         } else {
@@ -305,7 +309,9 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             task.setLabelString(cursor.getString(cursor.getColumnIndexOrThrow(Task.DB_COL_LABELS)));
             task.setDone(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_DONE)));
             task.setRepeat(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_REPEAT)));
+            task.setInactive(cursor.getInt(cursor.getColumnIndexOrThrow(Task.DB_COL_INACTIVE)));
             TaskBroContainer.addTaskToList(task);
+            Log.d(tag, "Task read: " + task.description());
         }
         cursor.close();
         db.close();
@@ -327,6 +333,7 @@ public class SQLiteStorageHelper extends SQLiteOpenHelper {
             event.setTask(cursor.getInt(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_TASK_ID)));
             event.setPriority(cursor.getString(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_PRIORITY)));
             event.setAvailability(cursor.getInt(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_AVAILABILITY)));
+            event.setInactive(cursor.getInt(cursor.getColumnIndexOrThrow(MyEvent.DB_COL_INACTIVE)));
             Log.d(tag, "MyEvent read: " + event.description());
             TaskBroContainer.addEventToList(event);
         }

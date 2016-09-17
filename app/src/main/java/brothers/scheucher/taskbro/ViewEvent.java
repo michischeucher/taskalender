@@ -65,7 +65,7 @@ public class ViewEvent extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (TaskBroContainer.getEvent(id) == null) {
-            Log.d(tag, "Event doesn't exist anymore..." + event.description());
+            Log.d(tag, "Event doesn't exist anymore...");
             finish();
         } else {
             fillFieldsBecauseOfData();

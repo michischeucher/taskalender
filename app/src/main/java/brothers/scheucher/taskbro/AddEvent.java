@@ -100,8 +100,10 @@ public class AddEvent extends AppCompatActivity {
         delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                event.delete(TaskBroContainer.getContext());
-                TaskBroContainer.deleteEventFromList(event);
+                //event.delete(TaskBroContainer.getContext());
+                //TaskBroContainer.deleteEventFromList(event);
+                event.setInactive(true);
+                event.save(TaskBroContainer.getContext());
                 TaskBroContainer.createCalculatingJob();
                 finish();
             }

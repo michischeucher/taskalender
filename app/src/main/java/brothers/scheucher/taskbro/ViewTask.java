@@ -173,7 +173,7 @@ public class ViewTask extends ActionBarActivity {
             ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedDate(task.getEarliestStart()));
             view_task_fields_container.addView(row);
         }
-        if (task.getDeadline() != null) {
+        if (task.getDeadline() != null && !task.hasRepeat()) {
             View row = inflater.inflate(R.layout.text_item_with_description, view_task_fields_container, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText(Task.deadline_description);
             ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedDateTime(task.getDeadline()));
@@ -182,7 +182,7 @@ public class ViewTask extends ActionBarActivity {
         if (task.hasRepeat()) {
             View row = inflater.inflate(R.layout.text_item_with_description, view_task_fields_container, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText(Task.repeat_description);
-            ((TextView)row.findViewById(R.id.text_of_item)).setText("not implemented yet");
+            ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedRepeat(task.getRepeat()));
             view_task_fields_container.addView(row);
         }
         if (!task.getLabelString().equals("")) {

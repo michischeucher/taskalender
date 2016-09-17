@@ -21,6 +21,7 @@ public class TaskBroContainer {
     private static ArrayList<DaySettingObject> day_settings;
 
     private static ArrayList<TaskBlock> task_blocks;
+    private static ArrayList<Task> repeating_tasks;
 
     private static int last_task_id = -1;
     private static int last_event_id = -1;
@@ -65,6 +66,7 @@ public class TaskBroContainer {
 
 
     private static int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
+        Log.d(tag, "repeating getPossibleWorktime: " + Util.getFormattedDateTimeToDateTime(start_date, end_date));
         int sum_work_time = 0;
 
         if (!(Util.isSameDate(start_date, end_date) && Util.isSameTime(start_date, end_date))) {//if there is really a slot! ;)
@@ -90,9 +92,12 @@ public class TaskBroContainer {
         return tasks;
     }
 
-    public static ArrayList<Task> getTasksNotDone() {
+    public static ArrayList<Task> getTasksNotDone(boolean no_repeating_tasks) {
         ArrayList<Task> tasks_not_done = new ArrayList<>();
         for (Task t : tasks) {
+            if (no_repeating_tasks && t.getRepeat() != 0) {
+                continue;
+            }
             if (!t.isDone()) {
                 tasks_not_done.add(t);
             }
@@ -100,9 +105,12 @@ public class TaskBroContainer {
         return tasks_not_done;
     }
 
-    public static ArrayList<Task> getTasksNotDone(int label_id) {
+    public static ArrayList<Task> getTasksNotDone(int label_id, boolean no_repeating_tasks) {
         ArrayList<Task> tasks_not_done = new ArrayList<>();
         for (Task t : tasks) {
+            if (no_repeating_tasks && t.getRepeat() != 0) {
+                continue;
+            }
             if (!t.isDone() && t.hasLabel(label_id)) {
                 tasks_not_done.add(t);
             }
@@ -113,9 +121,12 @@ public class TaskBroContainer {
         return tasks_not_done;
     }
 
-    public static ArrayList<Task> getTasksDone() {
+    public static ArrayList<Task> getTasksDone(boolean no_repeating_tasks) {
         ArrayList<Task> tasks_done = new ArrayList<>();
         for (Task t : tasks) {
+            if (no_repeating_tasks && t.getRepeat() != 0) {
+                continue;
+            }
             if (t.isDone()) {
                 tasks_done.add(t);
             }
@@ -353,6 +364,7 @@ public class TaskBroContainer {
     }
 
     public static Day createDay(GregorianCalendar date) {
+        Log.d(tag, "repeating createDay with date " + Util.getFormattedDate(date));
         Day new_day = new Day(date);
         synchronized(context) {
             for (MyEvent e : events) {
@@ -365,10 +377,34 @@ public class TaskBroContainer {
         ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(new_day.getStart().getTimeInMillis(), new_day.getEnd().getTimeInMillis());
         new_day.addAllEvents(events_from_other_calendars);
         synchronized(context) {
-            events.addAll(events_from_other_calendars);
+            events.addAll(new_day.getEvents());
         }
 
         days.add(new_day);
+
+        ArrayList<Task> repeating_tasks = TaskBroContainer.getRepeatingTasks();
+        Log.d(tag, "repeating tasks number = " + repeating_tasks.size());
+        for (Task t : repeating_tasks) {
+            if (t.isRelevantRepeatForThatDay(date)) {
+                int already_worked_on_that_task = new_day.calculateWorkedTimeOfTask(t);
+
+                Log.d(tag, "repeating already_worked time = " + already_worked_on_that_task);
+                int not_distributed_minutes = new_day.addRepeatingTask(t, t.getRemaining_duration() - already_worked_on_that_task);//TODO!!!
+                Log.d(tag, "repeating not_distributed = " + not_distributed_minutes + " date = " + Util.getFormattedDate(date) + " for task = " + t.description());
+                GregorianCalendar date_before = (GregorianCalendar)date.clone();
+                while (not_distributed_minutes > 0) {
+                    date_before.add(GregorianCalendar.DAY_OF_YEAR, -1);
+                    Day day_before = TaskBroContainer.getDay(date_before);
+                    if (day_before == null) {
+                        day_before = TaskBroContainer.createDay(date_before);
+                    }
+                    not_distributed_minutes = day_before.addRepeatingTask(t, not_distributed_minutes);
+                }
+                Log.d(tag, "distributed repeating task, returned = " + not_distributed_minutes);
+            }
+        }
+
+
         return new_day;
     }
 
@@ -418,67 +454,13 @@ public class TaskBroContainer {
             task_blocks.clear();
         }
     }
-    public static void handleRepeatingTasks() {
-        if (tasks == null || tasks.size() <= 0) {
-            return;
-        }
-        Collections.sort(tasks);
-
-        // adding all repeating tasks by copying this task all the time...
-        // 1) find out the last date plus reapeating...
-        GregorianCalendar last_deadline = tasks.get(0).getDeadline();
-        int max_reapeat = 0;
-        ArrayList<Task> repeating_tasks = new ArrayList<>();
-        for (Task t : tasks) {
-            if (last_deadline == null || Util.earlierDate(last_deadline, t.getDeadline())) {
-                last_deadline = t.getDeadline();
-            }
-            if (t.getRepeat() != 0) {
-                repeating_tasks.add(t);
-                if (t.getRepeat() > max_reapeat) {
-                    max_reapeat = t.getRepeat();
-                }
-            }
-        }
-
-        if (last_deadline == null) {
-            last_deadline = new GregorianCalendar();
-        }
-        GregorianCalendar last_date_to_calculate = (GregorianCalendar)last_deadline.clone();
-        last_date_to_calculate.add(GregorianCalendar.MINUTE, max_reapeat);
-
-        // 2) copy the repeating tasks
-        for (Task t : repeating_tasks) {
-            GregorianCalendar current_dl = t.getDeadline();
-            while (Util.earlierDate(current_dl, last_date_to_calculate)) {
-                //if it is in the past, the task should get a new "start"-Deadline
-                if (Util.earlierDate(current_dl, new GregorianCalendar())) {
-                    current_dl.add(GregorianCalendar.MINUTE, t.getRepeat());
-                    t.setDeadline((GregorianCalendar)current_dl.clone());
-                    t.save(context);
-                    continue;
-                }
-
-                //copy task with that current_deadline
-                Task new_task = new Task();
-                new_task.setNotCreatedByUser(true);
-                new_task.setName(t.getName());
-                new_task.setRemaining_duration(t.getRemaining_duration());
-                new_task.setDeadline((GregorianCalendar) current_dl.clone());
-
-                tasks.add(new_task);
-
-                current_dl.add(GregorianCalendar.MINUTE, t.getRepeat());
-            }
-        }
-    }
 
     public static void calculateBlocks() {
         if (tasks == null || tasks.size() <= 0) {
             return;
         }
         Collections.sort(tasks, Collections.reverseOrder());
-        ArrayList<Task> not_done_tasks = getTasksNotDone();
+        ArrayList<Task> not_done_tasks = getTasksNotDone(true);
         if (not_done_tasks.size() <= 0) {
             return;
         }
@@ -544,6 +526,7 @@ public class TaskBroContainer {
                 block.setEnd((GregorianCalendar) earlier_date.clone());
             } else if (overlapping_time > 0 && last_task) {
                 Log.d(tag, "########### PROBLEM: Too much todo for too less time... :( possible_work_time = " + possible_work_time_for_current_task + " for that task must be free = " + current_task.getRemaining_duration() + " with overlapping = " + current_task.getOverlapping_minutes());
+                current_task.setOverlapping_minutes(0);//TODO otherwise the fillingfactor is wrong...
             }
         }
     }
@@ -570,33 +553,34 @@ public class TaskBroContainer {
             TaskBlock tb = task_blocks.get(i);
             int potential = tb.getPotential();
             if (potential < 0) { //cannot be newest block!!
-                task_blocks.get(i+1).setPotential(task_blocks.get(i+1).getPotential() + potential);
+                task_blocks.get(i+1).setPotential(task_blocks.get(i + 1).getPotential() + potential);
                 tb.setPotential(0);
             }
         }
     }
 
-    public static void distributeTasksToDays() {
-        Day last_day_where_time_left = null;
-        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
-            TaskBlock tb = task_blocks.get(i);
-            tb.calculateTaskFillingFactors();
-
-            if (i == (task_blocks.size() - 1)) { //first block must start with today
-                last_day_where_time_left = tb.addTasksToDays(new GregorianCalendar());
-            } else { //otherwise it starts with the end of the other block
-                last_day_where_time_left = tb.addTasksToDays(last_day_where_time_left.getStart());
-            }
-        }
-    }
     public static void calculateDays() {
         if (tasks.size() <= 0) { return; }
         resetForCalculation();
 
-        handleRepeatingTasks();
         calculateBlocks();
         calculatePotentialOfBlocks();
-        distributeTasksToDays();
+
+
+        for (TaskBlock tb : task_blocks) {
+            tb.calculateTaskFillingFactors();
+            Collections.sort(tb.getTasks());
+        }
+
+        //create all Days till last day saved, if not already created
+        GregorianCalendar latest_date = new GregorianCalendar();
+        for (Day d : days) {
+            if (Util.earlierDate(latest_date, d.getStart())) {
+                latest_date = (GregorianCalendar)d.getStart().clone();
+            }
+        }
+        distributeTasksFromTaskBlocksTillDate(latest_date);
+
     }
 
     //DEBUGGING
@@ -607,4 +591,49 @@ public class TaskBroContainer {
         }
     }
 
+    public static ArrayList<Task> getRepeatingTasks() {
+        if (repeating_tasks != null) {
+            return repeating_tasks;
+        }
+
+        repeating_tasks = new ArrayList<>();
+        for (Task t : tasks) {
+            if (t.getRepeat() != 0) {
+                repeating_tasks.add(t);
+            }
+        }
+
+        return repeating_tasks;
+    }
+
+
+
+    public static void distributeTasksFromTaskBlocksTillDate(GregorianCalendar latest_date) {
+        GregorianCalendar date_in_future = (GregorianCalendar)latest_date.clone();
+        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.DAYS_TO_LOOK_FORWARD);
+
+        for (GregorianCalendar date : Util.getListOfDates(new GregorianCalendar(), date_in_future)) {
+            if (TaskBroContainer.getDay(date) == null) {
+                TaskBroContainer.createDay(date);
+            }
+        }
+
+        synchronized (context) {
+            Collections.sort(days);
+            for (int i = 0; i < (days.size() - Settings.DAYS_TO_LOOK_FORWARD); i++) {
+                Day day = days.get(i);
+                day.distributeTaskBlockTasks();
+            }
+        }
+    }
+
+    public static Day getLatestDay() {
+        Day latest_day = days.get(days.size() - 1);
+        for (Day d : days) {
+            if (Util.earlierDate(latest_day.getStart(), d.getStart())) {
+                latest_day = d;
+            }
+        }
+        return latest_day;
+    }
 }

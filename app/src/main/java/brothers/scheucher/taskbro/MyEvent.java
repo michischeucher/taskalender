@@ -35,6 +35,7 @@ public class MyEvent implements Comparable {
     public static final String DB_COL_TASK_ID = "EventTaskID";
     public static final String DB_COL_AVAILABILITY = "EventAvailability";
     public static final String DB_COL_PRIORITY = "EventPriority";
+    private boolean all_day;
 
     public MyEvent() {
         this.id = -1;
@@ -51,6 +52,7 @@ public class MyEvent implements Comparable {
         this.task = null;
         this.color = -1;
         this.availability = false;
+        this.all_day = false;
     }
     public MyEvent(int id) {
         this.id = id;
@@ -67,6 +69,7 @@ public class MyEvent implements Comparable {
         this.task = null;
         this.color = -1;
         this.availability = false;
+        this.all_day = false;
     }
     public MyEvent(int duration, boolean is_task_event) {
         this.id = -1;
@@ -84,6 +87,7 @@ public class MyEvent implements Comparable {
         this.color = -1;
         this.availability = false;
         checkBlocking();
+        this.all_day = false;
     }
     public MyEvent(long extern_id) {
         this.id = -1;
@@ -327,5 +331,13 @@ public class MyEvent implements Comparable {
 
     public void setAvailability(boolean availability) {
         this.availability = availability;
+    }
+
+    public void setAllDay(boolean all_day) {
+        this.all_day = all_day;
+    }
+
+    public boolean isAll_day() {
+        return all_day;
     }
 }

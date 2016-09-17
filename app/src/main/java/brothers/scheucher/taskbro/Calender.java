@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 public class Calender extends Fragment {
     private static final String tag = "Calender";
 
-    public static final int MAX_SWIPES_LEFT_RIGHT = 50;
+    public static final int MAX_SWIPES_LEFT_RIGHT = 100;
 
     private static CalenderPagerAdapter calender_pager_adapter;
     private static int scroll_pos;

@@ -13,7 +13,7 @@ import java.util.GregorianCalendar;
 
 import static java.util.Collections.sort;
 
-public class Day {
+public class Day implements Comparable {
     private static final String tag = "Day";
     private DaySettingObject day_settings;
 
@@ -45,7 +45,6 @@ public class Day {
             scheduler.addBlockingTime(this.start, 0, 60*24);
         }
 
-
         this.event_blocks = new ArrayList<>();
         this.events_whole_day = new ArrayList<>();
         this.day_settings = TaskBroContainer.getDaySettingObject(this.start);
@@ -62,7 +61,9 @@ public class Day {
             scheduler.addBlockingTime(start, end);
         }
         this.already_distributed = 0;
+
     }
+
 
     public GregorianCalendar getStart() {
         return start;
@@ -200,6 +201,44 @@ public class Day {
         sortEvents();
     }
 
+    //return minutes which could not be distributed because of too less time!
+    //return 0 if all was distributed
+    public int addRepeatingTask(Task task, int work_time_for_that_task) {
+        if (Util.earlierDate(this.end, new GregorianCalendar())) {
+            return 0;
+        }
+
+        while(work_time_for_that_task > 0) {
+            int available_work_time = checkAvailableWorkTime(work_time_for_that_task, false);
+            Log.d(tag, "repeating available_work_time = " + available_work_time);
+
+            TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
+            if (free_slot == null || available_work_time == 0) {
+                return work_time_for_that_task;
+            }
+
+            MyEvent new_event = new MyEvent();
+            TaskBroContainer.addEventToList(new_event);
+            new_event.setId(TaskBroContainer.getNewEventID());
+            new_event.setNot_created_by_user(true);
+            new_event.setTask(task);
+            new_event.setNotice("Repeating task...");
+
+            new_event.setStart((GregorianCalendar) free_slot.start.clone());
+            new_event.setStart(free_slot.start.get(Calendar.HOUR_OF_DAY), free_slot.start.get(Calendar.MINUTE));
+            int effective_time = Math.min(free_slot.getDuration(), available_work_time);
+            new_event.setEndWithDuration(effective_time);
+            work_time_for_that_task -= effective_time;
+
+
+            Log.d(tag, "   going to addEvent " + new_event.description());
+            addTaskEventWithoutChecking(new_event);
+        }
+
+        return work_time_for_that_task; //must be always 0!! because everything is distributed
+    }
+
+
     private int getDistributedTaskEventsDurationOfTask(Task task) {
         int duration_of_all_task_events = 0;
         for (MyEvent e : events) {
@@ -254,7 +293,7 @@ public class Day {
         Block block = null;
 
         for (MyEvent e : this.events) {
-            if (e.getDurationInMinutes() >= 60 * 24) {
+            if (e.getDurationInMinutes() >= 60 * 24 || e.isAll_day()) {
                 //Log.d(tag, "Event is over the whole day: " + e.description());
                 events_whole_day.add(e);
                 continue;
@@ -328,14 +367,18 @@ public class Day {
                         event_coloumn.addView(event);
                     }
 
+                    event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
 
                     String event_name = "";
                     if (e.getTask() != null) {
                         event_name = e.getTask().getName() + " - " + Util.getFormattedDuration(Util.getMinutesBetweenDates(e.getStart(), e.getEnd()));
+                        if (e.getTask().hasRepeat()) {
+                            ((TextView) event.findViewById(R.id.event_name)).setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.stat_notify_sync_noanim, 0);
+                        }
+
                     } else {
                         event_name = e.getName() + " - " + Util.getFormattedTimeToTime(e.getStart(), e.getEnd());
                     }
-                    event = (LinearLayout) inflater.inflate(R.layout.event, event_coloumn, false);
                     ((TextView) event.findViewById(R.id.event_name)).setText(event_name);
                     Util.setColorOfDrawable(event, e.getColor() | 0xFF000000);
                     if (Util.isDarkColor(e.getColor())) {
@@ -380,7 +423,6 @@ public class Day {
 
         LinearLayout event;
 
-
         if (this.events_whole_day.size() > 0) {
             top_container_events.setVisibility(View.VISIBLE);
 
@@ -411,6 +453,10 @@ public class Day {
 
     public void addAllEvents(ArrayList<MyEvent> events) {
         for (MyEvent e : events) {
+            if (e.isAll_day() && Util.isSameDate(e.getEnd(), this.start)) {
+                Log.d(tag, "Event...");
+                continue;
+            }
             addEvent(e);
         }
     }
@@ -460,6 +506,40 @@ public class Day {
 
     public void setDistributedMinutes(int value) {
         this.already_distributed = value;
+    }
+
+    public void distributeTaskBlockTasks() {
+        Log.d(tag, "distributeTaskBlockTasks: " + description());
+        for (int i = TaskBroContainer.getTaskBlocks().size() - 1; i >= 0; i--) { //start with the newest block
+            TaskBlock tb = TaskBroContainer.getTaskBlocks().get(i);
+            if (!tb.alreadyDistributed()) {
+                for (Task t : tb.getTasks()) {
+                    addTask(t);
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public int compareTo(Object another) {
+        Day other = (Day) another;
+        if (this.start == null) {
+            return 1;
+        } else if (other.start == null) {
+            return -1;
+        }
+        return this.start.compareTo(other.start);
+    }
+
+    public int calculateWorkedTimeOfTask(Task task) {
+        int worked_time = 0;
+        for (MyEvent e : events) {
+            if (!e.isNot_created_by_user() && e.getTask() == task) {
+                worked_time += e.getDurationInMinutes();
+            }
+        }
+        return worked_time;
     }
 
 

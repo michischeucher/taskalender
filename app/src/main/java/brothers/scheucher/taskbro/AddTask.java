@@ -24,7 +24,7 @@ import java.util.GregorianCalendar;
 
 public class AddTask extends AppCompatActivity {
     private static final String tag = "AddTask";
-    private static final int MONTLY_REPEAT_MINUTES = 43830;
+    public static final int MONTLY_REPEAT_MINUTES = 43830;
     private Task task;
     private Context context;
 
@@ -33,7 +33,7 @@ public class AddTask extends AppCompatActivity {
     private TextView add_task_label_color;
     private boolean[] selected_labels;
 
-    private int selected_item = 4;
+    private int selected_item_repeat = 4;
 
     DurationPickerDialog duration_dialog;
 
@@ -88,10 +88,19 @@ public class AddTask extends AppCompatActivity {
 
         if (task.getRepeat() == 24 * 60) {
             add_task_repeat.setText("Täglich");
+            selected_item_repeat = 0;
         } else if (task.getRepeat() == 7 * 24 * 60) {
             add_task_repeat.setText("Wöchentlich");
+            selected_item_repeat = 1;
         } else if (task.getRepeat() == MONTLY_REPEAT_MINUTES) {
             add_task_repeat.setText("Monatlich");
+            selected_item_repeat = 2;
+        } else if (task.getRepeat() == 0) {
+            add_task_repeat.setText("Keine Wiederholung");
+            selected_item_repeat = 4;
+        } else {
+            add_task_repeat.setText(Util.getFormattedRepeat(task.getRepeat()));
+            selected_item_repeat = 3;
         }
 
         //Setting selected labels
@@ -204,35 +213,35 @@ public class AddTask extends AppCompatActivity {
                 reapeat_strings.add("Keine Wiederholung");
 
                 builder.setSingleChoiceItems(reapeat_strings.toArray(new CharSequence[reapeat_strings.size()])
-                        , selected_item, new DialogInterface.OnClickListener() {
+                        , selected_item_repeat, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        selected_item = which;
+                        selected_item_repeat = which;
                     }
                 })
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Log.d(tag, "selected = " + selected_item + " id = " + id);
-                                if (selected_item == 0) {
+                                Log.d(tag, "selected = " + selected_item_repeat + " id = " + id);
+                                if (selected_item_repeat == 0) {
                                     //täglich
                                     add_task_repeat.setText("Täglich");
                                     task.setRepeat(24*60);
-                                } else if (selected_item == 1) {
+                                } else if (selected_item_repeat == 1) {
                                     //wöchentlich
                                     add_task_repeat.setText("Wöchentlich");
                                     task.setRepeat(24*7*60);
-                                } else if (selected_item == 2) {
+                                } else if (selected_item_repeat == 2) {
                                     //monatlich
                                     add_task_repeat.setText("Monatlich");
                                     task.setRepeat(MONTLY_REPEAT_MINUTES);
-                                } else if (selected_item == 3) {
+                                } else if (selected_item_repeat == 3) {
                                     //benutzerdefiniert
                                     add_task_repeat.setText("Alle 2 Tage");
                                     task.setRepeat(24*2*60);
                                     Log.d(tag, "Noch nicht implementiert, benutzerdefiniert!");
                                     Toast toast = Toast.makeText(TaskBroContainer.getContext(), "Noch nicht implementiert", Toast.LENGTH_SHORT);
                                     toast.show();
-                                } else if (selected_item == 4) {
+                                } else if (selected_item_repeat == 4) {
                                     task.setRepeat(0);
                                     add_task_repeat.setText("Keine Wiederholung");
                                 }

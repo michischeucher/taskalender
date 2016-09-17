@@ -136,11 +136,13 @@ public class MyCalendarProvider {
                         CalendarContract.Instances.EVENT_ID,
                         CalendarContract.Instances.BEGIN,
                         CalendarContract.Instances.END,
-                        CalendarContract.Instances.TITLE };
+                        CalendarContract.Instances.TITLE,
+                        CalendarContract.Instances.ALL_DAY};
         int PROJECTION_ID_INDEX = 1;
         int PROJECTION_BEGIN_INDEX = 2;
         int PROJECTION_END_INDEX = 3;
         int PROJECTION_TITLE_INDEX = 4;
+        int PROJECTION_ALL_DAY_INDEX = 5;
 
 
         Cursor cursor =
@@ -153,20 +155,26 @@ public class MyCalendarProvider {
             String title = null;
             long beginVal = 0;
             long endVal = 0;
+            int all_day = 0;
 
             // Get the field values
             id = cursor.getLong(PROJECTION_ID_INDEX);
             beginVal = cursor.getLong(PROJECTION_BEGIN_INDEX);
             endVal = cursor.getLong(PROJECTION_END_INDEX);
             title = cursor.getString(PROJECTION_TITLE_INDEX);
+            all_day = cursor.getInt(PROJECTION_ALL_DAY_INDEX);
 
-            Log.d(tag, "Title: " + title + " from: " + beginVal + " to " + endVal + " id: " + id);
+            Log.d(tag, "Title: " + title + " from: " + beginVal + " to " + endVal + " id: " + id + " all_day = " + all_day);
             MyEvent new_event = new MyEvent(TaskBroContainer.getNewEventID());
             new_event.setName(title);
             new_event.getStart().setTimeInMillis(beginVal);
             new_event.getEnd().setTimeInMillis(endVal);
             new_event.checkBlocking();
             new_event.setExternID(id);
+
+            if (all_day > 0) {
+                new_event.setAllDay(true);
+            }
 
             events.add(new_event);
         }

@@ -185,7 +185,7 @@ public class LabelFragment extends Fragment {
             return;
         }
 
-        ArrayList<Task> task_array = TaskBroContainer.getTasksNotDone(label_id_global);
+        ArrayList<Task> task_array = TaskBroContainer.getTasksNotDone(label_id_global, false);
         if (label_id_global == -1) {
             View row = inflater.inflate(R.layout.text_description, null, false);
             ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben ohne Label");

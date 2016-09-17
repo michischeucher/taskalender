@@ -100,9 +100,12 @@ public class TaskBlock implements Comparable {
     }
 
     public void calculateTaskFillingFactors() {
+        Log.d(tag, "start calculateTaskFillingFactors for " + description());
         for (Task t : tasks) {
             t.calculateFillingFactor();
+            Log.d(tag, "filling factor task " + t.description() + " = " + t.getFilling_factor());
         }
+        Log.d(tag, "end calculateTaskFillingFactors for " + description());
     }
 
     //returns the day, where time is left (for next block: the next block must use the time of this day to distribute)
@@ -129,5 +132,19 @@ public class TaskBlock implements Comparable {
 
     public String description() {
         return "TaskBlock start: " + Util.getFormattedDateTime(this.start) + " end: " + Util.getFormattedDateTime(this.end) + " potential: " + potential + " #tasks: " + this.tasks.size() + " with durations(overall): " + getRemainingDurationOfTasks();
+    }
+
+    public boolean alreadyDistributed() {
+        int sum_already_distributed_duration = 0;
+        int sum_remaining_duration = 0;
+        for (Task t : tasks) {
+            sum_already_distributed_duration += t.already_distributed_duration;
+            sum_remaining_duration += t.getRemaining_duration();
+        }
+        if (sum_already_distributed_duration == sum_remaining_duration) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

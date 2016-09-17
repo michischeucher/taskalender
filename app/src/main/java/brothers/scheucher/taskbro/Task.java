@@ -291,7 +291,11 @@ public class Task implements Comparable {
     }
 
     public boolean hasRepeat() {
-        return false;
+        if (this.repeat > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void calculateFillingFactor() {
@@ -337,6 +341,10 @@ public class Task implements Comparable {
             notice_view.setTextColor(0xFFFFFFFF);
             deadline_view.setTextColor(0xFFFFFFFF);
             done_view.setTextColor(0xFFFFFFFF);
+        }
+
+        if (task.hasRepeat()) {
+            name_view.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.stat_notify_sync_noanim, 0);
         }
 
         if (task.isDone()) {
@@ -410,5 +418,21 @@ public class Task implements Comparable {
             return;
         }
         this.label_ids.add(label_id_to_add);
+    }
+
+    public boolean isRelevantRepeatForThatDay(GregorianCalendar date) {
+        GregorianCalendar date_to_check = (GregorianCalendar)date.clone();
+        Util.setTime(date_to_check, this.deadline);
+        int difference_in_minutes = (int)((date_to_check.getTimeInMillis() - this.deadline.getTimeInMillis()) / 1000 / 60);
+        if (difference_in_minutes < 0) {
+            difference_in_minutes *= (-1);
+            return false;
+        }
+        int tmp = difference_in_minutes % this.repeat;
+        if (tmp < 24 * 60) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -93,8 +93,7 @@ public class PotentialActivity extends AppCompatActivity {
 
             task_block_container.addView(row);
 
-            for (int i = (tb.getTasks().size() - 1); i >=0; i--) {
-                Task t = tb.getTasks().get(i);
+            for (Task t : tb.getTasks()) {
                 View rowView = t.createTaskInListView(inflater, task_block_container);
                 task_block_container.addView(rowView);
             }

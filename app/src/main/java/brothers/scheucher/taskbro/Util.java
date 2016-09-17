@@ -379,7 +379,7 @@ public class Util {
         String ret = "";
         boolean negative = false;
         if (minutes == 0) {
-            return "--";
+            return "0 Min";
         }
         if (minutes < 0) {
             ret += "-";
@@ -715,4 +715,31 @@ public class Util {
     }
 
 
+    public static String getFormattedRepeat(int repeat_minutes) {
+        if (repeat_minutes % AddTask.MONTLY_REPEAT_MINUTES == 0) {
+            int months = repeat_minutes / AddTask.MONTLY_REPEAT_MINUTES;
+            if (months == 1) {
+                return "Monatlich";
+            } else {
+                return "Alle " + months + " Monate";
+            }
+        } else if (repeat_minutes % (60 * 24 * 7) == 0) {
+            int weeks = repeat_minutes / (60 * 24 * 7);
+            if (weeks == 1) {
+                return "Wöchentlich";
+            } else {
+                return "Alle " + weeks + " Wochen";
+            }
+        } else if (repeat_minutes % (24 * 60) == 0) {
+            int days = repeat_minutes / (60 * 24);
+            if (days == 1) {
+                return "Täglich";
+            } else {
+                return "Alle " + days + " Tage";
+            }
+        } else {
+            return "Alle " + repeat_minutes + " Minuten";
+        }
+
+    }
 }

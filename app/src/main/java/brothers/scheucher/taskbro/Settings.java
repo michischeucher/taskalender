@@ -28,6 +28,7 @@ public class Settings {
 
     public static final int STANDARD_EARLIEST_MINUTE = 60*8;
     public static final int STANDARD_LATEST_MINUTE = 60 * 21;
+    public static final int DAYS_TO_LOOK_FORWARD = 7;
 
     public static int getPause_before_event() {
         return pause_before_event;

@@ -7,6 +7,7 @@
     >
 
     <View
+        android:id="@+id/potential_background"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:background="@drawable/rounded_potential"

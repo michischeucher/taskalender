@@ -3,6 +3,7 @@ package brothers.scheucher.taskbro;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,12 +23,14 @@ public class MainActivity extends AppCompatActivity
     private static final String tag = "MainActivity";
     private DrawerLayout drawer_layout;
     private static TextView potential_text_view;
+    private static View potential_background;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         potential_text_view = (TextView)(findViewById(R.id.potential));
+        potential_background = findViewById(R.id.potential_background);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,7 +96,9 @@ public class MainActivity extends AppCompatActivity
         if (event.isNot_created_by_user()) {
             event_done.setVisibility(ImageView.VISIBLE);
             event_not_done.setVisibility(ImageView.GONE);
-            task.setRemaining_duration(task.getRemaining_duration() - event.getDurationInMinutes());
+            if (!task.hasRepeat()) {
+                task.setRemaining_duration(task.getRemaining_duration() - event.getDurationInMinutes());
+            }
             task.save(this);
 
             event.setNot_created_by_user(false);
@@ -101,12 +106,14 @@ public class MainActivity extends AppCompatActivity
         } else {
             event_done.setVisibility(ImageView.GONE);
             event_not_done.setVisibility(ImageView.VISIBLE);
-            task.setRemaining_duration(task.getRemaining_duration() + event.getDurationInMinutes());
+            if (!task.hasRepeat()) {
+                task.setRemaining_duration(task.getRemaining_duration() + event.getDurationInMinutes());
+            }
             task.save(this);
 
             event.setNot_created_by_user(true);
             event.delete(this);
-            TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
+                TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
         }
     }
 
@@ -178,9 +185,9 @@ public class MainActivity extends AppCompatActivity
             potential_text_view.setText(Util.getFormattedPotentialShort(potential));
             Log.d(tag, "PotentialShortVersion= " + Util.getFormattedPotentialShort(potential));
             if (potential < 0) {
-                potential_text_view.setTextColor(Settings.TEXT_COLOR_ATTENTION);
+                Util.setColorOfDrawable(potential_background, Settings.TEXT_COLOR_ATTENTION);
             } else if(potential > 0) {
-                potential_text_view.setTextColor(0xFFFFFFFF);
+                Util.setColorOfDrawable(potential_background, ContextCompat.getColor(TaskBroContainer.getContext(), R.color.accent_color));
             }
         }
     }

@@ -192,6 +192,7 @@ public class MyEvent implements Comparable {
         if (extern_id != -1) {
             Log.d(tag, "Extern Event saved...");
             MyCalendarProvider.saveEvent(this);
+            return;
         }
 
         if (id == -1) {
@@ -206,21 +207,20 @@ public class MyEvent implements Comparable {
     }
 
     public void delete(Context context) {
+        if (id == -1) {
+            return;
+        }
         if (extern_id != -1) {
             Log.d(tag, "Extern Event deleted...");
             MyCalendarProvider.deleteEvent(this);
-        }
-
-        if (id == -1) {
-            return;
         } else {
             SQLiteStorageHelper db_helper = SQLiteStorageHelper.getInstance(context, 1);
             db_helper.openDB();
             db_helper.deleteEvent(this);
             db_helper.closeDB();
             db_helper.close();
-            TaskBroContainer.deleteEventFromList(this);
         }
+        TaskBroContainer.deleteEventFromList(this);
     }
 
     public String description() {

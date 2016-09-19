@@ -17,7 +17,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:colorPrimary">@color/accent_color</item>
+        <item name="android:colorPrimary">@color/accent_color_dark</item>
         <item name="android:colorPrimaryDark">@color/accent_color_dark</item>
         <item name="android:colorAccent">@color/accent_color</item>
     </style>

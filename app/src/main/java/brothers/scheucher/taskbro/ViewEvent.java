@@ -116,6 +116,13 @@ public class ViewEvent extends AppCompatActivity {
             view_event_fields_container.addView(row);
         }
 
+        if (!event.getCalenderName().equals("")) {
+            View row = inflater.inflate(R.layout.text_item_with_description, view_event_fields_container, false);
+            ((TextView)row.findViewById(R.id.description_of_item)).setText("Kalender");
+            ((TextView)row.findViewById(R.id.text_of_item)).setText(event.getCalenderName());
+            view_event_fields_container.addView(row);
         }
+
+    }
 
 }

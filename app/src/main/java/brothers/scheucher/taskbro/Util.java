@@ -444,7 +444,7 @@ public class Util {
         g = g >> 8;
         int b = 0x0000FF & color;
 //        Log.d(tag, "color = " + color + " is r = " + r + " g = " + g + " b = " + b);
-        if ((r + g + b) < 400) {
+        if ((r + g + b) < 370) {
 //            Log.d(tag, "is dark");
             return true;
         } else {

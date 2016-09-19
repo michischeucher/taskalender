@@ -1,6 +1,7 @@
 package brothers.scheucher.taskbro;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.GregorianCalendar;
 
@@ -38,6 +39,8 @@ public class MyEvent implements Comparable {
     public static final String DB_COL_PRIORITY = "EventPriority";
     public static final String DB_COL_INACTIVE = "EventInactive";
     private boolean all_day;
+    private String calender_name;
+    private int calender_id;
 
     public MyEvent() {
         this.id = -1;
@@ -56,6 +59,7 @@ public class MyEvent implements Comparable {
         this.availability = false;
         this.all_day = false;
         this.inactive = false;
+        this.calender_name = "";
     }
     public MyEvent(int id) {
         this.id = id;
@@ -74,6 +78,7 @@ public class MyEvent implements Comparable {
         this.availability = false;
         this.all_day = false;
         this.inactive = false;
+        this.calender_name = "";
     }
     public MyEvent(int duration, boolean is_task_event) {
         this.id = -1;
@@ -93,6 +98,7 @@ public class MyEvent implements Comparable {
         checkBlocking();
         this.all_day = false;
         this.inactive = false;
+        this.calender_name = "";
     }
     public MyEvent(long extern_id) {
         this.id = -1;
@@ -107,6 +113,7 @@ public class MyEvent implements Comparable {
         this.color = -1;
         this.availability = false;
         this.inactive = false;
+        this.calender_name = "";
     }
 
 
@@ -182,6 +189,11 @@ public class MyEvent implements Comparable {
     }
 
     public void save(Context context) {
+        if (extern_id != -1) {
+            Log.d(tag, "Extern Event saved...");
+            MyCalendarProvider.saveEvent(this);
+        }
+
         if (id == -1) {
             id = TaskBroContainer.getNewEventID();
         }
@@ -194,6 +206,11 @@ public class MyEvent implements Comparable {
     }
 
     public void delete(Context context) {
+        if (extern_id != -1) {
+            Log.d(tag, "Extern Event deleted...");
+            MyCalendarProvider.deleteEvent(this);
+        }
+
         if (id == -1) {
             return;
         } else {
@@ -366,5 +383,24 @@ public class MyEvent implements Comparable {
 
     public boolean isInactive() {
         return inactive;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public void setCalendarName(String calender_name) {
+        this.calender_name = calender_name;
+    }
+    public String getCalenderName() {
+        return this.calender_name;
+    }
+
+    public void setCalendarID(int calender_id) {
+        this.calender_id = calender_id;
+    }
+
+    public int getCalenderID() {
+        return this.calender_id;
     }
 }

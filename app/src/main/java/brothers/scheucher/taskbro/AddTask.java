@@ -270,7 +270,6 @@ public class AddTask extends AppCompatActivity {
                 task.setInactive(true);
                 task.save(TaskBroContainer.getContext());
                 TaskBroContainer.createCalculatingJob();
-                Calender.notifyChanges();
                 finish();
             }
         });

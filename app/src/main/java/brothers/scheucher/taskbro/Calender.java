@@ -93,7 +93,7 @@ public class Calender extends Fragment {
     }
 
     public static void notifyChanges() {
-        //Log.d(tag, "Calender: changeSomeValues");
+        Log.d(tag, "Calender: changeSomeValues");
         if (calender_pager_adapter != null) {
             calender_pager_adapter.notifyDataSetChanged();
         }

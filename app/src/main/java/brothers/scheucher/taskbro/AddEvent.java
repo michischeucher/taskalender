@@ -102,8 +102,12 @@ public class AddEvent extends AppCompatActivity {
             public void onClick(View v) {
                 //event.delete(TaskBroContainer.getContext());
                 //TaskBroContainer.deleteEventFromList(event);
-                event.setInactive(true);
-                event.save(TaskBroContainer.getContext());
+                if (event.getExternID() != -1) {
+                    event.delete(TaskBroContainer.getContext());
+                } else {
+                    event.setInactive(true);
+                    event.save(TaskBroContainer.getContext());
+                }
                 TaskBroContainer.createCalculatingJob();
                 finish();
             }
@@ -163,6 +167,7 @@ public class AddEvent extends AppCompatActivity {
             event.setAvailability(!blocking_switch.isChecked());
             //Log.d(tag, "going to save event = " + event.description());
             event.save(this);
+
             TaskBroContainer.addEventToList(event);
             TaskBroContainer.createCalculatingJob();
             finish();

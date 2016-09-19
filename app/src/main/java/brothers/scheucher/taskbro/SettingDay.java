@@ -202,7 +202,6 @@ public class SettingDay extends ActionBarActivity {
 
         settingPieChartBecauseOfData();
 
-        MyCalendarProvider.googleCalendar();
     }
 
     private void settingPieChartBecauseOfData() {

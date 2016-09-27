@@ -5,21 +5,14 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,10 +25,6 @@ import java.util.Random;
  */
 public class Util {
     private static final String tag = "Util";
-    private static final long TIME_IN_MINUTES = 3600000L; //mill * sec * min = 1000 * 60 * 60 =
-    private static DateFormat date_format;
-    private static DateFormat time_format;
-
 
     public static String DateToString(GregorianCalendar date) {
         if (date == null) {
@@ -47,8 +36,6 @@ public class Util {
         int hour = date.get(GregorianCalendar.HOUR_OF_DAY);
         int minute = date.get(GregorianCalendar.MINUTE);
         String retval = year + "-" + month + "-" + day + "-" + hour + "-" + minute;
-//        Log.d("Util", "date to convert = " + getFormattedDate(date) + " time = " + getFormattedTime(date));
-//        Log.d("Util", "converted to = " + retval);
         return retval;
     }
 
@@ -56,7 +43,6 @@ public class Util {
         if (date_string.equals("-")) {
             return null;
         }
-        Log.d(tag, "StringToDate: " + date_string);
         String[] parts = date_string.split("-");
         int year = 0;
         int month = 0;
@@ -70,7 +56,6 @@ public class Util {
             hour = Integer.valueOf(parts[3]);
             minute = Integer.valueOf(parts[4]);
         } catch (NumberFormatException e){
-//            Log.d(tag, "String to Date... exeption");
             year = 0;
             month = 0;
             day = 0;
@@ -78,7 +63,6 @@ public class Util {
             minute = 0;
         }
         GregorianCalendar d = new GregorianCalendar(year, month, day, hour, minute);
-//        Log.d("Util", "converted date = " + getFormattedDate(d) + " time = " + getFormattedTime(d));
         return d;
     }
 
@@ -98,7 +82,6 @@ public class Util {
     }
 
     private static String getDateShort(GregorianCalendar date) {
-
         GregorianCalendar c = new GregorianCalendar();
         c.add(GregorianCalendar.DAY_OF_YEAR, -2);
         if (isSameDate(date,c)) {
@@ -259,39 +242,6 @@ public class Util {
         }
     }
 
-
-    public static float calculateRemainingHours(GregorianCalendar current_date, GregorianCalendar deadline) {
-        Log.d(tag, "deadline = " + deadline.getTimeInMillis() + " current date = " + current_date.getTimeInMillis());
-
-        float remaining_hours = (float) ((deadline.getTimeInMillis() - current_date.getTimeInMillis()) / 1000 / 60.0 / 60.0);
-        Log.d(tag, "remaining hours = " + remaining_hours);
-        return remaining_hours;
-    }
-
-    public static int getColorCode(float remaining_time_to_deadline, int color) {
-        Log.d(tag, "getColorCode: remaining time = " + remaining_time_to_deadline + " color " + color);
-        if (remaining_time_to_deadline >= Settings.hours_before_deadline_no_problem) {
-            Log.d(tag, "really much time left...");
-            return (Settings.transparent_factor_no_problem << 24) | color;
-        }
-        if (remaining_time_to_deadline <= Settings.hours_before_deadline_urgent) {
-            Log.d(tag, "NO TIME LEFT");
-            return (Settings.transparent_factor_urgent << 24) | color;
-        }
-
-        int difference_hours = Settings.hours_before_deadline_no_problem - Settings.hours_before_deadline_urgent;
-        float percentage = (remaining_time_to_deadline - Settings.hours_before_deadline_urgent) / difference_hours;
-
-        //urgent = 0xFF no problem = 0x40
-        int diff = Settings.transparent_factor_urgent - Settings.transparent_factor_no_problem;
-
-        int alpha_value = (int)(diff * (1 - percentage) + Settings.transparent_factor_no_problem);
-        alpha_value = alpha_value << 24;
-        int ret = alpha_value | color;
-        Log.d(tag, "getColorCode: ret val = " + ret);
-        return ret;
-    }
-
     public static int getRandomColor() {
         Random random_generator = new Random();
         int color = random_generator.nextInt(0xFFFFFF);
@@ -309,13 +259,12 @@ public class Util {
         return hour * 60 + minute;
     }
 
-    public static int getHourOfDay(GregorianCalendar date_with_time) {
+    public static int getHour(GregorianCalendar date_with_time) {
         return date_with_time.get(GregorianCalendar.HOUR_OF_DAY);
     }
     public static int getMinute(GregorianCalendar date_with_time) {
         return date_with_time.get(GregorianCalendar.MINUTE);
     }
-
 
     public static String getFormattedDuration(int minutes) {
         String ret = "";
@@ -371,13 +320,11 @@ public class Util {
         } else {
             ret += " Potential";
         }
-        Log.d(tag, "potential " + minutes + " ret=" + ret);
         return ret;
     }
 
     public static String getFormattedPotentialShort(int minutes) {
         String ret = "";
-        boolean negative = false;
         if (minutes == 0) {
             return "0 Min";
         }
@@ -443,12 +390,9 @@ public class Util {
         int g = 0x00FF00 & color;
         g = g >> 8;
         int b = 0x0000FF & color;
-//        Log.d(tag, "color = " + color + " is r = " + r + " g = " + g + " b = " + b);
         if ((r + g + b) < 370) {
-//            Log.d(tag, "is dark");
             return true;
         } else {
-//            Log.d(tag, "is not dark");
             return false;
         }
     }
@@ -494,15 +438,10 @@ public class Util {
         overlapping.start = (GregorianCalendar)Util.getLaterDate(first_time.start, second_time.start).clone();
         overlapping.end = (GregorianCalendar)Util.getEarlierDate(first_time.end, second_time.end).clone();
 
-//        Log.d(tag, "calculateOverlappingTime: " + Util.getFormattedDateTime(first_time.start) + "-" + Util.getFormattedDateTime(first_time.end));
-//        Log.d(tag, "   " + Util.getFormattedDateTime(second_time.start) + "-" + Util.getFormattedDateTime(second_time.end));
         if (Util.earlierDate(overlapping.end, overlapping.start) ||
                 (Util.isSameDate(overlapping.start, overlapping.end) && Util.isSameTime(overlapping.start, overlapping.end))) {
-            //there is no overlapping...
-//            Log.d(tag, "No overlapping...");
-            return null;
+            return null; //there is no overlapping...
         } else {
-//            Log.d(tag, "=>overlapping: " + Util.getFormattedDateTime(overlapping.start) + "-" + Util.getFormattedDateTime(overlapping.end));
             return overlapping;
         }
     }
@@ -555,63 +494,6 @@ public class Util {
         GradientDrawable sh = (GradientDrawable)background.getBackground();
         sh.setColor(color);
 
-    }
-
-    public static void setSupportActionBarTitle(ViewEvent mActivity, ActionBar supportActionBar, String name) {
-        final FrameLayout frameLayout = new FrameLayout(mActivity);
-        FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-        frameLayout.setLayoutParams(frameLayoutParams);
-
-
-        // Create new LinearLayout
-        final LinearLayout linearLayout = new LinearLayout(mActivity);
-        frameLayoutParams =new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPixels(78));
-        frameLayoutParams.gravity = Gravity.LEFT;
-        linearLayout.setLayoutParams(frameLayoutParams);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-
-        // Add textviews
-        final TextView textView1 = new TextView(mActivity);
-        LinearLayout.LayoutParams linearLayoutParams =new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        frameLayoutParams.gravity = Gravity.BOTTOM;
-        textView1.setLayoutParams(linearLayoutParams);
-        textView1.setText("Title");
-        textView1.setTextColor(ContextCompat.getColor(mActivity, R.color.materialcolorpicker__white));
-        textView1.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        linearLayout.addView(textView1);
-
-
-        final TextView textView2 = new TextView(mActivity);
-        linearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        textView2.setLayoutParams(linearLayoutParams);
-        textView2.setText("Subtitle");
-        textView2.setTextColor(ContextCompat.getColor(mActivity, R.color.materialcolorpicker__white));
-        textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        linearLayout.addView(textView2);
-
-        frameLayout.addView(linearLayout);
-
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout)mActivity.findViewById(R.id.toolbar_layout);
-        collapsingToolbar.addView(frameLayout);
-        final float SCALE_MIN=0.4f;
-        AppBarLayout appBarLayout = (AppBarLayout) mActivity.findViewById(R.id.app_bar);
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int offSet) {
-                float collapsedRatio = (float) offSet / appBarLayout.getTotalScrollRange();
-                linearLayout.setScaleX(1 + (collapsedRatio * SCALE_MIN));
-                linearLayout.setScaleY(1 + (collapsedRatio * SCALE_MIN));
-                FrameLayout.LayoutParams frameLayoutParams =new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dpToPixels(78));
-                frameLayoutParams.gravity = Gravity.BOTTOM;
-                frameLayoutParams.setMargins(Math.round(dpToPixels(48) * (1+collapsedRatio)), 0, 0, Math.round(dpToPixels(15) * collapsedRatio));
-                linearLayout.setLayoutParams(frameLayoutParams);
-                // You can also setTransitionY/X, setAlpha, setColor etc.
-            }
-        });
     }
 
     private static int dpToPixels(int dp) {

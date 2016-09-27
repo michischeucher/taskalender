@@ -3,7 +3,7 @@ package brothers.scheucher.taskbro;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 
 /**
@@ -108,27 +108,6 @@ public class TaskBlock implements Comparable {
         Log.d(tag, "end calculateTaskFillingFactors for " + description());
     }
 
-    //returns the day, where time is left (for next block: the next block must use the time of this day to distribute)
-    public Day addTasksToDays(GregorianCalendar start_date) {
-        Day day;
-        GregorianCalendar current_date = (GregorianCalendar)start_date.clone();
-        while (true) { //GregorianCalendar current_date : Util.getListOfDates(start_date, this.end)) {
-            day = TaskBroContainer.getDay(current_date);
-            if (day == null) {
-                day = TaskBroContainer.createDay(current_date);
-                TaskBroContainer.addDayToList(day);
-            }
-            Log.d(tag, "Day " + day.description() + " has possibleWorkTime " + day.getPossibleWorkTime(day.getStart(), day.getEnd(), false));
-            for (int i = tasks.size() - 1; i >= 0; i--) {
-                day.addTask(tasks.get(i));
-            }
-            if (day.getPossibleWorkTime(day.getStart(), day.getEnd(), false) > 0) { //must always be 0 because of factor = 1 in last task (außer die tasks haben alle schon genügend zeit bekommen)
-                Log.d(tag, "Day " + day.description() + " is now full distributed");
-                return day;
-            }
-            current_date.add(Calendar.DAY_OF_YEAR,1);
-        }
-    }
 
     public String description() {
         return "TaskBlock start: " + Util.getFormattedDateTime(this.start) + " end: " + Util.getFormattedDateTime(this.end) + " potential: " + potential + " #tasks: " + this.tasks.size() + " with durations(overall): " + getRemainingDurationOfTasks();
@@ -146,5 +125,9 @@ public class TaskBlock implements Comparable {
         } else {
             return false;
         }
+    }
+
+    public void sortTasks() {
+        Collections.sort(this.tasks);
     }
 }

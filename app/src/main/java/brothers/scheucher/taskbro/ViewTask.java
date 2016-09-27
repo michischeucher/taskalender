@@ -87,26 +87,41 @@ public class ViewTask extends ActionBarActivity {
             public void onClick(View v) {
                 Log.d(tag, "part_finished clicked");
                 toggleButtonOptions(button);
-                Dialog dialog = new WorkFinishedDialog(activity, task, 35);
-
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        WorkFinishedDialog wfd = (WorkFinishedDialog)dialog;
-                        Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
-                        if (wfd.was_ok) {
-                            finish();
+                if (task.hasRepeat()) {
+                    WorkFinishedDialogRepeating wfdr = new WorkFinishedDialogRepeating(activity, task, task.getRemaining_duration());
+                    wfdr.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            WorkFinishedDialogRepeating wfdr = (WorkFinishedDialogRepeating)dialog;
+                            Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
+                            if (wfdr.was_ok) {
+                                finish();
+                            }
                         }
-                    }
-                });
-                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        Log.d(tag, "Arbeitseintragen => ABGEBROCHEN...");
-                    }
-                });
+                    });
+                    wfdr.show();
+                } else {
+                    Dialog dialog = new WorkFinishedDialog(activity, task, 35);
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            WorkFinishedDialog wfd = (WorkFinishedDialog)dialog;
+                            Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
+                            if (wfd.was_ok) {
+                                finish();
+                            }
+                        }
+                    });
+                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            Log.d(tag, "Arbeitseintragen => ABGEBROCHEN...");
+                        }
+                    });
 
-                dialog.show();
+                    dialog.show();
+                }
+
             }
         });
 

@@ -308,6 +308,12 @@ public class MyEvent implements Comparable {
         this.end.add(GregorianCalendar.MINUTE, duration);
     }
 
+    public void setStartWithDuration(int duration) {
+        this.start = (GregorianCalendar) end.clone();
+        this.start.add(GregorianCalendar.MINUTE, -duration);
+    }
+
+
     public void setTask(int task_id) {
         Task task = TaskBroContainer.getTask(task_id);
         this.task = task;
@@ -403,4 +409,5 @@ public class MyEvent implements Comparable {
     public int getCalenderID() {
         return this.calender_id;
     }
+
 }

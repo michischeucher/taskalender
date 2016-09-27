@@ -228,7 +228,25 @@ public class Task implements Comparable {
         } else if (other.deadline == null) {
             return -1;
         }
-        return this.deadline.compareTo(other.deadline);
+        int ret = this.deadline.compareTo(other.deadline);
+        if (ret != 0) {
+            return ret;
+        } else {
+            //same date => other criterion "duration"
+            if (this.filling_factor > other.filling_factor) {
+                return 1;
+            } else if (this.filling_factor < other.filling_factor) {
+                return -1;
+            } else {
+                if (this.remaining_duration.getDuration() > other.remaining_duration.getDuration()) {
+                    return -1;
+                } else if (this.remaining_duration.getDuration() < other.remaining_duration.getDuration()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
     }
 
     public void setDeadline(int hourOfDay, int minute) {
@@ -241,8 +259,8 @@ public class Task implements Comparable {
     public void setDeadline(int year, int monthOfYear, int dayOfMonth) {
         if (this.deadline == null) {
             this.deadline = new GregorianCalendar();
-            this.deadline.set(GregorianCalendar.HOUR_OF_DAY, Settings.STANDARD_DEADLINE_HOUR_IF_DATE_SET);
-            this.deadline.set(GregorianCalendar.MINUTE,Settings.STANDARD_DEADLINE_MINUTE_IF_DATE_SET);
+            this.deadline.set(GregorianCalendar.HOUR_OF_DAY, Settings.getDeadlineHourIfDateSet());
+            this.deadline.set(GregorianCalendar.MINUTE, Settings.getDeadlineMinuteIfDateSet());
         }
         Util.setDate(this.deadline, year, monthOfYear, dayOfMonth);
     }

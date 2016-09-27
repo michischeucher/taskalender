@@ -88,14 +88,14 @@ public class SettingDay extends ActionBarActivity {
         earliest_start_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(earliest_start_view, earliest_start), Util.getHourOfDay(earliest_start), Util.getMinute(earliest_start), true);
+                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(earliest_start_view, earliest_start), Util.getHour(earliest_start), Util.getMinute(earliest_start), true);
                 dialog.show();
             }
         });
         latest_end_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(latest_end_view, latest_end), Util.getHourOfDay(latest_end), Util.getMinute(latest_end), true);
+                TimePickerDialog dialog = new TimePickerDialog(context, new onTimeSetListener(latest_end_view, latest_end), Util.getHour(latest_end), Util.getMinute(latest_end), true);
                 dialog.show();
             }
         });

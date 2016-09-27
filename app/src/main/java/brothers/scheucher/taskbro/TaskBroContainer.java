@@ -62,6 +62,7 @@ public class TaskBroContainer {
         sql_helper.addAllDaySettingObjectsFromDatabase();
 
         TaskBroContainer.createCalculatingJob();
+        UserSettings.getAllSharedPreferencesOfUserSettings();
     }
 
     public static void createCalculatingJob() {
@@ -243,6 +244,7 @@ public class TaskBroContainer {
                 if (!events.contains(new_event)) {
                     events.add(new_event);
                 }
+
             }
         }
     }
@@ -655,7 +657,11 @@ public class TaskBroContainer {
             Collections.sort(days);
             for (int i = 0; i < (days.size() - Settings.DAYS_TO_LOOK_FORWARD); i++) {
                 Day day = days.get(i);
-                day.distributeTaskBlockTasks();
+                if (!day.alreadyDistributed()) {
+                    day.distributeTaskBlockTasks();
+                    day.createTaskEventsBecauseOfTaskDurations();
+                    day.alreadyDistributed(true);
+                }
             }
         }
     }

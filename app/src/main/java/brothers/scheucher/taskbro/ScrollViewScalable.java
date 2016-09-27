@@ -45,7 +45,6 @@ public class ScrollViewScalable extends ScrollView {
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
-
         private int scroll_pos_begin;
 
         @Override

@@ -54,6 +54,13 @@
                 android:value="brothers.scheucher.taskbro.MainActivity" />
         </activity>
         <activity
+            android:name="brothers.scheucher.taskbro.UserSettingActivity"
+            android:label="Einstellungen">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="brothers.scheucher.taskbro.MainActivity" />
+        </activity>
+        <activity
             android:name="brothers.scheucher.taskbro.ViewTask"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

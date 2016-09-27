@@ -86,9 +86,9 @@ public class PotentialActivity extends AppCompatActivity {
             }
             ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedPotential(tb.getPotential()));
             if (tb.getPotential() < 0) {
-                ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.TEXT_COLOR_ATTENTION);
+                ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.COLOR_ATTENTION);
             } else if (tb.getPotential() > 0){
-                ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.TEXT_COLOR_PERFECT);
+                ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.COLOR_PERFECT);
             }
 
             task_block_container.addView(row);

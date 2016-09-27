@@ -16,16 +16,14 @@ import android.widget.TimePicker;
 
 import java.util.GregorianCalendar;
 
-public class WorkFinishedDialog extends Dialog {
+public class WorkFinishedDialogRepeating extends Dialog {
 
-    private static final String tag = "WorkFinishedDialog";
+    private static final String tag = "WorkFinDiaRepeating";
     private final Activity activity;
 
     private Task task;
     private MyEvent event;
     private Duration worked_duration;
-    private Duration remaining_duration;
-    private boolean remaining_duration_modified = false;
 
     private RelativeLayout work_finished_dialog;
     private TextView start_time;
@@ -42,12 +40,10 @@ public class WorkFinishedDialog extends Dialog {
     private static final String DURATION = "duration";
     public boolean was_ok = false;
 
-    public WorkFinishedDialog(Activity a, Task task, int duration) {
+    public WorkFinishedDialogRepeating(Activity a, Task task, int duration) {
         super(a);
         this.activity = a;
         this.task = task;
-        this.remaining_duration = new Duration(task.getRemaining_duration());
-        this.remaining_duration.addMinutes(-duration);
         this.event = new MyEvent(duration, true);
         this.worked_duration = new Duration(duration);
         this.event.setTask(task);
@@ -107,30 +103,14 @@ public class WorkFinishedDialog extends Dialog {
                         }
                         last_changed = DURATION;
 
-                        if (!remaining_duration_modified) {
-                            remaining_duration.setDuration(task.getRemaining_duration() - worked_duration.getDuration());
-                        }
-
                         setFieldsBecauseOfData();
                     }
                 });
                 dialog.show();
             }
         });
-        remaining_duration_view = (TextView)work_finished_dialog.findViewById(R.id.remaining_duration);
-        remaining_duration_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DurationPickerDialog dialog = new DurationPickerDialog(activity, remaining_duration_view, remaining_duration);
-                dialog.setOnDismissListener(new OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        remaining_duration_modified = true;
-                    }
-                });
-                dialog.show();
-            }
-        });
+
+        findViewById(R.id.remaining_duration_container).setVisibility(View.GONE);
 
         ((Button)findViewById(R.id.negative_button)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +123,6 @@ public class WorkFinishedDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 Log.d(tag, "ok clicked, save work finished dialog");
-                task.setRemaining_duration(remaining_duration.getDuration());
                 event.setName(task.getName());
                 event.setNotice("Eingetragene Arbeitseinheit");
                 event.setEndWithDuration(worked_duration.getDuration());
@@ -164,8 +143,6 @@ public class WorkFinishedDialog extends Dialog {
         start_time.setText(Util.getFormattedTime(event.getStart()));
         end_time.setText(Util.getFormattedTime(event.getEnd()));
         worked_duration_view.setText(Util.getFormattedDuration(worked_duration.getDuration()));
-
-        remaining_duration_view.setText(Util.getFormattedDuration(remaining_duration.getDuration()));
     }
 
     @Override
@@ -257,10 +234,6 @@ public class WorkFinishedDialog extends Dialog {
                     last_changed = END_TIME;
                 }
 
-                if (!remaining_duration_modified) {
-                    remaining_duration.setDuration(task.getRemaining_duration() - worked_duration.getDuration());
-                }
-
                 setFieldsBecauseOfData();
             }
         });
@@ -280,7 +253,7 @@ public class WorkFinishedDialog extends Dialog {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 //            Log.d(tag, "hour = " + hourOfDay + " minute = " + minute);
             Util.setTime(time, hourOfDay, minute);
-            Log.d(tag, "time is set to = " + Util.getFormattedDateTime(time));
+            Log.d(tag, "time = " + Util.getFormattedDateTime(time));
             text_view.setText(Util.getFormattedTime(time));
         }
     }

@@ -71,4 +71,8 @@ public class Duration {
         }
         return ret;
     }
+
+    public void addMinutes(int minutes_to_add) {
+        this.setDuration(this.getDuration() + minutes_to_add);
+    }
 }

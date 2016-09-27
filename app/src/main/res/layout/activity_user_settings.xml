@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/touch_size"
+        android:layout_margin="@dimen/activity_margin"
+        >
+
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Standarddauer für Aufgaben"
+            />
+        <TextView
+            android:id="@+id/standard_duration_task"
+            style="@style/NormalText"
+            android:text="1 Std."
+            />
+        <TextView
+            style="@style/DescriptionText"
+            android:text="Standard Deadline-Uhrzeit"
+            />
+        <TextView
+            android:id="@+id/standard_deadline_time"
+            style="@style/NormalText"
+            android:text="23:00 Uhr"
+            />
+
+    </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

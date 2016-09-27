@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 
 import static java.util.Collections.sort;
@@ -20,12 +21,14 @@ public class Day implements Comparable {
     private GregorianCalendar start;
     private GregorianCalendar end;
     private ArrayList<MyEvent> events;
+    private ArrayList<TaskWithDuration> task_duration;
     private DayScheduler scheduler;
     private ArrayList<Block> event_blocks;
     private ArrayList<MyEvent> events_whole_day;
     private static final int MIN_DISPLAY_DURATION_FOR_ONE_EVENT = 30;
 
     private int already_distributed; //just for calculation
+    private boolean already_distributed_boolean;
 
 
     public Day(GregorianCalendar date) {
@@ -48,6 +51,7 @@ public class Day implements Comparable {
         this.event_blocks = new ArrayList<>();
         this.events_whole_day = new ArrayList<>();
         this.day_settings = TaskBroContainer.getDaySettingObject(this.start);
+        this.task_duration = new ArrayList<>();
 
         GregorianCalendar earliest_start_date = (GregorianCalendar)start.clone();
         earliest_start_date.add(GregorianCalendar.MINUTE, day_settings.getEarliest_minute());
@@ -61,9 +65,9 @@ public class Day implements Comparable {
             scheduler.addBlockingTime(start, end);
         }
         this.already_distributed = 0;
+        this.already_distributed_boolean = false;
 
     }
-
 
     public GregorianCalendar getStart() {
         return start;
@@ -111,6 +115,7 @@ public class Day implements Comparable {
     }
 
     public int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
+        Log.d(tag, "getPossibleWorkTime ");
         int sum_work_time = 0;
 
         TimeObj dates_to_check = new TimeObj(start_date, end_date);
@@ -131,7 +136,7 @@ public class Day implements Comparable {
 
     private int checkAvailableWorkTime(int available_work_time, boolean set_worked) {
         int already_worked = calculateWorkedTime();
-        Log.d(tag, description() + " already worked = " + already_worked);
+        //Log.d(tag, description() + " already worked = " + already_worked);
         int difference = day_settings.getTotalDurationInMinutes() - already_worked;
         if (set_worked) {
             difference -= this.already_distributed;
@@ -165,14 +170,21 @@ public class Day implements Comparable {
             }
         }
         return 24 * 60 - scheduler.getPossibleWorkTime() - day_settings.getEarliest_minute() - (24 * 60 - day_settings.getLatest_minute());
+
     }
 
     public void addTask(Task task) {
-        //Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
+        Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
+        if (task.already_distributed_duration == task.getRemaining_duration()) {
+            //dont need more time...
+            return;
+        }
 
-        int available_work_time = scheduler.getPossibleWorkTime();
-        available_work_time = checkAvailableWorkTime(available_work_time, false);
+        int available_work_time = getAvailableWorkTime(false) - this.already_distributed;
         int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
+        if (available_work_time > 0 && work_time_for_that_task == 0) {
+            work_time_for_that_task = 1;
+        }
 
         if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
             work_time_for_that_task = task.getRemaining_duration() - task.already_distributed_duration; //rest of duration...
@@ -180,27 +192,54 @@ public class Day implements Comparable {
         } else {
             task.already_distributed_duration += work_time_for_that_task;
         }
+        this.already_distributed += work_time_for_that_task;
+        Log.d(tag, "already_distributed is now = " + already_distributed + " because of work_time_for_that_task = " + work_time_for_that_task);
 
-        while(work_time_for_that_task > 0) {
-            TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
+        addTaskWithDuration(task, work_time_for_that_task);
+    }
 
-            MyEvent new_event = new MyEvent();
-            TaskBroContainer.addEventToList(new_event);
-            new_event.setId(TaskBroContainer.getNewEventID());
-            new_event.setNot_created_by_user(true);
-            new_event.setTask(task);
+    public void createTaskEventsBecauseOfTaskDurations() {
+        Collections.sort(task_duration);
+        Log.d(tag, "TaskWithDuration start for day: " + this.description());
+        for (TaskWithDuration twd : task_duration) {
+            Task task = twd.getTask();
+            int work_time_for_that_task = twd.getDurationInMinutes();
+            Log.d(tag, "TaskWithDuration: " + twd.description());
 
-            new_event.setStart((GregorianCalendar) free_slot.start.clone());
-            new_event.setStart(free_slot.start.get(Calendar.HOUR_OF_DAY), free_slot.start.get(Calendar.MINUTE));
-            int effective_time = Math.min(free_slot.getDuration(), work_time_for_that_task);
-            new_event.setEndWithDuration(effective_time);
-            work_time_for_that_task -= effective_time;
+            while(work_time_for_that_task > 0) {
+                TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
 
-            //Log.d(tag, "   going to addEvent " + new_event.description());
-            addTaskEventWithoutChecking(new_event);
+                MyEvent new_event = new MyEvent();
+                TaskBroContainer.addEventToList(new_event);
+                new_event.setId(TaskBroContainer.getNewEventID());
+                new_event.setNot_created_by_user(true);
+                new_event.setTask(task);
+
+                new_event.setStart((GregorianCalendar) free_slot.start.clone());
+                new_event.setStart(free_slot.start.get(Calendar.HOUR_OF_DAY), free_slot.start.get(Calendar.MINUTE));
+                int effective_time = Math.min(free_slot.getDuration(), work_time_for_that_task);
+                new_event.setEndWithDuration(effective_time);
+                work_time_for_that_task -= effective_time;
+
+                //Log.d(tag, "   going to addEvent " + new_event.description());
+                addTaskEventWithoutChecking(new_event);
+            }
         }
-
+        task_duration.clear();
         sortEvents();
+    }
+
+    private void addTaskWithDuration(Task task, int work_time_for_that_task) {
+        boolean found = false;
+        for (TaskWithDuration twd : task_duration) {
+            if (twd.getTask() == task) {
+                twd.addDuration(work_time_for_that_task);
+                found = true;
+            }
+        }
+        if (!found) {
+            task_duration.add(new TaskWithDuration(task, work_time_for_that_task));
+        }
     }
 
     //return minutes which could not be distributed because of too less time!
@@ -507,14 +546,33 @@ public class Day implements Comparable {
 
     public void distributeTaskBlockTasks() {
         Log.d(tag, "distributeTaskBlockTasks: " + description());
-        for (int i = TaskBroContainer.getTaskBlocks().size() - 1; i >= 0; i--) { //start with the newest block
-            TaskBlock tb = TaskBroContainer.getTaskBlocks().get(i);
-            if (!tb.alreadyDistributed()) {
-                for (Task t : tb.getTasks()) {
-                    addTask(t);
+
+        int available_work_time = getAvailableWorkTime(false);
+        boolean not_all_distributed = true;
+
+        while (available_work_time > 0 && not_all_distributed) {
+            Log.d(tag, "1while_schleife... available_work_time = " + available_work_time + " not_all_distributed = " + not_all_distributed);
+            not_all_distributed = false;
+            for (int i = TaskBroContainer.getTaskBlocks().size() - 1; i >= 0; i--) { //start with the newest block
+                TaskBlock tb = TaskBroContainer.getTaskBlocks().get(i);
+                if (!tb.alreadyDistributed()) {
+                    not_all_distributed = true;
+                    tb.sortTasks();
+                    for (Task t : tb.getTasks()) {
+                        addTask(t);
+                    }
                 }
             }
+            available_work_time = getAvailableWorkTime(false) - this.already_distributed;
+            Log.d(tag, "2while_schleife... available_work_time = " + available_work_time + " not_all_distributed = " + not_all_distributed);
         }
+    }
+
+    private int getAvailableWorkTime(boolean set_worked) {
+        //Log.d(tag, "getAvailableWorkTime set_worked = " + set_worked);
+        int available_work_time = scheduler.getPossibleWorkTime();
+        available_work_time = checkAvailableWorkTime(available_work_time, set_worked);
+        return available_work_time;
     }
 
 
@@ -537,6 +595,13 @@ public class Day implements Comparable {
             }
         }
         return worked_time;
+    }
+
+    public boolean alreadyDistributed() {
+        return already_distributed_boolean;
+    }
+    public void alreadyDistributed(boolean value) {
+        this.already_distributed_boolean = value;
     }
 
 

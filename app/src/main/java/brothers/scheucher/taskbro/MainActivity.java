@@ -1,5 +1,7 @@
 package brothers.scheucher.taskbro;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer_layout;
     private static TextView potential_text_view;
     private static View potential_background;
+    private Context activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         potential_text_view = (TextView)(findViewById(R.id.potential));
         potential_background = findViewById(R.id.potential_background);
+        activity = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingDay.class);
+            Intent intent = new Intent(this, UserSettingActivity.class);
             startActivity(intent);
             return true;
         }
@@ -89,20 +93,60 @@ public class MainActivity extends AppCompatActivity
 
     public void handleClickOnDoneToggle(View view) {
         int id = (int) ((View)(view.getParent())).getTag(R.string.id);
-        MyEvent event = TaskBroContainer.getEvent(id);
+        final MyEvent event = TaskBroContainer.getEvent(id);
         Task task = event.getTask();
         ImageView event_done = (ImageView)view.findViewById(R.id.event_done);
         ImageView event_not_done = (ImageView)view.findViewById(R.id.event_not_done);
-        if (event.isNot_created_by_user()) {
-            event_done.setVisibility(ImageView.VISIBLE);
+        if (event.isNot_created_by_user()) {//user clicked on done...
+/*            event_done.setVisibility(ImageView.VISIBLE);
             event_not_done.setVisibility(ImageView.GONE);
             if (!task.hasRepeat()) {
                 task.setRemaining_duration(task.getRemaining_duration() - event.getDurationInMinutes());
+                task.save(this);
             }
-            task.save(this);
 
             event.setNot_created_by_user(false);
-            event.save(this);
+*/
+            if (event.getTask().hasRepeat()) {
+                WorkFinishedDialogRepeating wfdr = new WorkFinishedDialogRepeating(this, event.getTask(), event.getDurationInMinutes());
+                wfdr.setStart(event.getStart());
+                wfdr.setEnd(event.getEnd());
+                wfdr.show();
+
+                wfdr.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        WorkFinishedDialogRepeating wfdr = (WorkFinishedDialogRepeating) dialog;
+                        if (wfdr.was_ok) {
+                            event.delete(activity);
+                            TaskBroContainer.createCalculatingJob();
+                        }
+
+                    }
+                });
+
+            } else {
+                WorkFinishedDialog wfd = new WorkFinishedDialog(this, event.getTask(), event.getDurationInMinutes());
+                wfd.setStart(event.getStart());
+                wfd.setEnd(event.getEnd());
+                wfd.show();
+
+                wfd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        WorkFinishedDialog wfd = (WorkFinishedDialog) dialog;
+                        if (wfd.was_ok) {
+                            event.delete(activity);
+                            TaskBroContainer.createCalculatingJob();
+                        }
+                    }
+                });
+            }
+//            int duration = event.getDurationInMinutes();
+//            event.setEnd(new GregorianCalendar());
+//            event.setStartWithDuration(duration);
+//            event.save(this);
+//            Calender.notifyChanges();
         } else {
             event_done.setVisibility(ImageView.GONE);
             event_not_done.setVisibility(ImageView.VISIBLE);
@@ -113,7 +157,8 @@ public class MainActivity extends AppCompatActivity
 
             event.setNot_created_by_user(true);
             event.delete(this);
-                TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
+            TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
+            TaskBroContainer.createCalculatingJob();
         }
     }
 
@@ -166,7 +211,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SettingDay.class);
             startActivity(intent);
         } else if (view_id == R.id.nav_settings) {
-            Log.d(tag, "Settings clicked");
+            Intent intent = new Intent(this, UserSettingActivity.class);
+            startActivity(intent);
         }
 
     }
@@ -185,7 +231,7 @@ public class MainActivity extends AppCompatActivity
             potential_text_view.setText(Util.getFormattedPotentialShort(potential));
             Log.d(tag, "PotentialShortVersion= " + Util.getFormattedPotentialShort(potential));
             if (potential < 0) {
-                Util.setColorOfDrawable(potential_background, Settings.TEXT_COLOR_ATTENTION);
+                Util.setColorOfDrawable(potential_background, Settings.COLOR_ATTENTION);
             } else if(potential > 0) {
                 Util.setColorOfDrawable(potential_background, ContextCompat.getColor(TaskBroContainer.getContext(), R.color.accent_color));
             }

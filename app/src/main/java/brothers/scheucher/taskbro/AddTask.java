@@ -277,7 +277,6 @@ public class AddTask extends AppCompatActivity {
     }
 
     private void showDurationPicker() {
-
         duration_dialog.show();
     }
 

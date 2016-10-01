@@ -325,14 +325,7 @@ public class Task implements Comparable {
     }
 
     public Duration getWorkedTimeTillNow() {
-        int worked_minutes = 0;
-        for (MyEvent e : TaskBroContainer.getEvents()) {
-            if (this == e.getTask() && !e.isNot_created_by_user()) {
-                worked_minutes += e.getDurationInMinutes();
-            }
-        }
-        Duration duration = new Duration(worked_minutes);
-        return duration;
+        return TaskBroContainer.calculateWorkedTimeOfTask(this);
     }
 
     public View createTaskInListView(LayoutInflater inflater, LinearLayout parent) {
@@ -415,7 +408,6 @@ public class Task implements Comparable {
         this.done = done;
         if (done) {
             this.remaining_duration.setDuration(0);
-            TaskBroContainer.createCalculatingJob();
         }
     }
 

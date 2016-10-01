@@ -87,13 +87,7 @@ public class Label implements Comparable {
     }
 
     public ArrayList<Label> getChildLabels() {
-        ArrayList<Label> child_labels = new ArrayList<Label>();
-        for (Label l : TaskBroContainer.getLabels()) {
-            if (this.equals(l.parent)) {
-                child_labels.add(l);
-            }
-        }
-        return child_labels;
+        return TaskBroContainer.getChildLabelsOf(this);
     }
 
     public String description() {
@@ -210,11 +204,6 @@ public class Label implements Comparable {
     }
 
     public boolean checkIfLabelNameExists(String label_name_to_check) {
-        String check_text = label_name_to_check.trim();
-        for (Label l : TaskBroContainer.getLabels()) {
-            if (l.getName().equals(check_text) && l != this) {
-                return false;
-            }
-        }
-        return true;
-    }}
+        return TaskBroContainer.checkLabelName(this, label_name_to_check);
+    }
+}

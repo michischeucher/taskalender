@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +57,6 @@ public class Calender extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_go_to_now) {
-            Log.d(tag, "going to now...");
             Calender.goToNow();
             return true;
         }
@@ -68,7 +66,6 @@ public class Calender extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(tag, "### ### onCreateView Calender");
         super.onCreate(savedInstanceState);
         ll = (RelativeLayout) inflater.inflate(R.layout.activity_calender, container, false);
 
@@ -88,12 +85,10 @@ public class Calender extends Fragment {
 
     @Override
     public void onResume() {
-        Log.d(tag, "### ### onResume Calender");
         super.onResume();
     }
 
     public static void notifyChanges() {
-        Log.d(tag, "Calender: changeSomeValues");
         if (calender_pager_adapter != null) {
             calender_pager_adapter.notifyDataSetChanged();
         }
@@ -134,7 +129,6 @@ public class Calender extends Fragment {
 
         @Override
         public Fragment getItem(int i) {
-            //Log.d(tag, "Calender: CalenderPagerAdapter: getItem");
             fragment = new CalenderDayFragment();
             Bundle args = new Bundle();
             args.putInt("number", i);
@@ -151,13 +145,11 @@ public class Calender extends Fragment {
         @Override
         public void restoreState(Parcelable state, ClassLoader loader) {
             super.restoreState(state, loader);
-            Log.d(tag, "restored");
         }
 
 
         @Override
         public int getItemPosition(Object object) {
-            //Log.d(tag, "Calender: CalenderPagerAdapter: getItemPosition");
             return POSITION_NONE; //for updating all fragments, when notifyDatasetcahnge is called... :)
         }
     }
@@ -179,7 +171,6 @@ public class Calender extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Log.d(tag, "### ### onCreateView Adapter");
             this.inflater = inflater;
             calender_day = inflater.inflate(R.layout.calender_day, container, false);
             calender_day_events_tasks = (LinearLayout)(calender_day.findViewById(R.id.calender_day_events_tasks));
@@ -213,14 +204,11 @@ public class Calender extends Fragment {
                     } else {
                         day_view_scrolling.scrollTo(0, Calender.getScrollPosition());
                     }
-                    Log.d(tag, "on pre draw with scroll: " + Calender.getScrollPosition());
                     day_view_scrolling.getViewTreeObserver().removeOnPreDrawListener(this);
                     return true;
                 }
 
             });
-
-            //Log.d(tag, "number " + number + " + current_date_offset " + current_date_offset + " => " + Util.getFormattedDate(current_date));
 
             TextView calender_day_date_view = ((TextView) calender_day.findViewById(R.id.calender_day_date));
             TextView calender_day_of_week_view = ((TextView) calender_day.findViewById(R.id.calender_day_of_week));
@@ -245,12 +233,10 @@ public class Calender extends Fragment {
         private void drawEvents(GregorianCalendar date) {
             Day day = TaskBroContainer.getDay(date);
             if (day == null) {
-                day = TaskBroContainer.createDay(date);
+                day = TaskBroContainer.createDay(getActivity(), date);
             }
-            Log.d(tag, "Start drawing events for " + Util.getFormattedDate(date) + " #events today = " + day.getEvents().size());
 
-
-            TaskBroContainer.distributeTasksFromTaskBlocksTillDate(day.getStart());
+            TaskBroContainer.distributeTasksFromTaskBlocksTillDate(getActivity(), day.getStart());
 
 
             day.calculateBlocksAndColoumns();
@@ -260,7 +246,6 @@ public class Calender extends Fragment {
             day.drawEvents(calender_day_events_tasks, inflater);
             day.drawWholeDayEvents(height_container, top_container_events, inflater);
 
-            Log.d(tag, "Finished drawing events for " + Util.getFormattedDate(date) + "");
         }
 
         public static int calculateScrollposition(GregorianCalendar now) {

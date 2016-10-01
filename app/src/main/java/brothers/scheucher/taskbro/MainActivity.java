@@ -1,6 +1,6 @@
 package brothers.scheucher.taskbro;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,22 +26,23 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer_layout;
     private static TextView potential_text_view;
     private static View potential_background;
-    private Context activity;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        activity = this;
+
         potential_text_view = (TextView)(findViewById(R.id.potential));
         potential_background = findViewById(R.id.potential_background);
-        activity = this;
+        drawer_layout = ((DrawerLayout)findViewById(R.id.drawer_layout));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TaskBroContainer.startApplication(this);
+        TaskBroContainer.createStartApplicationJob(activity);
 
-        drawer_layout = ((DrawerLayout)findViewById(R.id.drawer_layout));
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -119,7 +120,6 @@ public class MainActivity extends AppCompatActivity
                         WorkFinishedDialogRepeating wfdr = (WorkFinishedDialogRepeating) dialog;
                         if (wfdr.was_ok) {
                             event.delete(activity);
-                            TaskBroContainer.createCalculatingJob();
                         }
 
                     }
@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity
                         WorkFinishedDialog wfd = (WorkFinishedDialog) dialog;
                         if (wfd.was_ok) {
                             event.delete(activity);
-                            TaskBroContainer.createCalculatingJob();
                         }
                     }
                 });
@@ -158,14 +157,13 @@ public class MainActivity extends AppCompatActivity
             event.setNot_created_by_user(true);
             event.delete(this);
             TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
-            TaskBroContainer.createCalculatingJob();
+            TaskBroContainer.createCalculatingJob(activity);
         }
     }
 
     public void handleClickOnEvent(View view) {
         int id = (int) view.getTag(R.string.id);
         boolean task_event = (boolean) view.getTag(R.string.task_event);
-        Log.d(tag, "handleClickOnEvent id = " + id + " task_event = " + task_event);
 
         Intent intent;
         Bundle b = new Bundle();
@@ -220,7 +218,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Log.d(tag, "click item..." + id);
         displayView(id);
         return true;
     }
@@ -229,7 +226,6 @@ public class MainActivity extends AppCompatActivity
         if (potential_text_view != null) {
             int potential = TaskBroContainer.getPotential();
             potential_text_view.setText(Util.getFormattedPotentialShort(potential));
-            Log.d(tag, "PotentialShortVersion= " + Util.getFormattedPotentialShort(potential));
             if (potential < 0) {
                 Util.setColorOfDrawable(potential_background, Settings.COLOR_ATTENTION);
             } else if(potential > 0) {

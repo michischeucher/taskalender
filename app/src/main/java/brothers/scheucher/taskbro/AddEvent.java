@@ -1,5 +1,6 @@
 package brothers.scheucher.taskbro;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -30,11 +31,13 @@ public class AddEvent extends AppCompatActivity {
     private TextView title_view;
     private TextView notice_view;
     private Switch blocking_switch;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
+        activity = this;
 
         Bundle b = getIntent().getExtras();
         int current_date_offset = 0;
@@ -108,7 +111,7 @@ public class AddEvent extends AppCompatActivity {
                     event.setInactive(true);
                     event.save(TaskBroContainer.getContext());
                 }
-                TaskBroContainer.createCalculatingJob();
+                TaskBroContainer.createCalculatingJob(activity);
                 finish();
             }
         });
@@ -169,7 +172,7 @@ public class AddEvent extends AppCompatActivity {
             event.save(this);
 
             TaskBroContainer.addEventToList(event);
-            TaskBroContainer.createCalculatingJob();
+            TaskBroContainer.createCalculatingJob(activity);
             finish();
             return true;
         }

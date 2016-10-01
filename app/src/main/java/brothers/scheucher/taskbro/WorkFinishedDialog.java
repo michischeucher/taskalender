@@ -149,7 +149,7 @@ public class WorkFinishedDialog extends Dialog {
                 event.setEndWithDuration(worked_duration.getDuration());
                 event.save(TaskBroContainer.getContext());
                 TaskBroContainer.addEventToList(event);
-                TaskBroContainer.createCalculatingJob();
+                TaskBroContainer.createCalculatingJob(activity);
                 was_ok = true;
                 dismiss();
             }

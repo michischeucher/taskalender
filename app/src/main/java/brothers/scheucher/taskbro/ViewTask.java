@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +42,6 @@ public class ViewTask extends ActionBarActivity {
         if (b != null) {
             id = b.getInt("id");
             task = TaskBroContainer.getTask(id);
-            Log.d(tag, "fetched task");
         } else {
             //there is no task to view
             finish();
@@ -60,7 +58,6 @@ public class ViewTask extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(tag, "new click");
                 toggleButtonOptions(button);
             }
         });
@@ -69,7 +66,6 @@ public class ViewTask extends ActionBarActivity {
         all_finished.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(tag, "all_finished clicked");
                 if (task.isDone()) {
                     task.setDone(false);
                 } else {
@@ -77,6 +73,7 @@ public class ViewTask extends ActionBarActivity {
                 }
                 task.save(TaskBroContainer.getContext());
                 toggleButtonOptions(button);
+                TaskBroContainer.createCalculatingJob(activity);
                 finish();
             }
         });
@@ -85,7 +82,6 @@ public class ViewTask extends ActionBarActivity {
         part_finished.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(tag, "part_finished clicked");
                 toggleButtonOptions(button);
                 if (task.hasRepeat()) {
                     WorkFinishedDialogRepeating wfdr = new WorkFinishedDialogRepeating(activity, task, task.getRemaining_duration());
@@ -93,7 +89,6 @@ public class ViewTask extends ActionBarActivity {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
                             WorkFinishedDialogRepeating wfdr = (WorkFinishedDialogRepeating)dialog;
-                            Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
                             if (wfdr.was_ok) {
                                 finish();
                             }
@@ -101,25 +96,23 @@ public class ViewTask extends ActionBarActivity {
                     });
                     wfdr.show();
                 } else {
-                    Dialog dialog = new WorkFinishedDialog(activity, task, 35);
-                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    Dialog wfd = new WorkFinishedDialog(activity, task, 35);
+                    wfd.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            WorkFinishedDialog wfd = (WorkFinishedDialog)dialog;
-                            Log.d(tag, "Arbeitseinheit eingetragen, fertig! :)");
+                            WorkFinishedDialog wfd = (WorkFinishedDialog) dialog;
                             if (wfd.was_ok) {
                                 finish();
                             }
                         }
                     });
-                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    wfd.setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
-                            Log.d(tag, "Arbeitseintragen => ABGEBROCHEN...");
                         }
                     });
 
-                    dialog.show();
+                    wfd.show();
                 }
 
             }
@@ -129,7 +122,6 @@ public class ViewTask extends ActionBarActivity {
         edit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(tag, "edit_button clicked");
                 Intent intent = new Intent(context, AddTask.class);
                 Bundle b = new Bundle();
                 b.putInt("id", task.getId()); //Your id
@@ -144,7 +136,6 @@ public class ViewTask extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         if (TaskBroContainer.getTask(id) == null) {
-            Log.d(tag, "Task doesn't exist anymore...");
             finish();
         } else {
             fillFieldsBecauseOfData();

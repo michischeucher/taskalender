@@ -1,15 +1,12 @@
 package brothers.scheucher.taskbro;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.TimeZone;
@@ -38,8 +35,7 @@ public class MyCalendarProvider {
     private static final int PROJECTION_CALENDAR_ID_INDEX = 7;
     private static final int PROJECTION_CALENDAR_DISPLAY_NAME_INDEX = 8;
 
-    public static ArrayList<MyEvent> getEvents(long startMillis, long endMillis) {
-
+    public static ArrayList<MyEvent> getEvents(Activity activity, long startMillis, long endMillis) {
         Cursor cursor =
                 CalendarContract.Instances.query(TaskBroContainer.getContext().getContentResolver(), projection, startMillis, endMillis);
 
@@ -65,7 +61,6 @@ public class MyCalendarProvider {
             calender_id = cursor.getInt(PROJECTION_CALENDAR_ID_INDEX);
             calender_name = cursor.getString(PROJECTION_CALENDAR_DISPLAY_NAME_INDEX);
 
-            Log.d(tag, "Title: " + title + " from: " + beginVal + " to " + endVal + " id: " + id + " all_day = " + all_day);
             MyEvent new_event = new MyEvent(TaskBroContainer.getNewEventID());
             new_event.setName(title);
             new_event.getStart().setTimeInMillis(beginVal);
@@ -103,7 +98,7 @@ public class MyCalendarProvider {
         values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());// event_to_save.getStart().getTimeZone().getID());
         //values.put(CalendarContract.Events.EVENT_END_TIMEZONE, TimeZone.getDefault().getID());// event_to_save.getStart().getTimeZone().getID());
 
-        if (ActivityCompat.checkSelfPermission(TaskBroContainer.getContext(), Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+//        if (ActivityCompat.checkSelfPermission(TaskBroContainer.getContext(), Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -111,9 +106,9 @@ public class MyCalendarProvider {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            Log.d(tag, "ERROR: Permission missing");
-            return;
-        }
+  //          Log.d(tag, "ERROR: Permission missing");
+  //          return;
+   //     }
         Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event_to_save.getExternID());
         cr.update(uri, values, null, null);
     }

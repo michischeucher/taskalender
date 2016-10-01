@@ -85,7 +85,6 @@ public class Day implements Comparable {
         if (!this.events.contains(event_to_add)) {
             for (MyEvent e : this.events) {
                 if (e.getExternID() != -1 && e.getExternID() == event_to_add.getExternID()) {
-                    //Log.d(tag, "addEvent: already exists, externID-proof!!!" + event_to_add.description());
                     return;
                 }
             }
@@ -93,13 +92,12 @@ public class Day implements Comparable {
 
             if (event_to_add.isBlocking()) {
                 this.scheduler.addBlockingTime(event_to_add.getStart(), event_to_add.getEnd());
-            }//            Log.d(tag, "addEvent: Event hinzugefügt... " + event_to_add.description());
-        }// else { Log.d(tag, "addEvent: already exists..." + event_to_add.description());}
+            }
+        }
     }
 
     private void addTaskEventWithoutChecking(MyEvent new_event) {
         events.add(new_event);
-        //Log.d(tag, "addTaskEventWithoutChecking: " + new_event.description());
         if (new_event.isBlocking()) {
             scheduler.addBlockingTime(new_event.getStart(), new_event.getEnd());
         }
@@ -115,7 +113,6 @@ public class Day implements Comparable {
     }
 
     public int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
-        Log.d(tag, "getPossibleWorkTime ");
         int sum_work_time = 0;
 
         TimeObj dates_to_check = new TimeObj(start_date, end_date);
@@ -127,16 +124,13 @@ public class Day implements Comparable {
             }
         }
 
-        Log.d(tag, "getPossibleWorkTime for " + description() + " worktime=" + sum_work_time);
         sum_work_time = checkAvailableWorkTime(sum_work_time, set_worked);
 
-        Log.d(tag, "getPossibleWorkTime for " + description() + " worktime after checking=" + sum_work_time);
         return sum_work_time;
     }
 
     private int checkAvailableWorkTime(int available_work_time, boolean set_worked) {
         int already_worked = calculateWorkedTime();
-        //Log.d(tag, description() + " already worked = " + already_worked);
         int difference = day_settings.getTotalDurationInMinutes() - already_worked;
         if (set_worked) {
             difference -= this.already_distributed;
@@ -162,19 +156,15 @@ public class Day implements Comparable {
         DayScheduler scheduler = new DayScheduler(this.start);
         scheduler.addBlockingTime(this.start, 0, day_settings.getEarliest_minute());
         scheduler.addBlockingTime(this.start, day_settings.getLatest_minute(), 24 * 60);
-        synchronized (TaskBroContainer.getContext()) {
-            for (MyEvent e : this.events) {
-                if (e.isBlocking()) {
-                    scheduler.addBlockingTime(e.getStart(), e.getEnd());
-                }
+        for (MyEvent e : this.events) {
+            if (e.isBlocking()) {
+                scheduler.addBlockingTime(e.getStart(), e.getEnd());
             }
         }
         return 24 * 60 - scheduler.getPossibleWorkTime() - day_settings.getEarliest_minute() - (24 * 60 - day_settings.getLatest_minute());
-
     }
 
     public void addTask(Task task) {
-        Log.d(tag, "addTask: " + task.description() + " to day: " + this.description());
         if (task.already_distributed_duration == task.getRemaining_duration()) {
             //dont need more time...
             return;
@@ -193,18 +183,15 @@ public class Day implements Comparable {
             task.already_distributed_duration += work_time_for_that_task;
         }
         this.already_distributed += work_time_for_that_task;
-        Log.d(tag, "already_distributed is now = " + already_distributed + " because of work_time_for_that_task = " + work_time_for_that_task);
 
         addTaskWithDuration(task, work_time_for_that_task);
     }
 
     public void createTaskEventsBecauseOfTaskDurations() {
         Collections.sort(task_duration);
-        Log.d(tag, "TaskWithDuration start for day: " + this.description());
         for (TaskWithDuration twd : task_duration) {
             Task task = twd.getTask();
             int work_time_for_that_task = twd.getDurationInMinutes();
-            Log.d(tag, "TaskWithDuration: " + twd.description());
 
             while(work_time_for_that_task > 0) {
                 TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
@@ -221,7 +208,6 @@ public class Day implements Comparable {
                 new_event.setEndWithDuration(effective_time);
                 work_time_for_that_task -= effective_time;
 
-                //Log.d(tag, "   going to addEvent " + new_event.description());
                 addTaskEventWithoutChecking(new_event);
             }
         }
@@ -251,7 +237,6 @@ public class Day implements Comparable {
 
         while(work_time_for_that_task > 0) {
             int available_work_time = checkAvailableWorkTime(work_time_for_that_task, false);
-            Log.d(tag, "repeating available_work_time = " + available_work_time);
 
             TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
             if (free_slot == null || available_work_time == 0) {
@@ -272,7 +257,6 @@ public class Day implements Comparable {
             work_time_for_that_task -= effective_time;
 
 
-            Log.d(tag, "   going to addEvent " + new_event.description());
             addTaskEventWithoutChecking(new_event);
         }
 
@@ -315,7 +299,6 @@ public class Day implements Comparable {
                     ret += System.getProperty("line.separator");
                 }
                 ret += Util.getFormattedDateTimeToDateTime(tb.getStart(), tb.getEnd()) + ": " + Util.getFormattedPotential(tb.getPotential());
-                //Log.d(tag, "Potential found " + tb.getPotential() + " in block " + tb.description());
                 found = true;
             }
         }
@@ -335,7 +318,6 @@ public class Day implements Comparable {
 
         for (MyEvent e : this.events) {
             if (e.getDurationInMinutes() >= 60 * 24 || e.isAll_day()) {
-                //Log.d(tag, "Event is over the whole day: " + e.description());
                 events_whole_day.add(e);
                 continue;
             }
@@ -361,11 +343,6 @@ public class Day implements Comparable {
             //resetting the right value afterwards
             e.setEndWithDuration(duration);
         }
-
-        /*for (Block b : this.event_blocks) {
-            Log.d(tag, b.description());
-            b.printColumns();
-        }*/
     }
 
     public void drawEvents(LinearLayout calender_day_events_tasks, LayoutInflater inflater) {
@@ -376,7 +353,6 @@ public class Day implements Comparable {
         LinearLayout event;
 
         GregorianCalendar last_block_end = (GregorianCalendar) this.start.clone();
-        Log.d(tag, "draw events for " + description());
         //draw events in that day
         for (Block b : this.event_blocks) {
             if (Util.earlierDate(last_block_end, b.getStart())) {
@@ -395,12 +371,10 @@ public class Day implements Comparable {
             for (Column c : b.getColumns()) {
                 event_coloumn = (LinearLayout) inflater.inflate(R.layout.event_coloumn, event_block, false);
                 event_coloumn.setWeightSum(b.getDuration());
-                Log.d(tag, "coloumn duration = " + b.getDuration());
                 event_block.addView(event_coloumn);
 
                 GregorianCalendar last_event_end = (GregorianCalendar) b.getStart().clone();
                 for (MyEvent e : c.getEvents()) {
-                    Log.d(tag, e.description());
                     if (Util.earlierDate(last_event_end, e.getStart())) {
                         //create empty event...
                         event = (LinearLayout) inflater.inflate(R.layout.event_empty, event_coloumn, false);
@@ -452,10 +426,6 @@ public class Day implements Comparable {
                 }
             }
         }
-
-        Log.d(tag, "finished drawing events for " + description());
-
-
     }
 
     public void drawWholeDayEvents(LinearLayout height_container, LinearLayout top_container_events, LayoutInflater inflater) {
@@ -545,31 +515,17 @@ public class Day implements Comparable {
     }
 
     public void distributeTaskBlockTasks() {
-        Log.d(tag, "distributeTaskBlockTasks: " + description());
-
         int available_work_time = getAvailableWorkTime(false);
-        boolean not_all_distributed = true;
+        boolean all_distributed = false;
 
-        while (available_work_time > 0 && not_all_distributed) {
-            Log.d(tag, "1while_schleife... available_work_time = " + available_work_time + " not_all_distributed = " + not_all_distributed);
-            not_all_distributed = false;
-            for (int i = TaskBroContainer.getTaskBlocks().size() - 1; i >= 0; i--) { //start with the newest block
-                TaskBlock tb = TaskBroContainer.getTaskBlocks().get(i);
-                if (!tb.alreadyDistributed()) {
-                    not_all_distributed = true;
-                    tb.sortTasks();
-                    for (Task t : tb.getTasks()) {
-                        addTask(t);
-                    }
-                }
-            }
+        while (available_work_time > 0 && !all_distributed) {
+            Log.d(tag, "while-schleife...");
+            all_distributed = TaskBroContainer.fillDayWithTasks(this);
             available_work_time = getAvailableWorkTime(false) - this.already_distributed;
-            Log.d(tag, "2while_schleife... available_work_time = " + available_work_time + " not_all_distributed = " + not_all_distributed);
         }
     }
 
     private int getAvailableWorkTime(boolean set_worked) {
-        //Log.d(tag, "getAvailableWorkTime set_worked = " + set_worked);
         int available_work_time = scheduler.getPossibleWorkTime();
         available_work_time = checkAvailableWorkTime(available_work_time, set_worked);
         return available_work_time;

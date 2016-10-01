@@ -1,5 +1,6 @@
 package brothers.scheucher.taskbro;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -36,6 +37,7 @@ public class AddTask extends AppCompatActivity {
     private int selected_item_repeat = 4;
 
     DurationPickerDialog duration_dialog;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class AddTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         ActionBar actionBar = getSupportActionBar();
+        activity = this;
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -269,7 +272,7 @@ public class AddTask extends AppCompatActivity {
                 //TaskBroContainer.deleteTaskFromList(task);
                 task.setInactive(true);
                 task.save(TaskBroContainer.getContext());
-                TaskBroContainer.createCalculatingJob();
+                TaskBroContainer.createCalculatingJob(activity);
                 finish();
             }
         });
@@ -334,7 +337,7 @@ public class AddTask extends AppCompatActivity {
 
             task.save(this);
             TaskBroContainer.addTaskToList(task);
-            TaskBroContainer.createCalculatingJob();
+            TaskBroContainer.createCalculatingJob(activity);
 
 //            MyNotifications.setAlarmNotification(this);
 //            MyNotifications.createNotification(this);

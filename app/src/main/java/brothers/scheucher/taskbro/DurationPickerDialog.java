@@ -1,7 +1,6 @@
 package brothers.scheucher.taskbro;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -10,7 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class DurationPickerDialog extends Dialog {
+public class DurationPickerDialog extends android.support.v7.app.AppCompatDialog {
 
     private static final String tag = "DurationPickerDialog";
     private static final int HOURS = 12;
@@ -42,6 +41,7 @@ public class DurationPickerDialog extends Dialog {
         this.duration_current = new Duration(duration_result.getDuration());
         this.duration_max_set = false;
         this.duration_min_set = false;
+
     }
 
     public void setMaxValue(int max_value_hours, int max_value_minutes) {

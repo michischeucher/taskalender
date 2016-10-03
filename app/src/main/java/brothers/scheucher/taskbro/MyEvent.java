@@ -330,7 +330,7 @@ public class MyEvent implements Comparable {
         if (this.task != null) {
             return this.task.getColor();
         } else {
-            return Util.getRandomColor();
+            return 0x009688;//Util.getRandomColor();
         }
     }
 

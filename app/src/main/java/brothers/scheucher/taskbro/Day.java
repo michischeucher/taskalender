@@ -30,6 +30,26 @@ public class Day implements Comparable {
     private int already_distributed; //just for calculation
     private boolean already_distributed_boolean;
 
+    public void resetForCalculation() {
+        this.already_distributed = 0;
+        this.already_distributed_boolean = false;
+
+        this.scheduler = new DayScheduler(this.start);
+        GregorianCalendar now = new GregorianCalendar();
+        if (Util.isSameDate(this.start, now)) {
+            //if today: past is not possible...!
+            GregorianCalendar today_start = new GregorianCalendar();
+            Util.setTime(today_start, 0, 0);
+            scheduler.addBlockingTime(today_start, now);
+        } else if (Util.earlierDate(this.start, now)) {
+            scheduler.addBlockingTime(this.start, 0, 60*24);
+        }
+
+        for (MyEvent e : events) {
+            scheduler.addBlockingTime(e.getStart(), e.getEnd());
+        }
+    }
+
 
     public Day(GregorianCalendar date) {
         this.start = (GregorianCalendar)date.clone();
@@ -66,7 +86,6 @@ public class Day implements Comparable {
         }
         this.already_distributed = 0;
         this.already_distributed_boolean = false;
-
     }
 
     public GregorianCalendar getStart() {
@@ -405,11 +424,12 @@ public class Day implements Comparable {
                         if (e.isNot_created_by_user()) {
                             ImageView not_done_indicator = (ImageView)event.findViewById(R.id.event_not_done);
                             not_done_indicator.setVisibility(View.VISIBLE);
+                            Util.setColorOfDrawable(event, e.getColor() | 0xA0000000);
                         } else {
                             ImageView done_indicator = (ImageView)event.findViewById(R.id.event_done);
                             done_indicator.setVisibility(View.VISIBLE);
+                            Util.setColorOfDrawable(event, e.getColor() | 0xFF000000);
                         }
-                        Util.setColorOfDrawable(event, e.getColor() | 0xA0000000);
                     } else {
                         event.setTag(R.string.task_event, false);
                         event.setTag(R.string.id, e.getId());
@@ -559,6 +579,7 @@ public class Day implements Comparable {
     public void alreadyDistributed(boolean value) {
         this.already_distributed_boolean = value;
     }
+
 
 
     private class Block {

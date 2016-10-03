@@ -1,8 +1,11 @@
 package brothers.scheucher.taskbro;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -11,12 +14,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity
@@ -41,8 +44,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TaskBroContainer.createStartApplicationJob(activity);
-
+        TaskBroContainer.initApplication(activity);
+        checkPermissionAndStartApplication();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -55,6 +58,29 @@ public class MainActivity extends AppCompatActivity
         //first fragment
         displayView(R.id.nav_day);
         navigationView.setCheckedItem(R.id.nav_day);
+    }
+
+    private void checkPermissionAndStartApplication() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[]{Manifest.permission.READ_CALENDAR}, TaskBroContainer.PERMISSIONS_REQUEST_READ_CALENDER);
+            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+        } else {
+            StartApplicationAsync start_app_async = new StartApplicationAsync();
+            start_app_async.execute(activity);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == TaskBroContainer.PERMISSIONS_REQUEST_READ_CALENDER) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission is granted
+                checkPermissionAndStartApplication();
+            } else {
+                Toast.makeText(this, "Until you grant the permission, we canot display the names", Toast.LENGTH_SHORT).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -86,6 +112,15 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, UserSettingActivity.class);
             startActivity(intent);
+            return true;
+        } else if (id == R.id.action_calc_days) {
+            TaskBroContainer.createCalculatingJob(this);
+            return true;
+        } else if (id == R.id.action_calc_days_synchron) {
+            TaskBroContainer.calculateDays(activity);
+            Calender.notifyChanges();
+            MainActivity.notifyChanges();
+            PotentialActivity.notifyChanges();
             return true;
         }
 
@@ -206,7 +241,7 @@ public class MainActivity extends AppCompatActivity
             //transaction.addToBackStack("Labels shown");
             transaction.replace(R.id.fragment_container, fragment).commit();
         } else if (view_id == R.id.nav_day_settings) {
-            Intent intent = new Intent(this, SettingDay.class);
+            Intent intent = new Intent(this, DaySetting.class);
             startActivity(intent);
         } else if (view_id == R.id.nav_settings) {
             Intent intent = new Intent(this, UserSettingActivity.class);

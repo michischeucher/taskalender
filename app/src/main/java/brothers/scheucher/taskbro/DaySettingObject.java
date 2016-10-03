@@ -199,7 +199,7 @@ public class DaySettingObject {
     }
 
     public boolean[] getWorkingDaysBoolean() {
-        boolean[] ret_val = new boolean[SettingDay.NUM_DAYS_OF_WEEK];
+        boolean[] ret_val = new boolean[DaySetting.NUM_DAYS_OF_WEEK];
         for (int i = 0; i < ret_val.length; i++) {
             if (working_days.contains(i)) {
                 ret_val[i] = true;

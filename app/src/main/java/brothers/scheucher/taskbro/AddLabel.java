@@ -209,7 +209,9 @@ public class AddLabel extends AppCompatActivity {
             }
             label.setName(label_name);
             label.save(this);
+            Log.d(tag, "vor adden");
             TaskBroContainer.addLabelToList(label);
+            Log.d(tag, "nach adden");
             finish();
             return true;
         }

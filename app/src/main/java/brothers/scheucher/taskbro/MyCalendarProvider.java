@@ -1,11 +1,14 @@
 package brothers.scheucher.taskbro;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.CalendarContract;
 
 import java.util.ArrayList;
@@ -34,52 +37,64 @@ public class MyCalendarProvider {
     private static final int PROJECTION_DISPLAY_COLOR_INDEX = 6;
     private static final int PROJECTION_CALENDAR_ID_INDEX = 7;
     private static final int PROJECTION_CALENDAR_DISPLAY_NAME_INDEX = 8;
+    private static int PERMISSIONS_REQUEST_READ_CALENDER;
 
     public static ArrayList<MyEvent> getEvents(Activity activity, long startMillis, long endMillis) {
-        Cursor cursor =
-                CalendarContract.Instances.query(TaskBroContainer.getContext().getContentResolver(), projection, startMillis, endMillis);
-
         ArrayList<MyEvent> events = new ArrayList<>();
 
-        while (cursor.moveToNext()) {
-            long id = -1;
-            String title = null;
-            long beginVal = 0;
-            long endVal = 0;
-            int all_day = 0;
-            int color = 0;
-            int calender_id;
-            String calender_name;
-
-            // Get the field values
-            id = cursor.getLong(PROJECTION_ID_INDEX);
-            beginVal = cursor.getLong(PROJECTION_BEGIN_INDEX);
-            endVal = cursor.getLong(PROJECTION_END_INDEX);
-            title = cursor.getString(PROJECTION_TITLE_INDEX);
-            all_day = cursor.getInt(PROJECTION_ALL_DAY_INDEX);
-            color = cursor.getInt(PROJECTION_DISPLAY_COLOR_INDEX);
-            calender_id = cursor.getInt(PROJECTION_CALENDAR_ID_INDEX);
-            calender_name = cursor.getString(PROJECTION_CALENDAR_DISPLAY_NAME_INDEX);
-
-            MyEvent new_event = new MyEvent(TaskBroContainer.getNewEventID());
-            new_event.setName(title);
-            new_event.getStart().setTimeInMillis(beginVal);
-            new_event.getEnd().setTimeInMillis(endVal);
-            new_event.checkBlocking();
-            new_event.setExternID(id);
-            new_event.setColor(color);
-            new_event.setCalendarID(calender_id);
-            new_event.setCalendarName(calender_name);
-
-            if (all_day > 0) {
-                new_event.setAllDay(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[]{Manifest.permission.READ_CALENDAR}, PERMISSIONS_REQUEST_READ_CALENDER);
+            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+        } else {
+            // Android version is lesser than 6.0 or the permission is already granted.
+            Cursor cursor =
+                    CalendarContract.Instances.query(TaskBroContainer.getContext().getContentResolver(), projection, startMillis, endMillis);
+            if (cursor == null) {
+                return events;
             }
 
-            events.add(new_event);
+            while (cursor.moveToNext()) {
+                long id = -1;
+                String title = null;
+                long beginVal = 0;
+                long endVal = 0;
+                int all_day = 0;
+                int color = 0;
+                int calender_id;
+                String calender_name;
+
+                // Get the field values
+                id = cursor.getLong(PROJECTION_ID_INDEX);
+                beginVal = cursor.getLong(PROJECTION_BEGIN_INDEX);
+                endVal = cursor.getLong(PROJECTION_END_INDEX);
+                title = cursor.getString(PROJECTION_TITLE_INDEX);
+                all_day = cursor.getInt(PROJECTION_ALL_DAY_INDEX);
+                color = cursor.getInt(PROJECTION_DISPLAY_COLOR_INDEX);
+                calender_id = cursor.getInt(PROJECTION_CALENDAR_ID_INDEX);
+                calender_name = cursor.getString(PROJECTION_CALENDAR_DISPLAY_NAME_INDEX);
+
+                MyEvent new_event = new MyEvent(TaskBroContainer.getNewEventID());
+                new_event.setName(title);
+                new_event.getStart().setTimeInMillis(beginVal);
+                new_event.getEnd().setTimeInMillis(endVal);
+                new_event.checkBlocking();
+                new_event.setExternID(id);
+                new_event.setColor(color);
+                new_event.setCalendarID(calender_id);
+                new_event.setCalendarName(calender_name);
+
+                if (all_day > 0) {
+                    new_event.setAllDay(true);
+                }
+
+                events.add(new_event);
+            }
         }
 
         return events;
     }
+
+
 
     public static void saveEvent(MyEvent event_to_save) {
         if (event_to_save.getExternID() == -1) {

@@ -12,7 +12,7 @@ public class Settings {
     public static final int COLOR_ATTENTION = 0xFFFF0000;
     public static final int COLOR_PERFECT = 0xFF00B000;
 
-    public static final int DAYS_TO_LOOK_FORWARD = 7;
+    private static final int DAYS_TO_LOOK_FORWARD = 7;
 
     public static int getPause_before_event() {
         return pause_before_event;
@@ -35,4 +35,9 @@ public class Settings {
     public static int getDeadlineMinuteIfDateSet() {
         return UserSettings.getDeadlineMinuteIfDateSet();
     }
+
+    public static int getDaysToLookForward() {
+        return DAYS_TO_LOOK_FORWARD;
+    }
+
 }

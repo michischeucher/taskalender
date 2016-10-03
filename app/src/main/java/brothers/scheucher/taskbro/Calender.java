@@ -236,7 +236,7 @@ public class Calender extends Fragment {
                 day = TaskBroContainer.createDay(getActivity(), date);
             }
 
-            TaskBroContainer.distributeTasksFromTaskBlocksTillDate(getActivity(), day.getStart());
+            //TaskBroContainer.distributeTasksFromTaskBlocksTillDate(getActivity(), day.getStart());
 
 
             day.calculateBlocksAndColoumns();

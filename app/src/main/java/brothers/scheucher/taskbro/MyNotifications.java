@@ -36,7 +36,7 @@ public class MyNotifications {
         PendingIntent pending_new_task = PendingIntent.getActivity(context, 0, new_task, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.addAction(R.drawable.abc_btn_check_to_on_mtrl_000, "Neue Aufgabe", pending_new_task);
 
-        Intent intent_on_click = new Intent(context, SettingDay.class);
+        Intent intent_on_click = new Intent(context, DaySetting.class);
         PendingIntent pending_intent = PendingIntent.getActivity(context, 0, intent_on_click, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pending_intent);
         NotificationManager notification_manager = (NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);

@@ -6,6 +6,9 @@
 
         <item name="android:actionBarStyle" tools:ignore="NewApi">@style/MyActionBar</item>
         <item name="actionBarStyle">@style/MyActionBar</item>
+
+        <item name="android:alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
+
     </style>
 
 

@@ -47,8 +47,11 @@ public class TaskBroContainer {
 
     public static float scale_factor;
 
+    public static int PERMISSIONS_REQUEST_READ_CALENDER;
 
-    public static void createStartApplicationJob(Activity activity) {
+
+
+    public static void initApplication(Activity activity) {
         context = activity;
         if (events != null) {
             return;
@@ -76,9 +79,6 @@ public class TaskBroContainer {
 
         scale_factor = 1.0f;
 
-
-        StartApplicationAsync start_app_async = new StartApplicationAsync();
-        start_app_async.execute(activity);
     }
 
     public static void startApplication(Activity activity) {
@@ -93,7 +93,6 @@ public class TaskBroContainer {
 
         UserSettings.getAllSharedPreferencesOfUserSettings();
 
-        TaskBroContainer.createCalculatingJob(activity);
     }
 
     public static void createCalculatingJob(Activity activity) {
@@ -105,6 +104,7 @@ public class TaskBroContainer {
         MainActivity.notifyChanges();
         PotentialActivity.notifyChanges();
 */
+
     }
 
 
@@ -341,6 +341,7 @@ public class TaskBroContainer {
 
     public static void addLabelToList(Label new_label) {
         labels_lock.writeLock().lock();
+        Log.d(tag, "in lock");
         if (!labels.contains(new_label)) {
             labels.add(new_label);
         }
@@ -593,6 +594,11 @@ public class TaskBroContainer {
             repeating_tasks.clear();
         repeating_tasks_lock.writeLock().unlock();
 
+        days_lock.writeLock().lock();
+            days.clear();
+        days_lock.writeLock().unlock();
+
+
     }
 
     public static void calculateBlocks(Activity activity) {
@@ -719,8 +725,6 @@ public class TaskBroContainer {
 
         resetForCalculation();
         calculateBlocks(activity);
-
-        days.clear();
         calculatePotentialOfBlocks(activity);
 
         task_blocks_lock.writeLock().lock();
@@ -732,12 +736,13 @@ public class TaskBroContainer {
 
         //create all Days till last day saved, if not already created
         GregorianCalendar latest_date = new GregorianCalendar();
-        for (Day d : days) {
-            if (Util.earlierDate(latest_date, d.getStart())) {
-                latest_date = (GregorianCalendar)d.getStart().clone();
+        for (Task t : tasks) {
+            if (Util.earlierDate(latest_date, t.getDeadline())) {
+                latest_date = (GregorianCalendar)t.getDeadline().clone();
             }
         }
-        //distributeTasksFromTaskBlocksTillDate(latest_date);
+        latest_date.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
+        distributeTasksFromTaskBlocksTillDate(activity, latest_date);
     }
 
     //DEBUGGING
@@ -775,7 +780,7 @@ public class TaskBroContainer {
 
     public static void distributeTasksFromTaskBlocksTillDate(Activity activity, GregorianCalendar latest_date) {
         GregorianCalendar date_in_future = (GregorianCalendar)latest_date.clone();
-        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.DAYS_TO_LOOK_FORWARD);
+        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
 
         for (GregorianCalendar date : Util.getListOfDates(new GregorianCalendar(), date_in_future)) {
             if (TaskBroContainer.getDay(date) == null) {
@@ -783,15 +788,17 @@ public class TaskBroContainer {
             }
         }
 
-        Collections.sort(days);
-        for (int i = 0; i < (days.size() - Settings.DAYS_TO_LOOK_FORWARD); i++) {
-            Day day = days.get(i);
-            if (!day.alreadyDistributed()) {
-                day.distributeTaskBlockTasks();
-                day.createTaskEventsBecauseOfTaskDurations();
-                day.alreadyDistributed(true);
+        days_lock.writeLock().lock();
+            Collections.sort(days);
+            for (int i = 0; i < (days.size() - Settings.getDaysToLookForward()); i++) {
+                Day day = days.get(i);
+                if (!day.alreadyDistributed()) {
+                    day.distributeTaskBlockTasks();
+                    day.createTaskEventsBecauseOfTaskDurations();
+                    day.alreadyDistributed(true);
+                }
             }
-        }
+        days_lock.writeLock().unlock();
     }
 
     public static Day getLatestDay() {
@@ -842,6 +849,7 @@ public class TaskBroContainer {
                 return false;
             }
         }
+        labels_lock.readLock().unlock();
         return true;
     }
 
@@ -857,4 +865,5 @@ public class TaskBroContainer {
 
         return ret;
     }
+
 }

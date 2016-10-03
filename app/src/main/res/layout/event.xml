@@ -9,6 +9,8 @@
     android:onClick="handleClickOnEvent"
     android:background="@drawable/rounded_corners"
     android:orientation="horizontal"
+    android:layout_marginRight="1.5dp"
+    android:layout_marginBottom="1.5dp"
     >
     <TextView
         android:id="@+id/event_name"

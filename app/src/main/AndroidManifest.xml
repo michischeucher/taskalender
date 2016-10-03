@@ -47,7 +47,7 @@
                 android:value="brothers.scheucher.taskbro.MainActivity" />
         </activity>
         <activity
-            android:name="brothers.scheucher.taskbro.SettingDay"
+            android:name=".DaySetting"
             android:label="Einstellungen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

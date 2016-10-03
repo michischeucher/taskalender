@@ -325,21 +325,33 @@ public class Util {
 
     public static String getFormattedPotentialShort(int minutes) {
         String ret = "";
+        boolean is_negative = false;
         if (minutes == 0) {
             return "0 Min";
         }
         if (minutes < 0) {
             ret += "-";
             minutes *= (-1);
+            is_negative = true;
         }
         int duration_weeks = minutes / (60 * 24 * 7);
         int duration_days = minutes / (60 * 24);
         int duration_hours = minutes / 60;
+
         if (duration_weeks != 0) {
+            if (is_negative && (duration_days > 0 || duration_hours > 0)) {
+                duration_weeks++;
+            }
             ret += duration_weeks + " Wo.";
         } else if (duration_days != 0) {
+            if (is_negative && duration_hours > 0) {
+                duration_days++;
+            }
             ret += duration_days + " T";
         } else if (duration_hours != 0) {
+            if (is_negative && (minutes % 60) > 0) {
+                duration_hours++;
+            }
             ret += duration_hours + " Std";
         } else {
             ret += minutes + " Min";

@@ -21,8 +21,8 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
-public class SettingDay extends ActionBarActivity {
-    private static final String tag = "SettingDay";
+public class DaySetting extends ActionBarActivity {
+    private static final String tag = "DaySetting";
     private Context context;
     private PieChart setting_day_chart;
     private TextView duration_view;
@@ -71,10 +71,10 @@ public class SettingDay extends ActionBarActivity {
         duration_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DurationPickerDialog duration_dialog = new DurationPickerDialog(SettingDay.this, duration_view, day_setting.getTotal_duration());
+                DurationPickerDialog duration_dialog = new DurationPickerDialog(DaySetting.this, duration_view, day_setting.getTotal_duration());
                 duration_dialog.setMaxValue(24, 0);
                 duration_dialog.setDuration_min(sum_distributed_duration);
-                duration_dialog.setTitle("Zeit Pro Tag");
+                duration_dialog.setTitle("Gesamtarbeitszeit Pro Tag");
                 duration_dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
@@ -149,6 +149,7 @@ public class SettingDay extends ActionBarActivity {
                                 Log.d(tag, "cancelled");
                             }
                         });
+                builder.setTitle("Arbeitstage");
                 builder.show();
             }
         });
@@ -176,9 +177,9 @@ public class SettingDay extends ActionBarActivity {
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DurationPickerDialog duration_picker = new DurationPickerDialog(SettingDay.this, duration_value_view, label_duration);
+                    DurationPickerDialog duration_picker = new DurationPickerDialog(DaySetting.this, duration_value_view, label_duration);
                     duration_picker.setMaxValue(rest_duration.getDuration() + duration_picker.getDuration());
-                    duration_picker.setTitle("Dauer");
+                    duration_picker.setTitle("Arbeitszeit pro Tag");
                     duration_picker.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {

@@ -671,6 +671,26 @@ public class Day implements Comparable {
         already_distributed_boolean = true;
     }
 
+    public void deleteRepeatingTaskEvents() {
+        ArrayList<MyEvent> events_to_delete = new ArrayList<>();
+        for (MyEvent e : events) {
+            if (e.isRepeatingTaskEvent()) {
+                events_to_delete.add(e);
+            }
+        }
+        events.removeAll(events_to_delete);
+    }
+
+    public void deleteTaskEvents() {
+        ArrayList<MyEvent> events_to_delete = new ArrayList<>();
+        for (MyEvent e : events) {
+            if (e.getTask() != null) {
+                events_to_delete.add(e);
+            }
+        }
+        events.removeAll(events_to_delete);
+    }
+
 
     private class Block {
         TimeObj time;

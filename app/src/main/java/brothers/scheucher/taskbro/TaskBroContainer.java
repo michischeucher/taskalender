@@ -738,6 +738,16 @@ public class TaskBroContainer {
         if (tasks.size() <= 0) { return; }
 
         resetForCalculation(activity);
+        days_lock.readLock().lock();
+        for (Day day : days) {
+            day.deleteRepeatingTaskEvents();
+            day.deleteTaskEvents();
+            day.resetForCalculation(activity);
+        }
+        for (Day day : days) {
+            TaskBroContainer.addRepeatingTaskIfNecessary(activity, day);
+        }
+        days_lock.readLock().unlock();
 
         ArrayList<TaskBlock> task_blocks_new = calculateBlocks(activity);
         resetForCalculation(activity);

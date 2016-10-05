@@ -44,8 +44,11 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TaskBroContainer.initApplication(activity);
-        checkPermissionAndStartApplication();
+        if (!TaskBroContainer.isStarted()) {
+            TaskBroContainer.setStarted(true);
+            TaskBroContainer.initApplication(activity);
+            checkPermissionAndStartApplication();
+        }
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

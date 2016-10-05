@@ -17,6 +17,9 @@ public class DayScheduler {
         TimeObj whole_day = new TimeObj(date);
         free_slots.add(whole_day);
     }
+    public DayScheduler(DayScheduler day_scheduler) {
+        free_slots = (ArrayList<TimeObj>)day_scheduler.getFreeSlots().clone();
+    }
 
     public void addBlockingTime(GregorianCalendar start, GregorianCalendar end) {
         //Log.d(tag, "addBlockingTime: " + Util.getFormattedDateTimeToDateTime(start, end));

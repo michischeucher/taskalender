@@ -243,8 +243,8 @@ public class DaySetting extends ActionBarActivity {
             day_setting.setLatest_minute(Util.getMinuteOfDay(latest_end));
             day_setting.save(this);
             TaskBroContainer.addDaySettingObject(day_setting);
-            TaskBroContainer.calculateDays(this);
-//            TaskBroContainer.createCalculatingJob();
+            //TaskBroContainer.calculateDays(this);
+            TaskBroContainer.createCalculatingJob(this);
             finish();
             return true;
         }

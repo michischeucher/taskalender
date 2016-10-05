@@ -73,8 +73,7 @@ public class PotentialActivity extends AppCompatActivity {
             return;
         }
 
-        for (int j = (TaskBroContainer.getTaskBlocks().size() - 1); j >= 0; j--) {
-            TaskBlock tb = TaskBroContainer.getTaskBlocks().get(j);
+        for (TaskBlock tb : TaskBroContainer.getTaskBlocks()) {
             View row = inflater.inflate(R.layout.text_item_with_description, task_block_container, false);
             if (Util.earlierDate(tb.getEnd(), new GregorianCalendar())) {
                 ((TextView) row.findViewById(R.id.description_of_item)).setText("Vergangene Deadlines");

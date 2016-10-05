@@ -18,6 +18,7 @@ public class CalculateAsync extends AsyncTask<Object, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        //TaskBroContainer.sortLists();
         Calender.notifyChanges();
         MainActivity.notifyChanges();
         PotentialActivity.notifyChanges();

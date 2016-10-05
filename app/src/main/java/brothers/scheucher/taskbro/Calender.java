@@ -231,14 +231,14 @@ public class Calender extends Fragment {
         }
 
         private void drawEvents(GregorianCalendar date) {
+            TaskBroContainer.lookInTheFuture(getActivity(), date);
             Day day = TaskBroContainer.getDay(date);
             if (day == null) {
                 day = TaskBroContainer.createDay(getActivity(), date);
             }
 
-            //TaskBroContainer.distributeTasksFromTaskBlocksTillDate(getActivity(), day.getStart());
 
-
+            day.distributeTaskBlocks(getActivity());
             day.calculateBlocksAndColoumns();
 
             day.drawNowIndicator(calender_day.findViewById(R.id.now_view_container));

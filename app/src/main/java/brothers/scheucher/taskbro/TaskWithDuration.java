@@ -50,4 +50,8 @@ public class TaskWithDuration implements Comparable {
     public String description() {
         return "Task: " + this.task.description() + " duration: " + this.duration.description();
     }
+
+    public void setDuration(int duration_in_minutes) {
+        this.duration.setDuration(duration_in_minutes);
+    }
 }

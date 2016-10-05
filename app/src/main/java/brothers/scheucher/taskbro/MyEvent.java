@@ -41,6 +41,7 @@ public class MyEvent implements Comparable {
     private boolean all_day;
     private String calender_name;
     private int calender_id;
+    private boolean repeating_task_event;
 
     public MyEvent() {
         this.id = -1;
@@ -60,6 +61,7 @@ public class MyEvent implements Comparable {
         this.all_day = false;
         this.inactive = false;
         this.calender_name = "";
+        this.repeating_task_event = false;
     }
     public MyEvent(int id) {
         this.id = id;
@@ -79,6 +81,8 @@ public class MyEvent implements Comparable {
         this.all_day = false;
         this.inactive = false;
         this.calender_name = "";
+        this.repeating_task_event = false;
+
     }
     public MyEvent(int duration, boolean is_task_event) {
         this.id = -1;
@@ -99,6 +103,8 @@ public class MyEvent implements Comparable {
         this.all_day = false;
         this.inactive = false;
         this.calender_name = "";
+        this.repeating_task_event = false;
+
     }
     public MyEvent(long extern_id) {
         this.id = -1;
@@ -114,6 +120,8 @@ public class MyEvent implements Comparable {
         this.availability = false;
         this.inactive = false;
         this.calender_name = "";
+        this.repeating_task_event = false;
+
     }
 
 
@@ -410,4 +418,10 @@ public class MyEvent implements Comparable {
         return this.calender_id;
     }
 
+    public void setRepeatingTaskEvent(boolean is_repeating) {
+        this.repeating_task_event = is_repeating;
+    }
+    public boolean isRepeatingTaskEvent() {
+        return this.repeating_task_event;
+    }
 }

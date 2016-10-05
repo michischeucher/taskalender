@@ -172,6 +172,7 @@ public class AddEvent extends AppCompatActivity {
             event.save(this);
 
             TaskBroContainer.addEventToList(event);
+            TaskBroContainer.addEventToRelevantDays(event);
             TaskBroContainer.createCalculatingJob(activity);
             finish();
             return true;

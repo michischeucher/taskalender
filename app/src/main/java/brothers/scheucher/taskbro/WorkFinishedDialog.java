@@ -144,11 +144,13 @@ public class WorkFinishedDialog extends Dialog {
             public void onClick(View v) {
                 Log.d(tag, "ok clicked, save work finished dialog");
                 task.setRemaining_duration(remaining_duration.getDuration());
+                task.save(TaskBroContainer.getContext());
                 event.setName(task.getName());
                 event.setNotice("Eingetragene Arbeitseinheit");
                 event.setEndWithDuration(worked_duration.getDuration());
                 event.save(TaskBroContainer.getContext());
                 TaskBroContainer.addEventToList(event);
+                TaskBroContainer.addEventToRelevantDays(event);
                 TaskBroContainer.createCalculatingJob(activity);
                 was_ok = true;
                 dismiss();

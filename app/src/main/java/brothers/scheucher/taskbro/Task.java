@@ -193,7 +193,7 @@ public class Task implements Comparable {
     }
 
     public String description() {
-        return "id = " + id + " deadline = " + Util.getFormattedDateTime(deadline) + ", name = " + name + " duration in min = " + remaining_duration.description() + " inactive = " + inactive;
+        return "Task: id = " + id + " deadline = " + Util.getFormattedDateTime(deadline) + ", name = " + name + " duration in min = " + remaining_duration.description() + " inactive = " + inactive + " filling_factor = " + this.filling_factor;
     }
 
     public void save(Context context) {

@@ -1,5 +1,6 @@
 package brothers.scheucher.taskbro;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,6 @@ public class Day implements Comparable {
     private GregorianCalendar start;
     private GregorianCalendar end;
     private ArrayList<MyEvent> events;
-    private ArrayList<TaskWithDuration> task_duration;
     private DayScheduler scheduler;
     private ArrayList<Block> event_blocks;
     private ArrayList<MyEvent> events_whole_day;
@@ -30,33 +30,14 @@ public class Day implements Comparable {
     private int already_distributed; //just for calculation
     private boolean already_distributed_boolean;
 
-    public void resetForCalculation() {
+    public void resetForCalculation(Activity activity) {
         this.already_distributed = 0;
         this.already_distributed_boolean = false;
 
-        this.scheduler = new DayScheduler(this.start);
-        GregorianCalendar now = new GregorianCalendar();
-        if (Util.isSameDate(this.start, now)) {
-            //if today: past is not possible...!
-            GregorianCalendar today_start = new GregorianCalendar();
-            Util.setTime(today_start, 0, 0);
-            scheduler.addBlockingTime(today_start, now);
-        } else if (Util.earlierDate(this.start, now)) {
-            scheduler.addBlockingTime(this.start, 0, 60*24);
-        }
-
-        for (MyEvent e : events) {
-            scheduler.addBlockingTime(e.getStart(), e.getEnd());
-        }
+        initScheduler();
     }
 
-
-    public Day(GregorianCalendar date) {
-        this.start = (GregorianCalendar)date.clone();
-        Util.setTime(this.start, 0, 0);
-        this.end = (GregorianCalendar)start.clone();
-        this.end.add(GregorianCalendar.DAY_OF_YEAR, 1);
-        this.events = new ArrayList<>();
+    private void initScheduler() {
         this.scheduler = new DayScheduler(this.start);
         GregorianCalendar now = new GregorianCalendar();
         if (Util.isSameDate(this.start, now)) {
@@ -64,14 +45,9 @@ public class Day implements Comparable {
             GregorianCalendar today_start = new GregorianCalendar();
             Util.setTime(today_start, 0, 0);
             scheduler.addBlockingTime(today_start, now);
-        } else if (Util.earlierDate(this.start, now)) {
+        } else if (Util.earlierDate(this.start, now)) { // if past, nothing possible!
             scheduler.addBlockingTime(this.start, 0, 60*24);
         }
-
-        this.event_blocks = new ArrayList<>();
-        this.events_whole_day = new ArrayList<>();
-        this.day_settings = TaskBroContainer.getDaySettingObject(this.start);
-        this.task_duration = new ArrayList<>();
 
         GregorianCalendar earliest_start_date = (GregorianCalendar)start.clone();
         earliest_start_date.add(GregorianCalendar.MINUTE, day_settings.getEarliest_minute());
@@ -81,11 +57,38 @@ public class Day implements Comparable {
         latest_minute_date.add(GregorianCalendar.MINUTE, day_settings.getLatest_minute());
         scheduler.addBlockingTime(latest_minute_date, end);
 
-        if (!day_settings.isWorkingDay(Util.calculateWorkingDay(date))) {
+        if (!day_settings.isWorkingDay(Util.calculateWorkingDay(this.start))) {
             scheduler.addBlockingTime(start, end);
         }
+
+        //every normal event is added... no extra task event!
+        ArrayList<MyEvent> events_to_delete = new ArrayList<>();
+        for (MyEvent e : events) {
+            if (e.getTask() == null && !e.isAll_day() || e.isRepeatingTaskEvent()) {
+                scheduler.addBlockingTime(e.getStart(), e.getEnd());
+            } else if (e.isNot_created_by_user()){
+                events_to_delete.add(e);
+            }
+        }
+        events.removeAll(events_to_delete);
+    }
+
+
+    public Day(GregorianCalendar date) {
+        this.start = (GregorianCalendar)date.clone();
+        Util.setTime(this.start, 0, 0);
+        this.end = (GregorianCalendar)start.clone();
+        this.end.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        this.events = new ArrayList<>();
+
+        this.event_blocks = new ArrayList<>();
+        this.events_whole_day = new ArrayList<>();
+        this.day_settings = TaskBroContainer.getDaySettingObject(this.start);
+
         this.already_distributed = 0;
         this.already_distributed_boolean = false;
+
+        initScheduler();
     }
 
     public GregorianCalendar getStart() {
@@ -132,6 +135,32 @@ public class Day implements Comparable {
     }
 
     public int getPossibleWorkTime(GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
+        DayScheduler new_scheduler = new DayScheduler(scheduler);
+        for (MyEvent e : events) {
+            if (e.getTask() != null) {
+                new_scheduler.addBlockingTime(e.getStart(), e.getEnd());
+            }
+        }
+
+        int sum_work_time = 0;
+
+        TimeObj dates_to_check = new TimeObj(start_date, end_date);
+
+        for (TimeObj to : new_scheduler.getFreeSlots()) {
+            TimeObj overlapping = Util.calculateOverlappingTime(to, dates_to_check);
+            if (overlapping != null) {
+                sum_work_time += (int)Util.getMinutesBetweenDates(overlapping.start, overlapping.end);
+            }
+        }
+
+        Log.d(tag, "work time = " + sum_work_time);
+        sum_work_time = checkAvailableWorkTime(sum_work_time, set_worked, false);
+        Log.d(tag, "work time after check = " + sum_work_time);
+
+        return sum_work_time;
+    }
+
+    public int getTheoreticalWorkTime(GregorianCalendar start_date, GregorianCalendar end_date) {
         int sum_work_time = 0;
 
         TimeObj dates_to_check = new TimeObj(start_date, end_date);
@@ -143,13 +172,19 @@ public class Day implements Comparable {
             }
         }
 
-        sum_work_time = checkAvailableWorkTime(sum_work_time, set_worked);
+//        sum_work_time = Math.min(sum_work_time, this.day_settings.getTotalDurationInMinutes());
+
+        sum_work_time = checkAvailableWorkTime(sum_work_time, false, true);
 
         return sum_work_time;
     }
 
-    private int checkAvailableWorkTime(int available_work_time, boolean set_worked) {
-        int already_worked = calculateWorkedTime();
+
+
+
+    private int checkAvailableWorkTime(int available_work_time, boolean set_worked, boolean without_task_events) {
+        int already_worked = calculateWorkedTime(without_task_events);
+
         int difference = day_settings.getTotalDurationInMinutes() - already_worked;
         if (set_worked) {
             difference -= this.already_distributed;
@@ -171,12 +206,13 @@ public class Day implements Comparable {
         }
     }
 
-    private int calculateWorkedTime() {
+    private int calculateWorkedTime(boolean without_task_events) {
         DayScheduler scheduler = new DayScheduler(this.start);
         scheduler.addBlockingTime(this.start, 0, day_settings.getEarliest_minute());
         scheduler.addBlockingTime(this.start, day_settings.getLatest_minute(), 24 * 60);
         for (MyEvent e : this.events) {
-            if (e.isBlocking()) {
+            if (e.isRepeatingTaskEvent() ||
+                    e.isBlocking() && !e.isNot_created_by_user() && (!without_task_events || e.getTask() == null)) {
                 scheduler.addBlockingTime(e.getStart(), e.getEnd());
             }
         }
@@ -203,16 +239,19 @@ public class Day implements Comparable {
         }
         this.already_distributed += work_time_for_that_task;
 
-        addTaskWithDuration(task, work_time_for_that_task);
+        //addTaskWithDuration(task, work_time_for_that_task);
     }
 
-    public void createTaskEventsBecauseOfTaskDurations() {
-        Collections.sort(task_duration);
-        for (TaskWithDuration twd : task_duration) {
+    public void createTaskEvents(ArrayList<TaskWithDuration> task_durations) {
+        Collections.sort(task_durations);
+        for (TaskWithDuration twd : task_durations) {
             Task task = twd.getTask();
             int work_time_for_that_task = twd.getDurationInMinutes();
 
+            Log.d(tag, task.description() + " duration = " + twd.getDurationInMinutes());
+
             while(work_time_for_that_task > 0) {
+                Log.d(tag, " work_time = " + work_time_for_that_task);
                 TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
 
                 MyEvent new_event = new MyEvent();
@@ -228,23 +267,10 @@ public class Day implements Comparable {
                 work_time_for_that_task -= effective_time;
 
                 addTaskEventWithoutChecking(new_event);
+                Log.d(tag, "event added = " + new_event.description());
             }
         }
-        task_duration.clear();
         sortEvents();
-    }
-
-    private void addTaskWithDuration(Task task, int work_time_for_that_task) {
-        boolean found = false;
-        for (TaskWithDuration twd : task_duration) {
-            if (twd.getTask() == task) {
-                twd.addDuration(work_time_for_that_task);
-                found = true;
-            }
-        }
-        if (!found) {
-            task_duration.add(new TaskWithDuration(task, work_time_for_that_task));
-        }
     }
 
     //return minutes which could not be distributed because of too less time!
@@ -255,8 +281,9 @@ public class Day implements Comparable {
         }
 
         while(work_time_for_that_task > 0) {
-            int available_work_time = checkAvailableWorkTime(work_time_for_that_task, false);
+            int available_work_time = checkAvailableWorkTime(work_time_for_that_task, false, false);
 
+            Log.d(tag, "available work time for repeating task = " + available_work_time);
             TimeObj free_slot = scheduler.getFreeSlotOrBiggest(work_time_for_that_task);
             if (free_slot == null || available_work_time == 0) {
                 return work_time_for_that_task;
@@ -275,6 +302,8 @@ public class Day implements Comparable {
             new_event.setEndWithDuration(effective_time);
             work_time_for_that_task -= effective_time;
 
+            new_event.setRepeatingTaskEvent(true);
+            Log.d(tag, "repeating task adding: " + new_event.description());
 
             addTaskEventWithoutChecking(new_event);
         }
@@ -534,20 +563,10 @@ public class Day implements Comparable {
         this.already_distributed = value;
     }
 
-    public void distributeTaskBlockTasks() {
-        int available_work_time = getAvailableWorkTime(false);
-        boolean all_distributed = false;
-
-        while (available_work_time > 0 && !all_distributed) {
-            Log.d(tag, "while-schleife...");
-            all_distributed = TaskBroContainer.fillDayWithTasks(this);
-            available_work_time = getAvailableWorkTime(false) - this.already_distributed;
-        }
-    }
 
     private int getAvailableWorkTime(boolean set_worked) {
         int available_work_time = scheduler.getPossibleWorkTime();
-        available_work_time = checkAvailableWorkTime(available_work_time, set_worked);
+        available_work_time = checkAvailableWorkTime(available_work_time, set_worked, true);
         return available_work_time;
     }
 
@@ -573,13 +592,84 @@ public class Day implements Comparable {
         return worked_time;
     }
 
-    public boolean alreadyDistributed() {
+    public boolean isAlreadyDistributed() {
         return already_distributed_boolean;
     }
     public void alreadyDistributed(boolean value) {
         this.already_distributed_boolean = value;
     }
 
+    public ArrayList<MyEvent> getListWorkedTaskEvents() {
+        ArrayList<MyEvent> worked_task_events = new ArrayList<>();
+        for (MyEvent e : events) {
+            if (!e.isNot_created_by_user() && e.getTask() != null && !e.isRepeatingTaskEvent()) {
+                worked_task_events.add(e);
+            }
+        }
+        return worked_task_events;
+    }
+
+    public void distributeTaskBlocks(Activity activity) {
+        if (already_distributed_boolean || Util.earlierDate(this.end, new GregorianCalendar())) {
+            already_distributed_boolean = true;
+            return;
+        }
+        Day day_before = TaskBroContainer.getDayBefore(activity, this.start);
+        day_before.distributeTaskBlocks(activity);
+
+        //else: I am the last day to distribute
+        resetForCalculation(activity);
+
+        ArrayList<MyEvent> worked_task_events = getListWorkedTaskEvents();
+
+        // 1) theoretische zuordnung
+        int theoretical_work_time = getTheoreticalWorkTime(getStart(), getEnd());
+        ArrayList<TaskWithDuration> task_durations = TaskBroContainer.getTaskDurationsBecauseOfTaskBlocks(theoretical_work_time, worked_task_events, null);
+
+        // 2) effektiv bereits gearbeitete zeit abziehen
+        ArrayList<TaskWithDuration> correct_task_duration = new ArrayList<>();
+        ArrayList<Task> tasks_to_ignore = new ArrayList<>();
+
+        for (MyEvent wte : worked_task_events) {
+            for (TaskWithDuration twd : task_durations) {
+                if (twd.getTask() == wte.getTask()) { //if there is already worked today
+                    int diff = twd.getDurationInMinutes() - wte.getDurationInMinutes();
+                    if (diff > 0) {
+                        twd.addDuration(-wte.getDurationInMinutes());
+                        correct_task_duration.add(twd);
+                   } else { //more worked than necessary! or exactly equal work time!
+                        twd.setDuration(0);
+                    }
+                    tasks_to_ignore.add(twd.getTask());
+                }
+            }
+        }
+        for (TaskWithDuration twd : task_durations) {
+            twd.getTask().already_distributed_duration -= twd.getDurationInMinutes();
+        }
+
+        int wieder_freie_zeit = 0;
+        for (TaskWithDuration twd : correct_task_duration) {
+            wieder_freie_zeit += twd.getDurationInMinutes();
+            twd.getTask().already_distributed_duration += twd.getDurationInMinutes();
+            Log.d(tag, "correct = " + twd.getTask().description() + " with duration = " + twd.getDurationInMinutes());
+        }
+
+        resetForCalculation(activity);
+        createTaskEvents(correct_task_duration);
+
+        // 3) übrig gebliebene zeit wieder neu vergeben
+        //nicht notwendig, da eh possible worktime berechnet wird und die anderen tasks bereits drinnen sind!
+
+        // 4) alles andere normal verteilen, allerdings ohne dieser Tasks!
+        int possible_work_time = getPossibleWorkTime(getStart(), getEnd(), false);
+        possible_work_time -= wieder_freie_zeit;
+        Log.d(tag, "possible work time = " + possible_work_time + " for " + description());
+        ArrayList<TaskWithDuration> task_duration_possible = TaskBroContainer.getTaskDurationsBecauseOfTaskBlocks(possible_work_time, worked_task_events, tasks_to_ignore);
+        createTaskEvents(task_duration_possible);
+
+        already_distributed_boolean = true;
+    }
 
 
     private class Block {

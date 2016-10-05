@@ -1,7 +1,5 @@
 package brothers.scheucher.taskbro;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -88,7 +86,13 @@ public class TaskBlock implements Comparable {
     @Override
     public int compareTo(Object another) {
         TaskBlock tb = (TaskBlock) another;
-        return this.last_possible_start.compareTo(tb.last_possible_start);
+        if (this.start == null) {
+            return 1;
+        }
+        if (tb.getEnd() == null) {
+            return -1;
+        }
+        return this.start.compareTo(tb.start);
     }
 
     public int getRemainingDurationOfTasks() {
@@ -100,12 +104,9 @@ public class TaskBlock implements Comparable {
     }
 
     public void calculateTaskFillingFactors() {
-        Log.d(tag, "start calculateTaskFillingFactors for " + description());
         for (Task t : tasks) {
             t.calculateFillingFactor();
-            Log.d(tag, "filling factor task " + t.description() + " = " + t.getFilling_factor());
         }
-        Log.d(tag, "end calculateTaskFillingFactors for " + description());
     }
 
 
@@ -113,10 +114,13 @@ public class TaskBlock implements Comparable {
         return "TaskBlock start: " + Util.getFormattedDateTime(this.start) + " end: " + Util.getFormattedDateTime(this.end) + " potential: " + potential + " #tasks: " + this.tasks.size() + " with durations(overall): " + getRemainingDurationOfTasks();
     }
 
-    public boolean alreadyDistributed() {
+    public boolean alreadyDistributed(ArrayList<Task> tasks_to_ignore) {
         int sum_already_distributed_duration = 0;
         int sum_remaining_duration = 0;
         for (Task t : tasks) {
+            if (tasks_to_ignore != null && tasks_to_ignore.contains(t)) {
+                continue;
+            }
             sum_already_distributed_duration += t.already_distributed_duration;
             sum_remaining_duration += t.getRemaining_duration();
         }

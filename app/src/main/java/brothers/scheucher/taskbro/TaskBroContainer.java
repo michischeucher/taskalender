@@ -48,8 +48,20 @@ public class TaskBroContainer {
     public static float scale_factor;
 
     public static int PERMISSIONS_REQUEST_READ_CALENDER;
+    private static boolean all_task_blocks_distributed = false;
+    private static boolean started;
 
+    public static boolean isStarted() {
+        return started;
+    }
 
+    public static void setStarted(boolean started) {
+        TaskBroContainer.started = started;
+    }
+
+    public boolean isAllTaskBlocksDistributed() {
+        return all_task_blocks_distributed;
+    }
 
     public static void initApplication(Activity activity) {
         context = activity;
@@ -82,6 +94,7 @@ public class TaskBroContainer {
     }
 
     public static void startApplication(Activity activity) {
+        Log.d(tag, "startApplication");
         restoreScaleFactor();
 
         SQLiteStorageHelper sql_helper = SQLiteStorageHelper.getInstance(context, 1);
@@ -108,7 +121,7 @@ public class TaskBroContainer {
     }
 
 
-    private static int getPossibleWorkTime(Activity activity, GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked) {
+    private static int getPossibleWorkTime(Activity activity, GregorianCalendar start_date, GregorianCalendar end_date, boolean set_worked, boolean get_theoretical_work_time) {
         int sum_work_time = 0;
 
         if (!(Util.isSameDate(start_date, end_date) && Util.isSameTime(start_date, end_date))) {//if there is really a slot! ;)
@@ -117,13 +130,21 @@ public class TaskBroContainer {
                 if (day == null) {
                     day = TaskBroContainer.createDay(activity, current_date);
                 }
-                int possible_work_time_in_that_day = day.getPossibleWorkTime(start_date, end_date, set_worked);
+
+                int possible_work_time_in_that_day = 0;
+                if (get_theoretical_work_time) {
+                    possible_work_time_in_that_day = day.getTheoreticalWorkTime(start_date, end_date);
+                } else {
+                    possible_work_time_in_that_day = day.getPossibleWorkTime(start_date, end_date, set_worked);
+                }
                 //day.addDistributedWorkTime(possible_work_time_in_that_day);
                 sum_work_time += possible_work_time_in_that_day;
             }
         }
         return sum_work_time;
     }
+
+
 
     public static ArrayList<Label> getLabels() {
         return labels;
@@ -493,7 +514,7 @@ public class TaskBroContainer {
 
         ArrayList events_from_other_calendars = MyCalendarProvider.getEvents(activity, new_day.getStart().getTimeInMillis() + 1000, new_day.getEnd().getTimeInMillis() - 1000);
         events_lock.writeLock().lock();
-        events.addAll(events_from_other_calendars);
+            events.addAll(events_from_other_calendars);
         events_lock.writeLock().unlock();
 
         events_lock.readLock().lock();
@@ -508,17 +529,24 @@ public class TaskBroContainer {
         events_lock.readLock().unlock();
 
         days_lock.writeLock().lock();
-        days.add(new_day);
+            days.add(new_day);
         days_lock.writeLock().unlock();
 
+        addRepeatingTaskIfNecessary(activity, new_day);
+
+        return new_day;
+    }
+
+    public static void addRepeatingTaskIfNecessary(Activity activity, Day day) {
+        Log.d(tag, "addRepeatingTaskIfNecessary for day " + day.description());
         ArrayList<Task> repeating_tasks = TaskBroContainer.getRepeatingTasks();
         repeating_tasks_lock.readLock().lock();
         for (Task t : repeating_tasks) {
-            if (t.isRelevantRepeatForThatDay(date)) {
-                int already_worked_on_that_task = new_day.calculateWorkedTimeOfTask(t);
+            if (t.isRelevantRepeatForThatDay(day.getStart())) {
+                int already_worked_on_that_task = day.calculateWorkedTimeOfTask(t);
 
-                int not_distributed_minutes = new_day.addRepeatingTask(t, t.getRemaining_duration() - already_worked_on_that_task);//TODO!!!
-                GregorianCalendar date_before = (GregorianCalendar)date.clone();
+                int not_distributed_minutes = day.addRepeatingTask(t, t.getRemaining_duration() - already_worked_on_that_task);//TODO!!!
+                GregorianCalendar date_before = (GregorianCalendar)day.getStart().clone();
                 while (not_distributed_minutes > 0) {
                     date_before.add(GregorianCalendar.DAY_OF_YEAR, -1);
                     Day day_before = TaskBroContainer.getDay(date_before);
@@ -530,8 +558,6 @@ public class TaskBroContainer {
             }
         }
         repeating_tasks_lock.readLock().unlock();
-
-        return new_day;
     }
 
     public static ArrayList<TaskBlock> getTaskBlocks() {
@@ -552,7 +578,7 @@ public class TaskBroContainer {
     public static int getPotential() {
         task_blocks_lock.readLock().lock();
         if (task_blocks.size() > 0) {
-            TaskBlock tb = task_blocks.get(task_blocks.size() - 1);
+            TaskBlock tb = task_blocks.get(0);
             if (tb != null) {
                 task_blocks_lock.readLock().unlock();
                 return tb.getPotential();
@@ -562,7 +588,7 @@ public class TaskBroContainer {
         return 0;
     }
 
-    public static void resetForCalculation() {
+    public static void resetForCalculation(Activity activity) {
         ArrayList<Task> tasks_to_delete = new ArrayList<>();
         tasks_lock.readLock().lock();
             for (Task t : tasks) {
@@ -580,7 +606,7 @@ public class TaskBroContainer {
         ArrayList<MyEvent> events_to_delete = new ArrayList<>();
         events_lock.readLock().lock();
             for (MyEvent e : events) {
-                if (e.isNot_created_by_user()) {
+                if (e.isNot_created_by_user() && !e.isRepeatingTaskEvent()) {
                     events_to_delete.add(e);
                 }
             }
@@ -595,36 +621,32 @@ public class TaskBroContainer {
         repeating_tasks_lock.writeLock().unlock();
 
         days_lock.writeLock().lock();
-            days.clear();
+            for (Day day : days) {
+                day.resetForCalculation(activity);
+            }
+            //days.clear();
         days_lock.writeLock().unlock();
-
 
     }
 
-    public static void calculateBlocks(Activity activity) {
-        if (tasks == null || tasks.size() <= 0) {
-            return;
-        }
+    public static ArrayList<TaskBlock> calculateBlocks(Activity activity) {
         tasks_lock.writeLock().lock();
             Collections.sort(tasks, Collections.reverseOrder());
         tasks_lock.writeLock().unlock();
         ArrayList<Task> not_done_tasks = getTasksNotDone(true);
-        if (not_done_tasks.size() <= 0) {
-            return;
+
+        if (tasks == null || tasks.size() <= 0 || not_done_tasks.size() <= 0) {
+            return null;
         }
 
         //first block
-        task_blocks_lock.writeLock().lock();
-            task_blocks.clear();
-            TaskBlock block = new TaskBlock();
-            task_blocks.add(block);
-        task_blocks_lock.writeLock().unlock();
+        ArrayList<TaskBlock> task_blocks_new = new ArrayList<>();
 
-        tasks_lock.readLock().lock();
+        TaskBlock block = new TaskBlock();
+        task_blocks_new.add(block);
         if (not_done_tasks.get(0).getDeadline() != null) {
             block.setEnd((GregorianCalendar) not_done_tasks.get(0).getDeadline().clone());
         }
-        tasks_lock.readLock().unlock();
 
         boolean last_task = false;
         GregorianCalendar earlier_date;
@@ -642,9 +664,7 @@ public class TaskBroContainer {
                 if ((i+1) < not_done_tasks.size() &&
                         not_done_tasks.get(i+1).getDeadline() != null) { //last task without deadline...
                     block = new TaskBlock();
-                    task_blocks_lock.writeLock().lock();
-                        task_blocks.add(block);
-                    task_blocks_lock.writeLock().unlock();
+                    task_blocks_new.add(block);
                     block.setEnd((GregorianCalendar) not_done_tasks.get(i+1).getDeadline().clone());
                 }
                 continue;
@@ -669,7 +689,7 @@ public class TaskBroContainer {
                 }
             }
 
-            possible_work_time_for_current_task = TaskBroContainer.getPossibleWorkTime(activity, current_task.getDeadline(), earlier_date, false);
+            possible_work_time_for_current_task = TaskBroContainer.getPossibleWorkTime(activity, current_task.getDeadline(), earlier_date, false, false);
             overlapping_time = current_task.getRemaining_duration() + current_task.getOverlapping_minutes() - possible_work_time_for_current_task;
 
             block.setOverlapping_time(overlapping_time);
@@ -677,73 +697,83 @@ public class TaskBroContainer {
 
             if (overlapping_time < 0 && !last_task) { //if everything is possible in that block...
                 block = new TaskBlock();
-                task_blocks_lock.writeLock().lock();
-                    task_blocks.add(block);
-                task_blocks_lock.writeLock().unlock();
+                task_blocks_new.add(block);
                 block.setEnd((GregorianCalendar) earlier_date.clone());
             } else if (overlapping_time > 0 && last_task) {
                 current_task.setOverlapping_minutes(0);//TODO otherwise the fillingfactor is wrong...
             }
         }
+        return task_blocks_new;
     }
 
-    public static void calculatePotentialOfBlocks(Activity activity) {
-        if (task_blocks == null || days == null || task_blocks.size() <= 0) {
+
+    public static void calculatePotentialOfBlocks(Activity activity, ArrayList<TaskBlock> task_blocks_new) {
+        if (task_blocks_new == null || days == null || task_blocks_new.size() <= 0) {
             return;
         }
 
-        task_blocks_lock.readLock().lock();
-        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
-            TaskBlock tb = task_blocks.get(i);
+        Collections.sort(task_blocks_new);
+        for (TaskBlock tb : task_blocks_new) { //start with the newest block
             if (tb.getStart() == null && tb.getEnd() == null) { //tasks without Deadlines
                 tb.setPotential(0);
             } else {
-                int potential = TaskBroContainer.getPossibleWorkTime(activity, tb.getStart(), tb.getEnd(), true);
+                int potential = TaskBroContainer.getPossibleWorkTime(activity, tb.getStart(), tb.getEnd(), true, false);
                 potential -= tb.getRemainingDurationOfTasks();
                 tb.setPotential(potential);
             }
         }
-        task_blocks_lock.readLock().unlock();
-        for (Day day : days) {
-            day.setDistributedMinutes(0);
-        }
 
-        task_blocks_lock.readLock().lock();
-        for (int i = 0; i < task_blocks.size() - 1; i++) { //start with oldest block EXCEPT newest block!!!
-            TaskBlock tb = task_blocks.get(i);
+        for (int i = task_blocks_new.size() - 1; i > 0; i--) { //start with oldest block EXCEPT newest block!!!
+            TaskBlock tb = task_blocks_new.get(i);
             int potential = tb.getPotential();
             if (potential < 0) { //cannot be newest block!!
-                task_blocks.get(i+1).setPotential(task_blocks.get(i + 1).getPotential() + potential);
+                task_blocks_new.get(i - 1).setPotential(task_blocks_new.get(i - 1).getPotential() + potential);
                 tb.setPotential(0);
             }
         }
-        task_blocks_lock.readLock().unlock();
+
     }
 
     public static void calculateDays(Activity activity) {
         if (tasks.size() <= 0) { return; }
 
-        resetForCalculation();
-        calculateBlocks(activity);
-        calculatePotentialOfBlocks(activity);
+        resetForCalculation(activity);
+
+        ArrayList<TaskBlock> task_blocks_new = calculateBlocks(activity);
+        resetForCalculation(activity);
+        calculatePotentialOfBlocks(activity, task_blocks_new);
+
+        for (TaskBlock tb : task_blocks_new) {
+            tb.calculateTaskFillingFactors();
+            Collections.sort(tb.getTasks());
+        }
 
         task_blocks_lock.writeLock().lock();
-            for (TaskBlock tb : task_blocks) {
-                tb.calculateTaskFillingFactors();
-                Collections.sort(tb.getTasks());
-            }
+            task_blocks = task_blocks_new;
         task_blocks_lock.writeLock().unlock();
 
-        //create all Days till last day saved, if not already created
+        resetForCalculation(activity);
+
         GregorianCalendar latest_date = new GregorianCalendar();
-        for (Task t : tasks) {
-            if (Util.earlierDate(latest_date, t.getDeadline())) {
-                latest_date = (GregorianCalendar)t.getDeadline().clone();
+        for (TaskBlock tb : task_blocks_new) {
+            if (tb.getEnd() != null && Util.earlierDate(latest_date, tb.getEnd())) {
+                latest_date = (GregorianCalendar)tb.getEnd().clone();
             }
         }
-        latest_date.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
-        distributeTasksFromTaskBlocksTillDate(activity, latest_date);
+
+        //ensure to have also repeating tasks berücksichtigt...
+        /*GregorianCalendar date_in_future = (GregorianCalendar)latest_date.clone();
+        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
+        for (GregorianCalendar date : Util.getListOfDates(new GregorianCalendar(), date_in_future)) {
+            if (TaskBroContainer.getDay(date) == null) {
+                TaskBroContainer.createDay(activity, date);
+            }
+        }*/
+//        Day latest_day = TaskBroContainer.getDay(latest_date);
+        //latest_day.distributeTaskBlocks(activity);
+
     }
+
 
     //DEBUGGING
     private static void printAllTasks() {
@@ -776,30 +806,107 @@ public class TaskBroContainer {
         return repeating_tasks;
     }
 
+/*
+    private static void distributeTaskBlocks(Activity activity) {
+        boolean all_distributed = false;
+        Day day = TaskBroContainer.getDay(new GregorianCalendar());
+        if (day == null) {
+            day = TaskBroContainer.createDay(activity, new GregorianCalendar());
+        }
+        while (!all_distributed) {
+            all_distributed = true;
+            while (day.getPossibleWorkTime(day.getStart(), day.getEnd(), false) > 0) {
+                TaskBroContainer.getTaskDurationsBecauseOfTaskBlocks()
 
-
-    public static void distributeTasksFromTaskBlocksTillDate(Activity activity, GregorianCalendar latest_date) {
-        GregorianCalendar date_in_future = (GregorianCalendar)latest_date.clone();
-        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
-
-        for (GregorianCalendar date : Util.getListOfDates(new GregorianCalendar(), date_in_future)) {
-            if (TaskBroContainer.getDay(date) == null) {
-                TaskBroContainer.createDay(activity, date);
             }
         }
+    }
+*/
+
+    private static void distributeTaskBlocks(Activity activity, GregorianCalendar latest_date) {
+
+
+        //
+/*
+        boolean all_distributed = false;
+        Day day = TaskBroContainer.getDay(new GregorianCalendar());
+        task_blocks_lock.readLock().lock();
+        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
+            TaskBlock tb = task_blocks.get(i);
+            while (!tb.alreadyDistributed(null)) {
+
+            }
+        }
+        task_blocks_lock.readLock().unlock();
+        */
+    }
+/*
+    public static void distributeTasksFromTaskBlocksTillDate(Activity activity, GregorianCalendar latest_date) {
+
 
         days_lock.writeLock().lock();
             Collections.sort(days);
-            for (int i = 0; i < (days.size() - Settings.getDaysToLookForward()); i++) {
-                Day day = days.get(i);
-                if (!day.alreadyDistributed()) {
-                    day.distributeTaskBlockTasks();
-                    day.createTaskEventsBecauseOfTaskDurations();
-                    day.alreadyDistributed(true);
-                }
-            }
         days_lock.writeLock().unlock();
+
+        days_lock.readLock().lock();
+            for (int i = 0; i < (days.size() - Settings.getDaysToLookForward()); i++) {
+                if (all_task_blocks_distributed) {
+                    break;
+                }
+                Day day = days.get(i);
+                Log.d(tag, "START distributing for day " + day.description());
+                day.resetForCalculation();
+
+//                int theoretical_work_time = day.getTheoreticalWorkTime(day.getStart(), day.getEnd());
+//                Log.d(tag, "theoretical work time = " + theoretical_work_time);
+                ArrayList<MyEvent> worked_task_events = day.getListWorkedTaskEvents();
+                for (MyEvent wte : worked_task_events) {
+                    Log.d(tag, "-wte " + wte.description());
+                }
+                ArrayList<Task> tasks_to_ignore = new ArrayList<>();
+                ArrayList<TaskWithDuration> task_durations = TaskBroContainer.getTaskDurationsBecauseOfTaskBlocks(theoretical_work_time, worked_task_events, null);//TODO
+
+                ArrayList<TaskWithDuration> correct_task_duration = new ArrayList<>();
+
+                for (MyEvent wte : worked_task_events) {
+                    for (TaskWithDuration twd : task_durations) {
+                        if (twd.getTask() == wte.getTask()) {
+                            int diff = twd.getDurationInMinutes() - wte.getDurationInMinutes();
+                            if (diff > 0) {
+                                twd.addDuration(-wte.getDurationInMinutes());
+                                twd.getTask().already_distributed_duration -= wte.getDurationInMinutes();
+                            } else { //more worked than necessary! or exactly equal work time!
+                                twd.setDuration(0);
+                            }
+                            correct_task_duration.add(twd);
+                            tasks_to_ignore.add(twd.getTask());
+                        }
+                    }
+                }
+
+                for (TaskWithDuration ctwd : correct_task_duration) {
+                    Log.d(tag, "--ctwd " + ctwd.getDurationInMinutes() + " task " + ctwd.getTask().description());
+                }
+
+                day.resetForCalculation();
+                day.createTaskEvents(correct_task_duration);
+                for (TaskWithDuration twd : correct_task_duration) {
+                    twd.getTask().already_distributed_duration += twd.getDurationInMinutes();
+                }
+
+                int possible_work_time = day.getPossibleWorkTime(day.getStart(), day.getEnd(), false);
+                Log.d(tag, "possible worktime = " + possible_work_time + " " + day.description());
+                ArrayList<TaskWithDuration> tmp = TaskBroContainer.getTaskDurationsBecauseOfTaskBlocks(possible_work_time, worked_task_events, tasks_to_ignore);//TODO
+                for (TaskWithDuration twd : tmp) {
+                    Log.d(tag, "twd:" + twd.getTask().description() + " duration = " + twd.getDurationInMinutes());
+                }
+                day.createTaskEvents(tmp);
+
+                day.calculateBlocksAndColoumns();
+            }
+        days_lock.readLock().unlock();
     }
+    */
 
     public static Day getLatestDay() {
         Day latest_day = days.get(days.size() - 1);
@@ -823,21 +930,71 @@ public class TaskBroContainer {
         return new Duration(worked_minutes);
     }
 
-    public static boolean fillDayWithTasks(Day day_to_fill) {
-        boolean all_distributed = true;
-        task_blocks_lock.readLock().lock();
-        for (int i = task_blocks.size() - 1; i >= 0; i--) { //start with the newest block
-            TaskBlock tb = task_blocks.get(i);
-            if (!tb.alreadyDistributed()) {
-                all_distributed = false;
-                tb.sortTasks();
-                for (Task t : tb.getTasks()) {
-                    day_to_fill.addTask(t);
+
+
+    public static ArrayList<TaskWithDuration> getTaskDurationsBecauseOfTaskBlocks(int time_to_distribute, ArrayList<MyEvent> worked_task_events, ArrayList<Task> tasks_to_ignore) {
+        ArrayList<TaskWithDuration> ret = new ArrayList<>();
+        if (time_to_distribute <= 0) {
+            return ret;
+        }
+
+            task_blocks_lock.readLock().lock();
+            for (TaskBlock tb : task_blocks) { //start with the newest block
+                boolean task_found = true;
+                while (task_found && time_to_distribute > 0) {
+                    task_found = false;
+                    Log.d(tag, " - task_found && time_to_distribute > 0 => " + time_to_distribute);
+                    tb.sortTasks();
+                    for (Task t : tb.getTasks()) {
+                        int remaining_duration_to_add = 0;
+                        for (MyEvent e : worked_task_events) {
+                            if (e.getTask() == t) {
+                                remaining_duration_to_add += e.getDurationInMinutes();
+                            }
+                        }
+
+                        if (t.already_distributed_duration == (t.getRemaining_duration() + remaining_duration_to_add) ||
+                                (tasks_to_ignore != null && tasks_to_ignore.contains(t))) {
+                            continue;
+                        } else {
+                            task_found = true;
+                            Log.d(tag, " - task found: " + t.description());
+                        }
+
+                        //calculate work time for that task
+                        int work_time_for_that_task = (int)(time_to_distribute * t.getFilling_factor());
+                        if (time_to_distribute > 0 && work_time_for_that_task == 0) {
+                            work_time_for_that_task = 1;
+                        }
+                        if (work_time_for_that_task > (t.getRemaining_duration() + remaining_duration_to_add - t.already_distributed_duration)) {
+                            work_time_for_that_task = t.getRemaining_duration() + remaining_duration_to_add - t.already_distributed_duration;
+                        }
+
+                        //setting some things
+                        t.already_distributed_duration += work_time_for_that_task;
+
+                        time_to_distribute -= work_time_for_that_task;
+
+                        //adding to list without dublicates
+                        boolean found = false;
+                        for (TaskWithDuration twd : ret) {
+                            if (twd.getTask() == t) {
+                                found = true;
+                                twd.addDuration(work_time_for_that_task);
+                                Log.d(tag, "work time is now = " + twd.getDurationInMinutes() + " for " + twd.getTask().description());
+                            }
+                        }
+                        if (!found) {
+                            TaskWithDuration td = new TaskWithDuration(t, work_time_for_that_task);
+                            ret.add(td);
+                            Log.d(tag, "work time is = " + td.getDurationInMinutes() + " for new " + td.getTask().description());
+                        }
+                    }
                 }
             }
-        }
-        task_blocks_lock.readLock().unlock();
-        return all_distributed;
+            task_blocks_lock.readLock().unlock();
+
+        return ret;
     }
 
     public static boolean checkLabelName(Label current_label, String label_name_to_check) {
@@ -866,4 +1023,48 @@ public class TaskBroContainer {
         return ret;
     }
 
+    public static void sortLists() {
+        days_lock.writeLock().lock();
+            Collections.sort(days);
+        days_lock.writeLock().unlock();
+
+        tasks_lock.writeLock().lock();
+            Collections.sort(task_blocks, Collections.reverseOrder());
+        tasks_lock.writeLock().unlock();
+
+        events_lock.writeLock().lock();
+            Collections.sort(events);
+        events_lock.writeLock().unlock();
+    }
+
+    public static Day getDayBefore(Activity activity, GregorianCalendar date) {
+        GregorianCalendar date_before = (GregorianCalendar) date.clone();
+        date_before.add(GregorianCalendar.DAY_OF_YEAR, -1);
+        Day day_before = TaskBroContainer.getDay(date_before);
+        if (day_before == null) {
+            day_before = TaskBroContainer.createDay(activity, date_before);
+        }
+        return day_before;
+    }
+
+    public static void addEventToRelevantDays(MyEvent event) {
+        for (GregorianCalendar date : Util.getListOfDates(event.getStart(), event.getEnd())) {
+            Day day_where_event_to_add = getDay(date);
+            if (day_where_event_to_add != null) {
+                day_where_event_to_add.addEvent(event);
+            }
+        }
+
+    }
+
+    public static void lookInTheFuture(Activity activity, GregorianCalendar date) {
+        GregorianCalendar date_in_future = (GregorianCalendar)date.clone();
+        date_in_future.add(GregorianCalendar.DAY_OF_YEAR, Settings.getDaysToLookForward());
+        for (GregorianCalendar d : Util.getListOfDates(new GregorianCalendar(), date_in_future)) {
+            if (TaskBroContainer.getDay(d) == null) {
+                TaskBroContainer.createDay(activity, d);
+            }
+            Log.d(tag, "future : " + Util.getFormattedDate(d));
+        }
+    }
 }

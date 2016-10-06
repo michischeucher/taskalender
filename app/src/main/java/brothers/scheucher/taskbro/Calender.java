@@ -237,8 +237,8 @@ public class Calender extends Fragment {
                 day = TaskBroContainer.createDay(getActivity(), date);
             }
 
+//            day.distributeTaskBlocks(getActivity(), false);
 
-            day.distributeTaskBlocks(getActivity());
             day.calculateBlocksAndColoumns();
 
             day.drawNowIndicator(calender_day.findViewById(R.id.now_view_container));

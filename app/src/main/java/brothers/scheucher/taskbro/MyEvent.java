@@ -424,4 +424,6 @@ public class MyEvent implements Comparable {
     public boolean isRepeatingTaskEvent() {
         return this.repeating_task_event;
     }
+
+
 }

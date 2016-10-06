@@ -4,8 +4,8 @@
     tools:context="brothers.scheucher.taskbro.MainActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_calc_days" android:title="Im Hintergrund Aktualisieren"
-        android:orderInCategory="100" app:showAsAction="never" />
+<!--    <item android:id="@+id/action_calc_days" android:title="Im Hintergrund Aktualisieren"
+        android:orderInCategory="100" app:showAsAction="never" />-->
     <item android:id="@+id/action_calc_days_synchron" android:title="Aktualisieren"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

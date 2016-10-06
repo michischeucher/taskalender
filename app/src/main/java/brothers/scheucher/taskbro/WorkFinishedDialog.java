@@ -92,6 +92,7 @@ public class WorkFinishedDialog extends Dialog {
             public void onClick(View v) {
                 Log.d(tag, "TODO: muss zusammenkalkuliet werden");
                 DurationPickerDialog dialog = new DurationPickerDialog(activity, worked_duration_view, worked_duration);
+                dialog.setTitle("Gearbeitete Dauer");
                 dialog.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
@@ -122,6 +123,8 @@ public class WorkFinishedDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 DurationPickerDialog dialog = new DurationPickerDialog(activity, remaining_duration_view, remaining_duration);
+                dialog.setTitle("Arbeitsaufwand");
+
                 dialog.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {

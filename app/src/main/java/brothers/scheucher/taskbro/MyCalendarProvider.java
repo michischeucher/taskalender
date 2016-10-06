@@ -83,8 +83,9 @@ public class MyCalendarProvider {
                 new_event.setCalendarID(calender_id);
                 new_event.setCalendarName(calender_name);
 
-                if (all_day > 0) {
+                if (all_day > 0 || new_event.getDurationInMinutes() >= 24 * 60) {
                     new_event.setAllDay(true);
+                    new_event.setAvailability(true);
                 }
 
                 events.add(new_event);

@@ -73,6 +73,7 @@ public class PotentialActivity extends AppCompatActivity {
             return;
         }
 
+        int potential_commulated = 0;
         for (TaskBlock tb : TaskBroContainer.getTaskBlocks()) {
             View row = inflater.inflate(R.layout.text_item_with_description, task_block_container, false);
             if (Util.earlierDate(tb.getEnd(), new GregorianCalendar())) {
@@ -81,12 +82,15 @@ public class PotentialActivity extends AppCompatActivity {
                 ((TextView)row.findViewById(R.id.description_of_item)).setText("Aufgaben ohne Deadlines");
                 ((TextView)row.findViewById(R.id.text_of_item)).setVisibility(View.GONE);
             } else {
-                ((TextView)row.findViewById(R.id.description_of_item)).setText(Util.getFormattedDateTimeToDateTime(tb.getStart(), tb.getEnd()));
+//                ((TextView)row.findViewById(R.id.description_of_item)).setText(Util.getFormattedDateTimeToDateTime(tb.getStart(), tb.getEnd()));
+                ((TextView)row.findViewById(R.id.description_of_item)).setText("Bis: " + Util.getFormattedDateTime(tb.getEnd()));
             }
-            ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedPotential(tb.getPotential()));
-            if (tb.getPotential() < 0) {
+            potential_commulated += tb.getPotential();
+            ((TextView)row.findViewById(R.id.text_of_item)).setText(Util.getFormattedPotential(potential_commulated));
+
+            if (potential_commulated < 0) {
                 ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.COLOR_ATTENTION);
-            } else if (tb.getPotential() > 0){
+            } else if (potential_commulated > 0){
                 ((TextView)row.findViewById(R.id.text_of_item)).setTextColor(Settings.COLOR_PERFECT);
             }
 

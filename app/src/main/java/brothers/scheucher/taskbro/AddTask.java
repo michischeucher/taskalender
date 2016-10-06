@@ -337,6 +337,7 @@ public class AddTask extends AppCompatActivity {
 
             task.save(this);
             TaskBroContainer.addTaskToList(task);
+
             TaskBroContainer.createCalculatingJob(activity);
 
 //            MyNotifications.setAlarmNotification(this);

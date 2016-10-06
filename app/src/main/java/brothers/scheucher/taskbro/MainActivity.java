@@ -116,10 +116,10 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, UserSettingActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_calc_days) {
+        } /*else if (id == R.id.action_calc_days) {
             TaskBroContainer.createCalculatingJob(this);
             return true;
-        } else if (id == R.id.action_calc_days_synchron) {
+        }*/ else if (id == R.id.action_calc_days_synchron) {
             TaskBroContainer.calculateDays(activity);
             Calender.notifyChanges();
             MainActivity.notifyChanges();
@@ -189,12 +189,12 @@ public class MainActivity extends AppCompatActivity
             event_not_done.setVisibility(ImageView.VISIBLE);
             if (!task.hasRepeat()) {
                 task.setRemaining_duration(task.getRemaining_duration() + event.getDurationInMinutes());
+                task.save(this);
             }
-            task.save(this);
 
             event.setNot_created_by_user(true);
             event.delete(this);
-            TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
+//            TaskBroContainer.addEventToList(event); //because it should be visible anyway while there is no new calculation
             TaskBroContainer.createCalculatingJob(activity);
         }
     }

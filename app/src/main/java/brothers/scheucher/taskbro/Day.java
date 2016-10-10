@@ -187,8 +187,9 @@ public class Day implements Comparable {
 
     private int checkAvailableWorkTime(int available_work_time, boolean set_worked, boolean without_task_events) {
         int already_worked = calculateWorkedTime(without_task_events);
+        int already_distributed_task_events = calculateDistributedTime();
 
-        int difference = day_settings.getTotalDurationInMinutes() - already_worked;
+        int difference = day_settings.getTotalDurationInMinutes() - already_worked - already_distributed_task_events;
         if (set_worked) {
             difference -= this.already_distributed;
         }
@@ -209,6 +210,16 @@ public class Day implements Comparable {
         }
     }
 
+    private int calculateDistributedTime() {
+        int distributed = 0;
+        for (MyEvent e : this.events) {
+            if (e.isNot_created_by_user() && e.getTask() != null && !e.isRepeatingTaskEvent()) {
+                distributed += e.getDurationInMinutes();
+            }
+        }
+        return distributed;
+    }
+
     private int calculateWorkedTime(boolean without_task_events) {
         DayScheduler scheduler = new DayScheduler(this.start);
         scheduler.addBlockingTime(this.start, 0, day_settings.getEarliest_minute());
@@ -223,26 +234,26 @@ public class Day implements Comparable {
     }
 
     public void addTask(Task task) {
-        if (task.already_distributed_duration == task.getRemaining_duration()) {
-            //dont need more time...
-            return;
-        }
-
-        int available_work_time = getAvailableWorkTime(false) - this.already_distributed;
-        int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
-        if (available_work_time > 0 && work_time_for_that_task == 0) {
-            work_time_for_that_task = 1;
-        }
-
-        if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
-            work_time_for_that_task = task.getRemaining_duration() - task.already_distributed_duration; //rest of duration...
-            task.already_distributed_duration = task.getRemaining_duration();
-        } else {
-            task.already_distributed_duration += work_time_for_that_task;
-        }
-        this.already_distributed += work_time_for_that_task;
-
-        //addTaskWithDuration(task, work_time_for_that_task);
+//        if (task.already_distributed_duration == task.getRemaining_duration()) {
+//            //dont need more time...
+//            return;
+//        }
+//
+//        int available_work_time = getAvailableWorkTime(false) - this.already_distributed;
+//        int work_time_for_that_task = (int)(available_work_time * task.getFilling_factor());
+//        if (available_work_time > 0 && work_time_for_that_task == 0) {
+//            work_time_for_that_task = 1;
+//        }
+//
+//        if (work_time_for_that_task > (task.getRemaining_duration() - task.already_distributed_duration)) { //not necessary to have so much time... ;)
+//            work_time_for_that_task = task.getRemaining_duration() - task.already_distributed_duration; //rest of duration...
+//            task.already_distributed_duration = task.getRemaining_duration();
+//        } else {
+//            task.already_distributed_duration += work_time_for_that_task;
+//        }
+//        this.already_distributed += work_time_for_that_task;
+//
+//        //addTaskWithDuration(task, work_time_for_that_task);
     }
 
     public void createTaskEvents(ArrayList<TaskWithDuration> task_durations) {
@@ -634,6 +645,7 @@ public class Day implements Comparable {
         ArrayList<MyEvent> worked_task_events = getListWorkedTaskEvents();
         for (MyEvent e : worked_task_events) {
             Log.d(tag, "worked task event = " + e.description() + description());
+            e.getTask().already_distributed_duration -= e.getDurationInMinutes();
         }
 
         for (TaskBlock tb : TaskBroContainer.getTaskBlocks()) {
@@ -660,36 +672,23 @@ public class Day implements Comparable {
                 correct_task_duration.add(twd);
                 tasks_to_ignore.add(twd.getTask());
             }
-        }
-/*
-        for (MyEvent wte : worked_task_events) {
-            for (TaskWithDuration twd : task_durations) {
-                if (twd.getTask() == wte.getTask()) { //if there is already worked today
-                    int diff = twd.getDurationInMinutes() - wte.getDurationInMinutes();
-                    if (diff > 0) {
-                        twd.addDuration(-wte.getDurationInMinutes());
-                        correct_task_duration.add(twd);
-                   } else { //more worked than necessary! or exactly equal work time!
-                        twd.setDuration(0);
-                    }
-                    tasks_to_ignore.add(twd.getTask());
-                }
-            }
-        }
-        */
-        for (TaskWithDuration twd : task_durations) {
+
             twd.getTask().already_distributed_duration -= twd.getDurationInMinutes();
+            Log.d(tag, "#2) " + twd.getTask().description() + " => " + twd.getTask().already_distributed_duration + " twd.getDuration = " + twd.getDurationInMinutes());
         }
+
+        resetForCalculation(activity);
 
         int wieder_freie_zeit = 0;
         for (TaskWithDuration twd : correct_task_duration) {
             wieder_freie_zeit += twd.getDurationInMinutes();
             twd.getTask().already_distributed_duration += twd.getDurationInMinutes();
-            Log.d(tag, "correct = " + twd.getTask().description() + " with duration = " + twd.getDurationInMinutes());
+            Log.d(tag, "#3) " + twd.getTask().description() + " => " + twd.getTask().already_distributed_duration +  " with duration = " + twd.getDurationInMinutes());
         }
 
-        resetForCalculation(activity);
         createTaskEvents(correct_task_duration);
+
+
 
         // 3) übrig gebliebene zeit wieder neu vergeben
         //nicht notwendig, da eh possible worktime berechnet wird und die anderen tasks bereits drinnen sind!

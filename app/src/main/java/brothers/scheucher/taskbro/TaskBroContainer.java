@@ -758,6 +758,9 @@ public class TaskBroContainer {
         days_lock.writeLock().unlock();
 
         ArrayList<TaskBlock> task_blocks_new = calculateBlocks(activity);
+        if (task_blocks_new == null) {
+            return;
+        }
         resetForCalculation(activity);
         calculatePotentialOfBlocks(activity, task_blocks_new);
 
@@ -986,6 +989,7 @@ public class TaskBroContainer {
 
                         //setting some things
                         t.already_distributed_duration += work_time_for_that_task;
+                        Log.d(tag, "#1) " + t.description() + " => " + t.already_distributed_duration);
 
                         time_to_distribute -= work_time_for_that_task;
 
